@@ -1,6 +1,6 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}DTS{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -9,101 +9,142 @@
 
 
 {% block navbar %}
-<div class="navbar navbar-duomi navbar-static-top" role="navigation">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">Flasky</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="/">Home</a></li>
-            </ul>
-        </div>
+<html>
+ <head></head>
+ <body>
+  <div class="navbar navbar-duomi navbar-static-top" role="navigation">
+   <div class="container-fluid">
+    <div class="navbar-header">
+     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+     <a class="navbar-brand" href="/">DTS</a>
     </div>
-</div>
-<div class="container-fluid">
+    <div class="navbar-collapse collapse">
+     <ul class="nav navbar-nav">
+      <li><a href="/">首页</a></li>
+     </ul>
+    </div>
+   </div>
+  </div>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-2">
+     <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="">
+      <li> <a href="#"> <i class="glyphicon glyphicon-th-large"></i> 首页 </a> </li>
+      <li> <a href="#systemSetting" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-cog"></i> 我的工作台 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
+       <ul id="systemSetting" class="nav nav-list collapse secondmenu" style="height: 0px;">
+        <li class="active"><a href="#"><i class="glyphicon glyphicon-user"></i>&nbsp;我的待办</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-th-list"></i>&nbsp;待处理问题</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-asterisk"></i>&nbsp;我创建的问题</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-edit"></i>&nbsp;抄送我的问题</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;我关注的问题</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-modify"></i>&nbsp;我修改的问题</a></li>
+       </ul> </li>
+      <li> <a href="#configSetting" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-credit-card"></i> 问题单浏览 <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
+       <ul id="configSetting" class="nav nav-list collapse secondmenu">
+        <li class="active"><a href="#"><i class="glyphicon glyphicon-globe"></i>&nbsp;全局缺省配置</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-star-empty"></i>&nbsp;未开通用户配置</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-star"></i>&nbsp;退订用户配置</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-text-width"></i>&nbsp;试用用户配置</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-ok-circle"></i>&nbsp;开通用户配置</a></li>
+       </ul> </li>
+      <li> <a href="#disSetting" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-globe"></i> 我的浏览 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
+       <ul id="disSetting" class="nav nav-list secondmenu collapse">
+        <li><a href="#"><i class="glyphicon glyphicon-th-list"></i>&nbsp;分发包配置</a></li>
+       </ul> </li>
+      <li> <a href="#dicSetting" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-bold"></i> 字典配置 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
+       <ul id="dicSetting" class="nav nav-list secondmenu collapse">
+        <li><a href="#"><i class="glyphicon glyphicon-text-width"></i>&nbsp;关键字配置</a></li>
+       </ul> </li>
+      <li> <a href="#"> <i class="glyphicon glyphicon-fire"></i> 关于系统 <span class="badge pull-right">1</span> </a> </li>
+     </ul>
+    </div>
+    <div class="col-md-10">
+     <div class="btn-group btn-group-lg" role="group" aria-label="...">
+      <button type="button" class="btn btn-primary">标准流程</button>
+      <button type="button" class="btn btn-info">简易流程</button>
+      <button type="button" class="btn btn-default">Right5</button>
+     </div>
+    <hr>
+    <div class="btn-group btn-group-lg">
+       <button type="button" class="btn btn-default">选择列</button>
+       <button type="button" class="btn btn-default dropdown-toggle"
+          data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">切换下拉菜单</span>
+       </button>
+       <ul class="dropdown-menu" role="menu">
+          <li><a href="#">功能</a></li>
+          <li><a href="#">另一个功能</a></li>
+          <li><a href="#">其他</a></li>
+          <li class="divider"></li>
+          <li><a href="#">分离的链接</a></li>
+       </ul>
+
+    <div class="btn-group btn-group-lg">
+       <button type="button" class="btn btn-primary">导出数据</button>
+       <button type="button" class="btn btn-primary dropdown-toggle"
+          data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">切换下拉菜单</span>
+       </button>
+       <ul class="dropdown-menu" role="menu">
+          <li><a href="#">功能</a></li>
+          <li><a href="#">另一个功能</a></li>
+          <li><input type="text" class="form-control"></input></li>
+          <li class="divider"></li>
+          <li><a href="#">分离的链接</a></li>
+        </ul>
+    </div>
     <div class="row">
-        <div class="col-md-2">
-            <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="">
-                                <li>
-                                    <a href="#">
-                                        <i class="glyphicon glyphicon-th-large"></i>
-                                        首页
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#systemSetting" class="nav-header collapsed" data-toggle="collapse">
-                            					  <i class="glyphicon glyphicon-cog"></i>
-                            					  系统管理
-                               			    <span class="pull-right glyphicon glyphicon-chevron-toggle"></span>
-                        						</a>
-		                                <ul id="systemSetting" class="nav nav-list collapse secondmenu" style="height: 0px;">
-			                                <li class="active"><a href="#"><i class="glyphicon glyphicon-user"></i>&nbsp;用户管理</a></li>
-						                          <li><a href="#"><i class="glyphicon glyphicon-th-list"></i>&nbsp;菜单管理</a></li>
-						                          <li><a href="#"><i class="glyphicon glyphicon-asterisk"></i>&nbsp;角色管理</a></li>
-						                          <li><a href="#"><i class="glyphicon glyphicon-edit"></i>&nbsp;修改密码</a></li>
-						                          <li><a href="#"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;日志查看</a></li>
-		                       	 				</ul>
-                                </li>
-                                <li>
-                                    <a href="#configSetting" class="nav-header collapsed" data-toggle="collapse">
-                                        <i class="glyphicon glyphicon-credit-card"></i>
-                                        配置管理
-                                        <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span>
-                                    </a>
-                                    <ul id="configSetting" class="nav nav-list collapse secondmenu">
-                                        <li class="active"><a href="#"><i class="glyphicon glyphicon-globe"></i>&nbsp;全局缺省配置</a></li>
-                                        <li><a href="#"><i class="glyphicon glyphicon-star-empty"></i>&nbsp;未开通用户配置</a></li>
-                                        <li><a href="#"><i class="glyphicon glyphicon-star"></i>&nbsp;退订用户配置</a></li>
-                                        <li><a href="#"><i class="glyphicon glyphicon-text-width"></i>&nbsp;试用用户配置</a></li>
-                                        <li><a href="#"><i class="glyphicon glyphicon-ok-circle"></i>&nbsp;开通用户配置</a></li>
-                                    </ul>
-                                </li>
-
-                                <li>
-                                    <a href="#disSetting" class="nav-header collapsed" data-toggle="collapse">
-                                        <i class="glyphicon glyphicon-globe"></i>
-                                        分发配置
-            							 							<span class="pull-right glyphicon glyphicon-chevron-toggle"></span>
-                                    </a>
-                                    <ul id="disSetting" class="nav nav-list secondmenu collapse">
-                                        <li><a href="#"><i class="glyphicon glyphicon-th-list"></i>&nbsp;分发包配置</a></li>
-                                    </ul>
-                                </li>
-
-                                <li>
-                                    <a href="#dicSetting" class="nav-header collapsed" data-toggle="collapse">
-                                        <i class="glyphicon glyphicon-bold"></i>
-                                        字典配置
-                                        <span class="pull-right glyphicon glyphicon-chevron-toggle"></span>
-                                    </a>
-                                    <ul id="dicSetting" class="nav nav-list secondmenu collapse">
-                                        <li><a href="#"><i class="glyphicon glyphicon-text-width"></i>&nbsp;关键字配置</a></li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i class="glyphicon glyphicon-fire"></i>
-                                        关于系统
-                                        <span class="badge pull-right">1</span>
-                                    </a>
-                                </li>
-            </ul>
-        </div>
-        <div class="col-md-10">
-			    {% block page_content %}
-			    		
-			    {% endblock %}
-		  	</div>
+       <form class="bs-example bs-example-form" role="form">
+        <div class="input-group">
+           <input type="text" class="form-control">
+           <span class="input-group-btn">
+              <button class="btn btn-default" type="button">
+                 Go!
+              </button>
+           </span>
+        </div><!-- /input-group -->
+       </form><!-- bs-example -->
     </div>
-</div>
+    <hr>
+    <div class="form-inline">
+        <div class="form-group">
+          <div class="checkbox"><lable><input type="checkbox"></input>请选择</lable>
+          </div>
+        </div>
+    </div>
+    <table class="table table-bordered">
+       <caption>边框表格布局</caption>
+       <thead>
+          <tr>
+             <th><input type="checkbox"></input></th>
+             <th>城市</th>
+             <th>密码</th>
+          </tr>
+       </thead>
+       <tbody>
+          <tr>
+             <td>Tanmay</td>
+             <td>Bangalore</td>
+             <td>560001</td>
+          </tr>
+          <tr>
+             <td>Sachin</td>
+             <td>Mumbai</td>
+             <td>400003</td>
+          </tr>
+          <tr>
+             <td>Uma</td>
+             <td>Pune</td>
+             <td>411027</td>
+          </tr>
+       </tbody>
+    </table>
+
+    </div>
+   </div>
+  </div>
+ </body>
+</html>
 {% endblock %}
-
-
-
