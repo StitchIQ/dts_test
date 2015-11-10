@@ -1,0 +1,201 @@
+<html>
+<title>Move</title>
+<meta http-equiv="Content-Type" mrc="text/html; charset=utf-8">
+<style type="text/css">
+.bg td{
+font-size:12px;
+text-align:left;
+line-height:15px;
+height:20px;
+}
+.bg td.tit{
+    background-color:#e2e2e2;
+    height:17px;
+	text-align:center;
+	line-height:15px;
+}
+.bg td.num{
+    background-color:#e2e2e2;
+	text-align:right;
+	line-height:15px;
+	width:30px;
+	height:22px;
+}
+.resizeDivClass{
+   text-align:right;
+   width:1px;
+   margin:0px 0 0px 0;
+   background:#fff;
+   border:0px;
+   float:right;
+   cursor:e-resize;
+}
+</style>
+<script language="javascript">
+function MouseDownToResize(obj){
+setTableLayoutToFixed();
+obj.mouseDownX=event.clientX;
+obj.pareneTdW=obj.parentElement.offsetWidth;
+obj.pareneTableW=theObjTable.offsetWidth;
+obj.setCapture();
+}
+function MouseMoveToResize(obj){
+    if(!obj.mouseDownX) return false;
+    var newWidth=obj.pareneTdW*1+event.clientX*1-obj.mouseDownX;
+    if(newWidth>10)
+    {
+	var theObjTable = document.getElementById("theObjTable");
+	obj.parentElement.style.width = newWidth;
+	theObjTable.style.width=obj.pareneTdW*1+event.clientX*1-obj.mouseDownX;
+	}
+}
+function MouseUpToResize(obj){
+obj.releaseCapture();
+obj.mouseDownX=0;
+}
+function setTableLayoutToFixed()
+{
+ var theObjTable = document.getElementById("theObjTable");
+ if(theObjTable.style.tableLayout=='fixed') return;
+   var headerTr=theObjTable.rows[0];
+    for(var i=0;i<headerTr.cells.length;i++)
+    {
+    headerTr.cells[i].styleOffsetWidth=headerTr.cells[i].offsetWidth;
+    }
+
+    for(var i=0;i<headerTr.cells.length;i++)
+    {
+    headerTr.cells[i].style.width=headerTr.cells[i].styleOffsetWidth;
+    }
+    theObjTable.style.tableLayout='fixed';
+}
+</script>
+<script language="javascript"><!--
+function theObjTable(o,a,b,c){
+	var t=document.getElementById(o).getElementsByTagName("tr");
+	for(var i=0;i<t.length;i++){
+		t[i].style.backgroundColor=(t[i].sectionRowIndex%2==0)?a:b;
+		t[i].onclick=function(){
+			if(this.x!="1"){
+			}else{
+				this.x="0";
+				this.style.backgroundColor=(this.sectionRowIndex%2==0)?a:b;
+			}
+		}
+		t[i].onmouseover=function(){
+			if(this.x!="1")this.style.backgroundColor=c;
+		}
+		t[i].onmouseout=function(){
+			if(this.x!="1")this.style.backgroundColor=(this.sectionRowIndex%2==0)?a:b;
+		}
+	}
+}
+--></script>
+<body >
+<table width="100%"  class="bg"   border=1 cellspacing=0   bordercolorlight="#7b7b7b"  bordercolordark="#efefef" id="theObjTable" >
+       <tr >
+            <td class="num" >NO</td>
+            <td width="100px" class="tit" >
+            <span class="resizeDivClass" onMouseDown="MouseDownToResize(this);" onMouseMove="MouseMoveToResize(this);" onMouseUp="MouseUpToResize(this);"></span>
+            Company
+            </td>
+            <td class="tit" >
+            <span class="resizeDivClass" onMouseDown="MouseDownToResize(this);" onMouseMove="MouseMoveToResize(this);" onMouseUp="MouseUpToResize(this);"></span>
+            OrderCustom
+            </td>
+            <td class="tit" >
+            <span class="resizeDivClass" onMouseDown="MouseDownToResize(this);" onMouseMove="MouseMoveToResize(this);" onMouseUp="MouseUpToResize(this);"></span>
+            Dept
+            </td>
+            <td class="tit" >
+            <span class="resizeDivClass" onMouseDown="MouseDownToResize(this);" onMouseMove="MouseMoveToResize(this);" onMouseUp="MouseUpToResize(this);"></span>
+            User
+            </td>
+            <td class="tit" >
+            <span class="resizeDivClass" onMouseDown="MouseDownToResize(this);" onMouseMove="MouseMoveToResize(this);" onMouseUp="MouseUpToResize(this);"></span>
+            Money
+            </td>
+      </tr>
+      <tr  >
+           <td  class="num" >1</td>
+           <td >ChinaTel</td>
+           <td >OrderName</td>
+           <td >AD pate</td>
+           <td >Wanttianyi</td>
+           <td >Cash</td>
+      </tr >
+      <tr  >
+           <td class="num" >2</td>
+           <td >ChinaMove</td>
+           <td >OrderName</td>
+           <td >Market</td>
+           <td >Lixiaohong</td>
+           <td >Critse</td>
+      </tr >
+      <tr  >
+           <td class="num" >3</td>
+           <td >ChinaUnion</td>
+           <td >OrderName</td>
+           <td >Market</td>
+           <td >Wanglaoer</td>
+           <td >Card</td>
+      </tr >
+</table>
+<script language="javascript"><!--
+theObjTable("theObjTable","#c0c0c0","#fff","#a3a2a2");
+--></script>
+</body>
+</html> <html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>Mouse Move</title>
+</head>
+
+<body>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+var currentMoveObj = null;
+var relLeft;
+var relTop;
+function f_mdown(obj)
+{
+    currentMoveObj = obj;
+    currentMoveObj.style.position = "absolute";
+    relLeft = event.x - currentMoveObj.style.pixelLeft;
+    relTop = event.y - currentMoveObj.style.pixelTop;
+}
+window.document.onmouseup = function()
+{
+    currentMoveObj = null;
+}
+function f_move(obj)
+{
+    if(currentMoveObj != null)
+    {
+        currentMoveObj.style.pixelLeft=event.x-relLeft;
+        currentMoveObj.style.pixelTop=event.y-relTop;
+    }
+}
+
+//-->
+</SCRIPT>
+<BODY>
+<TABLE width="290" border=1 onselectstart="return false" style="position:absolute;left:80;top:70" onmousedown="f_mdown(this)" onmousemove="f_move(this)">
+<TR>
+    <TD bgcolor="#F8F8F8" align="center" style="cursor:move">title1</TD>
+</TR>
+<TR>
+    <TD align="center" height="60">content</TD>
+</TR>
+</TABLE>
+<TABLE width="260" border=1 onselectstart="return false" style="position:absolute;left:330;top:260" onmousedown="f_mdown(this)" onmousemove="f_move(this)">
+<TR>
+    <TD bgcolor="#F8F8F8" align="center" style="cursor:move">title2</TD>
+</TR>
+<TR>
+    <TD align="center" height="60">content</TD>
+</TR>
+</TABLE>
+</body>
+</html>
