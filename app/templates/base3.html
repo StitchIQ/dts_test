@@ -28,11 +28,17 @@
           </div>
           <div class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
-                  <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                  <li><a href="{{ url_for('main.newbug') }}">NewBug</a></li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
-                  {% if current_user.is_authenticated() %}
-                  <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                  {% if current_user.is_authenticated %}
+                  <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
+                      <ul class="dropdown-menu">
+                          <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
+                          <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                      </ul>
+                  </li>
                   {% else %}
                   <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
                   {% endif %}
@@ -40,6 +46,7 @@
           </div>
       </div>
   </div>
+
 
 
   <div class="container-fluid">
@@ -77,7 +84,8 @@
     </div>
     <div class="col-md-10">
      <div class="btn-group btn-group-lg" role="group" aria-label="...">
-      <button type="button" class="btn btn-primary">标准流程</button>
+      <a herf="{{ url_for('main.newbug') }}">
+      <button type="button" class="btn btn-primary">标准流程</button></a>
       <button type="button" class="btn btn-info">简易流程</button>
       <button type="button" class="btn btn-default">Right5</button>
      </div>
