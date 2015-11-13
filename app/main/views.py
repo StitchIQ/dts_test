@@ -1,9 +1,10 @@
 from flask import render_template, redirect, request, url_for, flash
 from flask.ext.login import login_user, logout_user, login_required, \
 	current_user
-
+from .. import db
 from . import main
 from .forms import StandardBug
+from ..models import Bugs
 
 
 @main.route('/')
@@ -13,10 +14,23 @@ def index():
 @main.route('/newbugs', methods=['GET', 'POST'])
 @login_required
 def newbug():
-    form = StandardBug()
-    if form.validate_on_submit():
-        flash('Bugs password.')
-    return render_template("standard_bug.html", form=form)
+	form = StandardBug()
+	if form.validate_on_submit():
+		bug = Bugs(product_name=form.product_name.data,
+			product_version = form.product_version.data,
+			software_version = form.software_version.data,
+			bug_level = form.bug_level.data,
+			system_view = form.system_view.data,
+			bug_show_times = form.bug_show_times.data,
+			bug_title = form.bug_title.data,
+			bug_descrit = form.bug_descrit.data,
+			bug_owner_id = form.bug_owner_id.data,
+			author_id = current_user._get_current_object())
+		db.session.add(bug)
+		db.session.commit()
+		#bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+		flash('Bugs password.')
+	return render_template("standard_bug.html", form=form)
 
 '''
 @main.route('/change-password', methods=['GET', 'POST'])

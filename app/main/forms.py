@@ -11,13 +11,15 @@ class NameForm(Form):
 
 
 class StandardBug(Form):
-    wentimiaoshu = StringField('Email', validators=[Required(), Length(1, 64)])
-    chanpinmingcheng = StringField('Email', validators=[Required(), Length(1, 64)])
-    banbenhao = StringField('Email', validators=[Required(), Length(1, 64)])
-    yanzhongxing = StringField('Email', validators=[Required(), Length(1, 64)])
-    ceshibuzhou = StringField('Email', validators=[Required(), Length(1, 64)])
-    xitongbiaoxian = StringField('Email', validators=[Required(), Length(1, 64)])
-    chuxianpinlv = StringField('Email', validators=[Required(), Length(1, 64)])
-    password = PasswordField('Password', validators=[Required()])
-    remember_me = BooleanField('Keep me logged in')
+    product_name = StringField('产品名称', validators=[Required(), Length(1, 64)])
+    product_version = StringField('产品版本号', validators=[Required(), Length(1, 64)])
+    software_version = StringField('软件版本号', validators=[Required(), Length(1, 64)])
+    bug_level = StringField('严重程度', validators=[Required(), Length(1, 64)])
+    system_view = StringField('系统表现', validators=[Required(), Length(1, 64)])
+    bug_show_times = StringField('出现频率', validators=[Required(), Length(1, 64)])
+    bug_title = StringField('问题标题', validators=[Required(), Length(1, 64)])
+    bug_descrit = StringField('问题描述', validators=[Required(), Length(1, 64)])
+    bug_owner_id = StringField('问题处理人', validators=[Required(), Email()])
+
+    save = SubmitField('保存')
     submit = SubmitField('提交')

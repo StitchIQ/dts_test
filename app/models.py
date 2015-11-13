@@ -1,3 +1,4 @@
+from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
@@ -58,3 +59,22 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+class Bugs(db.Model):
+    __tablename__ = 'bugs'
+    id = db.Column(db.Integer, primary_key=True)
+    product_name = db.Column(db.Text)
+    product_version = db.Column(db.Text)
+    software_version = db.Column(db.Text)
+    bug_level = db.Column(db.Text)
+    system_view = db.Column(db.Text)
+    bug_show_times = db.Column(db.Text)
+    bug_title = db.Column(db.Text)
+    bug_descrit = db.Column(db.Text)
+    bug_owner_id = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    #comments = db.relationship('Comment', backref='post', lazy='dynamic')
+
+    def __repr__(self):
+        return '<User %r>' % self.id
