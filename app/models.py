@@ -1,7 +1,10 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+import bleach
+from markdown import markdown
 from flask import current_app
+
 from flask.ext.login import UserMixin
 from . import db, login_manager
 
@@ -65,18 +68,29 @@ class Bugs(db.Model):
     __tablename__ = 'bugs'
     id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    product_name = db.Column(db.String(64), default='1')
-    product_version = db.Column(db.String(64), default='1')
-    software_version = db.Column(db.String(64), default='1')
-    bug_level = db.Column(db.String(64), default='1')
-    system_view = db.Column(db.String(64), default='1')
-    bug_show_times = db.Column(db.String(64), default='1')
-    bug_title = db.Column(db.String(64), default='1')
-    bug_descrit = db.Column(db.String(64), default='1')
-    bug_owner_id = db.Column(db.String(64), default='1')
+    product_name = db.Column(db.String(64))
+    product_version = db.Column(db.String(64))
+    software_version = db.Column(db.String(64))
+    bug_level = db.Column(db.String(64))
+    system_view = db.Column(db.String(64))
+    bug_show_times = db.Column(db.String(64))
+    bug_title = db.Column(db.String(64))
+    bug_descrit = db.Column(db.Text)
+    bug_owner_id = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     # comments = db.relationship('Comment', backref='post', lazy='dynamic')
 
     def __repr__(self):
         return '<User %r>' % self.id
+
+    @staticmethod
+    def on_changed_bug_descrit(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'p']
+        target.body_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'),
+            tags=allowed_tags, strip=True))
+
+db.event.listen(Bugs.bug_descrit, 'set', Bugs.on_changed_bug_descrit)

@@ -1,9 +1,10 @@
+#coding=utf-8
 from flask import render_template, redirect, request, url_for, flash
 from flask.ext.login import login_user, logout_user, login_required, \
 	current_user
 from .. import db
 from . import main
-from .forms import StandardBug
+from .forms import StandardBug, BugsProcess
 from ..models import Bugs, User
 
 
@@ -11,12 +12,13 @@ from ..models import Bugs, User
 def index():
     return render_template('index.html')
 
-@main.route('/newbugs', methods=['GET', 'POST'])
+@main.route('/newbugs/', methods=['GET', 'POST'])
 @login_required
 def newbug():
 	form = StandardBug()
 	if form.validate_on_submit():
 		bug = Bugs(product_name=form.product_name.data,
+		product_version=form.product_version.data,
 		software_version=form.software_version.data,
 		bug_level=form.bug_level.data,
 		system_view=form.system_view.data,
@@ -30,21 +32,20 @@ def newbug():
 		db.session.commit()
 		# bug_owner_id=form.bug_owner_id.data,
 		# bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-		flash('Bugs password.')
+		flash('Bugs 提交成功.')
+		return redirect(url_for('.bug_process', id=33))
 	return render_template("standard_bug.html", form=form)
 
-'''
-@main.route('/change-password', methods=['GET', 'POST'])
+
+@main.route('/bug_process/<int:id>', methods=['GET', 'POST'])
 @login_required
-def change_password():
-    form = ChangePasswordForm()
+def bug_process(id):
+    post = Bugs.query.get_or_404(id)
+    form = BugsProcess()
     if form.validate_on_submit():
-        if current_user.verify_password(form.old_password.data):
-            current_user.password = form.password.data
-            db.session.add(current_user)
-            flash('Your password has been updated.')
-            return redirect(url_for('main.index'))
-        else:
-            flash('Invalid password.')
-    return render_template("auth/change_password.html", form=form)
-'''
+        post.bug_descrit = form.bug_descrit.data
+        db.session.add(post)
+        flash('The post has been updated.')
+        return redirect(url_for('.bug_process', id=post.id))
+    form.bug_descrit.data = post.bug_descrit
+    return render_template('bugs.html', form=form)

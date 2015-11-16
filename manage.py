@@ -22,30 +22,8 @@ def test():
 	tests = unittest.TestLoader().discover('tests')
 	unittest.TextTestRunner(verbosity=2).run(tests)
 
-"""
-@app.route('/')
-def index():
-	return render_template('index.html')
-
-@app.route("/base2")
-def base2():
-# 主页面
-    return render_template('base2.html')
-
-
-@app.route("/main")
-def main():
-# 主页面
-    return render_template('main.html')
-
-@app.route('/add')
-def add_numbers():
-    #Add two numbers server side, ridiculous but well...
-    a = request.args.get('a', 0, type=int)
-    b = request.args.get('b', 0, type=int)
-    return jsonify(result = a + b)
-"""
 
 
 if __name__ == '__main__':
 	manager.run()
+	#app.run(host="0.0.0.0",port=8000)
