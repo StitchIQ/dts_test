@@ -47,5 +47,5 @@ def bug_process(id):
         db.session.add(post)
         flash('The post has been updated.')
         return redirect(url_for('.bug_process', id=post.id))
-	form.bug_descrit.data = post.bug_descrit
+    form.bug_descrit.data = post.bug_descrit
     return render_template('bugs.html', form=form)

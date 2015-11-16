@@ -37,9 +37,10 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
-    logout_user()
-    flash('You have been logged out.')
-    return redirect(url_for('main.index'))
+	user_name = current_user.username
+	logout_user()
+	flash('You have been logged out. %s'%user_name)
+	return redirect(url_for('main.index'))
 
 
 @auth.route('/register', methods=['GET', 'POST'])
