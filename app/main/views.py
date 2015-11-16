@@ -42,10 +42,10 @@ def newbug():
 def bug_process(id):
     post = Bugs.query.get_or_404(id)
     form = BugsProcess()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and current_user == post.author:
         post.bug_descrit = form.bug_descrit.data
         db.session.add(post)
         flash('The post has been updated.')
         return redirect(url_for('.bug_process', id=post.id))
-    form.bug_descrit.data = post.bug_descrit
+	form.bug_descrit.data = post.bug_descrit
     return render_template('bugs.html', form=form)

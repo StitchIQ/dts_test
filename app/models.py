@@ -19,6 +19,39 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
 
+class Bugs(db.Model):
+    __tablename__ = 'bugs'
+    id = db.Column(db.Integer, primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    product_name = db.Column(db.String(64))
+    product_version = db.Column(db.String(64))
+    software_version = db.Column(db.String(64))
+    bug_level = db.Column(db.String(64))
+    system_view = db.Column(db.String(64))
+    bug_show_times = db.Column(db.String(64))
+    bug_title = db.Column(db.String(64))
+    bug_descrit = db.Column(db.Text)
+    bug_descrit_html = db.Column(db.Text)
+    bug_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    # comments = db.relationship('Comment', backref='post', lazy='dynamic')
+
+    def __repr__(self):
+        return '<User %r>' % self.id
+
+    @staticmethod
+    def on_changed_bug_descrit(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'p']
+        target.bug_descrit_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'),
+            tags=allowed_tags, strip=True))
+
+db.event.listen(Bugs.bug_descrit, 'set', Bugs.on_changed_bug_descrit)
+
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -27,8 +60,14 @@ class User(UserMixin, db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
-    bugs = db.relationship('Bugs', backref='author', lazy='dynamic')
 
+    bugs = db.relationship('Bugs',
+                           foreign_keys=[Bugs.author_id],
+                           backref='author', lazy='dynamic')
+
+    bugs_owner = db.relationship('Bugs',
+                                 foreign_keys=[Bugs.bug_owner_id],
+                                 backref='bug_owner', lazy='dynamic')
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -64,33 +103,3 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-class Bugs(db.Model):
-    __tablename__ = 'bugs'
-    id = db.Column(db.Integer, primary_key=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    product_name = db.Column(db.String(64))
-    product_version = db.Column(db.String(64))
-    software_version = db.Column(db.String(64))
-    bug_level = db.Column(db.String(64))
-    system_view = db.Column(db.String(64))
-    bug_show_times = db.Column(db.String(64))
-    bug_title = db.Column(db.String(64))
-    bug_descrit = db.Column(db.Text)
-    bug_owner_id = db.Column(db.String(64))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-
-    # comments = db.relationship('Comment', backref='post', lazy='dynamic')
-
-    def __repr__(self):
-        return '<User %r>' % self.id
-
-    @staticmethod
-    def on_changed_bug_descrit(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
-                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
-                        'h1', 'h2', 'h3', 'p']
-        target.body_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
-            tags=allowed_tags, strip=True))
-
-db.event.listen(Bugs.bug_descrit, 'set', Bugs.on_changed_bug_descrit)
