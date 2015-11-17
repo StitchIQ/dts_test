@@ -1,8 +1,9 @@
 #coding=utf-8
 from flask.ext.wtf import Form
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
+
 from flask.ext.pagedown.fields import PageDownField
 
 
@@ -23,9 +24,17 @@ class StandardBug(Form):
     #bug_descrit = StringField('问题描述', validators=[Required(), Length(1, 64)])
     bug_owner_id = StringField('问题处理人', validators=[Required(), Email()])
 
-    save = SubmitField('保存')
+    #save = SubmitField('保存')
     submit = SubmitField('提交')
 
 class BugsProcess(Form):
-    bug_descrit = PageDownField("What's on your mind?", validators=[Required()])
-    submit = SubmitField('Submit')
+    product_name = StringField('产品名称')
+    product_version = StringField('产品版本号')
+    software_version = StringField('软件版本号')
+    bug_level = StringField('严重程度')
+    system_view = StringField('系统表现')
+    bug_show_times = StringField('出现频率')
+    bug_title = StringField('问题标题')
+    bug_descrit = TextAreaField('问题描述')
+
+    bug_owner_id = StringField('问题处理人')

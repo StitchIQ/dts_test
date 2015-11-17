@@ -2,6 +2,7 @@
 from flask import render_template, redirect, request, url_for, flash
 from flask.ext.login import login_user, logout_user, login_required, \
 	current_user
+from wtforms_components import read_only
 from .. import db
 from . import main
 from .forms import StandardBug, BugsProcess
@@ -47,5 +48,23 @@ def bug_process(id):
         db.session.add(post)
         flash('The post has been updated.')
         return redirect(url_for('.bug_process', id=post.id))
+    #form.id.data = post.id
+    form.product_name.data = post.product_name
+    form.product_version.data = post.product_version
+    form.software_version.data = post.software_version
+    form.bug_level.data = post.bug_level
+    form.system_view.data = post.system_view
+    form.bug_show_times.data = post.bug_show_times
     form.bug_descrit.data = post.bug_descrit
+    form.bug_title.data = post.bug_title
+
+    read_only(form.bug_title)
+    read_only(form.product_name)
+    read_only(form.product_version)
+    read_only(form.software_version)
+    read_only(form.bug_level)
+    read_only(form.system_view)
+    read_only(form.bug_show_times)
+    read_only(form.bug_descrit)
+
     return render_template('bugs.html', form=form)
