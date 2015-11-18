@@ -45,7 +45,7 @@ def bug_process(id):
     form = BugsProcess()
     test = NameForm()
     if test.validate_on_submit() and current_user == post.author:
-        post.bug_owner = test.name.data
+        post.bug_owner = post.bug_owner
         db.session.add(post)
         flash('The post has been updated.')
         return redirect(url_for('.bug_process', id=post.id))
@@ -68,4 +68,9 @@ def bug_process(id):
     read_only(form.bug_show_times)
     read_only(form.bug_descrit)
 
-    return render_template('bugs.html', form=form, test=test, post=post)
+    if current_user == post.bug_owner:
+         test = NameForm()
+    else:
+        test = None
+
+    return render_template('bugs.html', form=form, test=test)
