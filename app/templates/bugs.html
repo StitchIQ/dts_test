@@ -88,7 +88,16 @@
     <li> <a href="#buginfo" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-cog"></i> 问题单信息 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
         <ul id="buginfo" class="nav nav-list secondmenu collapse">
         <div class="col-md-4">
-            {{ form.bug_title(readonly="readonly")}}
+            {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
+
+            {% if post.bug_owner == current_user %}
+                {{ wtf.quick_form(test,horizontal_columns=('lg', 2, 20)) }}
+                <li>author is :{{ post.bug_owner }}</li>
+                <li>currenet user is : {{ current_user }}</li>
+            {% else %}
+                <li>bug_owner is 222:{{ post.bug_owner }}</li>
+                <li>currenet user is : {{ current_user }}</li>
+            {% endif %}
 
             <br>
         </div>

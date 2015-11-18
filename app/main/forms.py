@@ -8,7 +8,7 @@ from flask.ext.pagedown.fields import PageDownField
 
 
 class NameForm(Form):
-    name = StringField('What is your name?', validators=[Required()])
+    name = StringField('What is your name?', validators=[Required(), Email()])
     submit = SubmitField('Submit')
 
 
