@@ -33,6 +33,7 @@ class Bugs(db.Model):
     bug_descrit = db.Column(db.Text)
     bug_descrit_html = db.Column(db.Text)
     bug_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    bug_status = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     # comments = db.relationship('Comment', backref='post', lazy='dynamic')
@@ -51,6 +52,12 @@ class Bugs(db.Model):
 
 db.event.listen(Bugs.bug_descrit, 'set', Bugs.on_changed_bug_descrit)
 
+
+class BugStatus(db.Model):
+    __tablename__ = 'bugstatus'
+    id = db.Column(db.Integer, primary_key=True)
+    bug_status = db.Column(db.Integer)
+    bug_status_descrit = db.Column(db.String(64))
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'

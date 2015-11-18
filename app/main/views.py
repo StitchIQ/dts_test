@@ -5,7 +5,8 @@ from flask.ext.login import login_user, logout_user, login_required, \
 from wtforms_components import read_only
 from .. import db
 from . import main
-from .forms import StandardBug, BugsProcess, NameForm
+from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
+    TestLeadEdit2, BugClose
 from ..models import Bugs, User
 
 
@@ -27,7 +28,8 @@ def newbug():
         bug_title=form.bug_title.data,
         bug_descrit=form.bug_descrit.data,
         bug_owner_id=User.query.filter_by(email=form.bug_owner_id.data).first().id,
-        author=current_user._get_current_object())
+        author=current_user._get_current_object(),
+        bug_status=form.bug_status.data)
 
         db.session.add(bug)
         db.session.commit()
@@ -35,6 +37,7 @@ def newbug():
         # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
         flash('Bugs 提交成功.')
         return redirect(url_for('.bug_process', id=33))
+    flash('Bugs 提交失败.')
     return render_template("standard_bug.html", form=form)
 
 
@@ -43,12 +46,43 @@ def newbug():
 def bug_process(id):
     post = Bugs.query.get_or_404(id)
     form = BugsProcess()
-    test = NameForm()
-    if test.validate_on_submit() and current_user == post.author:
-        post.bug_owner = post.bug_owner
+    testleadedit = TestLeadEdit()
+    developedit = DevelopEdit()
+    testleadedit2 = TestLeadEdit2()
+    bugclose = BugClose()
+    if testleadedit.validate_on_submit() and current_user == post.bug_owner:
+        post.bug_owner_id = User.query.filter_by(
+            email=testleadedit.bug_owner_id.data).first().id
+        post.bug_status = testleadedit.bug_status.data
         db.session.add(post)
-        flash('The post has been updated.')
+        flash('The TestLeader has been updated.')
         return redirect(url_for('.bug_process', id=post.id))
+
+    if developedit.validate_on_submit() and current_user == post.bug_owner:
+        post.bug_owner_id = User.query.filter_by(
+            email=developedit.bug_owner_id.data).first().id
+        post.bug_status = developedit.bug_status.data
+        db.session.add(post)
+        flash('The Developer has been updated.')
+        return redirect(url_for('.bug_process', id=post.id))
+
+    if testleadedit2.validate_on_submit() and current_user == post.bug_owner:
+        post.bug_owner_id = User.query.filter_by(
+            email=testleadedit2.bug_owner_id.data).first().id
+        post.bug_status = testleadedit2.bug_status.data
+        db.session.add(post)
+        flash('The TestLeader2 has been updated.')
+        return redirect(url_for('.bug_process', id=post.id))
+
+    if bugclose.validate_on_submit() and current_user == post.bug_owner:
+        post.bug_owner_id = User.query.filter_by(
+            email=bugclose.bug_owner_id.data).first().id
+        post.bug_status = bugclose.bug_status.data
+        db.session.add(post)
+        flash('The Tester has been updated.')
+        return redirect(url_for('.bug_process', id=post.id))
+
+
     #form.id.data = post.id
     form.product_name.data = post.product_name
     form.product_version.data = post.product_version
@@ -68,9 +102,6 @@ def bug_process(id):
     read_only(form.bug_show_times)
     read_only(form.bug_descrit)
 
-    if current_user == post.bug_owner:
-         test = NameForm()
-    else:
-        test = None
-
-    return render_template('bugs.html', form=form, test=test)
+    return render_template('bugs.html', form=form, post=post,
+        testleadedit=testleadedit, developedit=developedit,
+        testleadedit2=testleadedit2, bugclose=bugclose)

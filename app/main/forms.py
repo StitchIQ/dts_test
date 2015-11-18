@@ -1,6 +1,6 @@
 #coding=utf-8
 from flask.ext.wtf import Form
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, RadioField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
 
@@ -20,10 +20,10 @@ class StandardBug(Form):
     system_view = StringField('系统表现', validators=[Required(), Length(1, 64)])
     bug_show_times = StringField('出现频率', validators=[Required(), Length(1, 64)])
     bug_title = StringField('问题标题', validators=[Required(), Length(1, 64)])
-    bug_descrit = PageDownField("问题描述", validators=[Required()])
+    bug_descrit = PageDownField('问题描述', validators=[Required()])
     #bug_descrit = StringField('问题描述', validators=[Required(), Length(1, 64)])
     bug_owner_id = StringField('问题处理人', validators=[Required(), Email()])
-
+    bug_status = RadioField('选择处理', choices=[('1', '新建'),('2', '测试经理审核')], default='1')
     #save = SubmitField('保存')
     submit = SubmitField('提交')
 
@@ -37,4 +37,26 @@ class BugsProcess(Form):
     bug_title = StringField('问题标题')
     bug_descrit = TextAreaField('问题描述')
 
-    bug_owner_id = StringField('问题处理人')
+    #bug_owner_id = StringField('问题处理人')
+
+class TestLeadEdit(Form):
+    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
+    bug_status = RadioField('选择处理', choices=[('1', '返回修改'),('3', '开发人员修改')], default='1')
+    submit = SubmitField('Submit')
+
+
+class DevelopEdit(Form):
+    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
+    bug_status = RadioField('选择处理', choices=[('2', '返回测试经理'),('4', '测试经理组织回归测试')])
+    submit = SubmitField('Submit')
+
+
+class TestLeadEdit2(Form):
+    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
+    bug_status = RadioField('选择处理', choices=[('3', '返回开发人员修改'),('5', '测试人员回归')])
+    submit = SubmitField('Submit')
+
+class BugClose(Form):
+    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
+    bug_status = RadioField('选择处理', choices=[('6', '问题关闭'),('4', '测试经理组织回归测试')])
+    submit = SubmitField('Submit')
