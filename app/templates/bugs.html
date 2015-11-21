@@ -89,8 +89,8 @@
         <ul id="buginfo" class="nav nav-list secondmenu collapse">
         <div class="col-md-4">
             {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
-            <p>current uesr {{ current_user }}</p>
-            <p>post bugowner uesr {{ post.bug_owner }}</p>
+            <p>current user {{ current_user }}</p>
+            <p>bugs bugowner user {{ bugs.bug_owner }}</p>
             <br>
         </div>
         </ul>
@@ -98,51 +98,51 @@
 
       <li> <a href="#bug_audit" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-credit-card"></i> 测试经理审核 <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
         <ul>
-            {% if post.bug_status =='2' and current_user == post.bug_owner %}
+            {% if bugs.bug_status =='2' and current_user == bugs.bug_owner %}
                 <ul id="bug_audit" class="nav nav-list collapse secondmenu in">
                 <p>测试经理审核</p>
                 {{ wtf.quick_form(testleadedit,horizontal_columns=('lg', 2, 20)) }}
                 </ul>
             {% else %}
-                {{ post.bug_status }}
+                {{ bugs.bug_status }}
             {% endif %}
        </ul> </li>
 
       <li> <a href="#deveployment" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-globe"></i> 开发定位处理 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
         <ul>
-            {% if post.bug_status =='3' and current_user == post.bug_owner %}
+            {% if bugs.bug_status =='3' and current_user == bugs.bug_owner %}
                 <ul id="deveployment" class="nav nav-list secondmenu collapse in">
                 <p>开发定位处理</p>
                 {{ wtf.quick_form(developedit,horizontal_columns=('lg', 2, 20)) }}
                 </ul>
             {% else %}
-                {{ post.bug_status }}
+                {{ bugs.bug_status }}
             {% endif %}
         </ul>
        </li>
 
       <li> <a href="#retest" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-bold"></i> 回归测试 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
             <ul>
-                {% if post.bug_status =='4' and current_user == post.bug_owner %}
+                {% if bugs.bug_status =='4' and current_user == bugs.bug_owner %}
                     <ul id="retest" class="nav nav-list secondmenu collapse in">
                     <p>回归测试</p>
                     {{ wtf.quick_form(testleadedit2,horizontal_columns=('lg', 2, 20)) }}
                     </ul>
                 {% else %}
-                    {{ post.bug_status }}
+                    {{ bugs.bug_status }}
                 {% endif %}
         </ul>
        </li>
 
     <li> <a href="#bugclose" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-fire"></i> 问题关闭 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
             <ul>
-                {% if post.bug_status =='5' and current_user == post.bug_owner %}
+                {% if bugs.bug_status =='5' and current_user == bugs.bug_owner %}
                     <ul id="bugclose" class="nav nav-list secondmenu collapse in">
                      <p>问题关闭</p>
                     {{ wtf.quick_form(bugclose,horizontal_columns=('lg', 2, 20)) }}
                     </ul>
                 {% else %}
-                    {{ post.bug_status }}
+                    {{ bugs.bug_status }}
                 {% endif %}
            </ul> </li>
 

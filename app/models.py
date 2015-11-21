@@ -18,6 +18,15 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.name
 
+class Process(db.Model):
+    __tablename__ = 'process'
+    id = db.Column(db.Integer,primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    bugs_id = db.Column(db.Integer, db.ForeignKey('bugs.id'))
+    status = db.Column(db.String(64))
+    opinion = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
+
 
 class Bugs(db.Model):
     __tablename__ = 'bugs'
@@ -36,7 +45,9 @@ class Bugs(db.Model):
     bug_status = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
-    # comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    process = db.relationship('Process',
+                            foreign_keys=[Process.bugs_id],
+                            backref='bugs', lazy='dynamic')
 
     def __repr__(self):
         return '<User %r>' % self.id
@@ -75,6 +86,9 @@ class User(UserMixin, db.Model):
     bugs_owner = db.relationship('Bugs',
                                  foreign_keys=[Bugs.bug_owner_id],
                                  backref='bug_owner', lazy='dynamic')
+
+    process = db.relationship('Process', backref='author', lazy='dynamic')
+
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -109,4 +123,8 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+
+
 

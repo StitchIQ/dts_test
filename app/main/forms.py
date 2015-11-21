@@ -40,23 +40,27 @@ class BugsProcess(Form):
     #bug_owner_id = StringField('问题处理人')
 
 class TestLeadEdit(Form):
+    process_opinion = TextAreaField('处理意见')
     bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
-    bug_status = RadioField('选择处理', choices=[('1', '返回修改'),('3', '开发人员修改')], default='1')
+    bug_status = RadioField('选择处理', choices=[('1', '返回修改'),('3', '开发人员修改')], default='3')
     submit = SubmitField('Submit')
 
 
 class DevelopEdit(Form):
+    process_opinion = TextAreaField('处理意见')
     bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
-    bug_status = RadioField('选择处理', choices=[('2', '返回测试经理'),('4', '测试经理组织回归测试')])
+    bug_status = RadioField('选择处理', choices=[('2', '返回测试经理'),('4', '测试经理组织回归测试')],default='4')
     submit = SubmitField('Submit')
 
 
 class TestLeadEdit2(Form):
+    process_opinion = TextAreaField('处理意见')
     bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
-    bug_status = RadioField('选择处理', choices=[('3', '返回开发人员修改'),('5', '测试人员回归')])
+    bug_status = RadioField('选择处理', choices=[('3', '返回开发人员修改'),('5', '测试人员回归')],default='5')
     submit = SubmitField('Submit')
 
 class BugClose(Form):
-    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
-    bug_status = RadioField('选择处理', choices=[('6', '问题关闭'),('4', '测试经理组织回归测试')])
+    process_opinion = TextAreaField('处理意见')
+    #bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
+    bug_status = RadioField('选择处理', choices=[('6', '问题关闭'),('4', '测试经理组织回归测试')], default='6')
     submit = SubmitField('Submit')
