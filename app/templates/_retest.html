@@ -1,0 +1,31 @@
+<li> <a href="#retest" class="nav-header collapsed" data-toggle="collapse">
+        <i class="glyphicon glyphicon-bold"></i> 回归测试
+
+        <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
+            <ul>
+                {% if bugs.bug_status =='4' and current_user == bugs.bug_owner %}
+                    <ul id="retest" class="nav nav-list secondmenu collapse in">
+                    <p>回归测试</p>
+                    {{ wtf.quick_form(testleadedit2,horizontal_columns=('lg', 2, 20)) }}
+                    </ul>
+                {% else %}
+                    {{ bugs.bug_status }}
+                {% endif %}
+        </ul>
+</li>
+
+<li> <a href="#bugclose" class="nav-header collapsed" data-toggle="collapse">
+        <i class="glyphicon glyphicon-fire"></i> 问题关闭
+
+        <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
+            <ul>
+                {% if bugs.bug_status =='5' and current_user == bugs.bug_owner %}
+                    <ul id="bugclose" class="nav nav-list secondmenu collapse in">
+                     <p>问题关闭</p>
+                    {{ wtf.quick_form(bugclose,horizontal_columns=('lg', 2, 20)) }}
+                    </ul>
+                {% else %}
+                    {{ bugs.bug_status }}
+                {% endif %}
+           </ul>
+</li>

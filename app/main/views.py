@@ -35,9 +35,15 @@ def newbug():
         db.session.commit()
         # bug_owner_id=form.bug_owner_id.data,
         # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+        process = Process(author=current_user._get_current_object(),
+                                 bugs=bug,
+                                 status='2',
+                                 opinion='')
+        db.session.add(process)
+
         flash('Bugs 提交成功.')
-        return redirect(url_for('.bug_process', id=33))
-    flash('Bugs 提交失败.')
+        return redirect(url_for('.bug_process', id=bug.id))
+    #flash('Bugs 提交失败.')
     return render_template("standard_bug.html", form=form)
 
 
@@ -45,8 +51,9 @@ def newbug():
 @login_required
 def bug_process(id):
     bugs = Bugs.query.get_or_404(id)
-    process_list = bugs.process.order_by(Process.timestamp.asc())
-    #post.comments.order_by(Comment.timestamp.asc())
+    process_log = bugs.process.order_by(Process.timestamp.desc())
+    process_list = bugs.process.order_by(Process.timestamp.desc())
+    #post.comments.order_by(Comment.timestamp.asc()) .filter_by(status='3')
     form = BugsProcess()
     testleadedit = TestLeadEdit()
     developedit = DevelopEdit()
@@ -69,6 +76,7 @@ def bug_process(id):
                         status=testleadedit.bug_status.data,
                         opinion=testleadedit.process_opinion.data)
         db.session.add(process)
+        #flash(process_list.timestamp)
         flash('The TestLeader has been updated.')
         return redirect(url_for('.bug_process', id=bugs.id))
 
@@ -136,6 +144,8 @@ def bug_process(id):
     read_only(form.bug_show_times)
     read_only(form.bug_descrit)
 
+    #flash(process_list.first().opinion)
     return render_template('bugs.html', form=form, bugs=bugs,
         testleadedit=testleadedit, developedit=developedit,
-        testleadedit2=testleadedit2, bugclose=bugclose)
+        testleadedit2=testleadedit2, bugclose=bugclose,
+        process_list=process_list,process_log=process_log)

@@ -1,0 +1,34 @@
+<li> <a href="#bug_audit" class="nav-header collapsed" data-toggle="collapse">
+        <i class="glyphicon glyphicon-credit-card"></i> 测试经理审核
+        <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
+
+<ul>
+    {% if bugs.bug_status >='2' %}
+
+        <ul id="bug_audit" class="nav nav-list collapse secondmenu in">
+        <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
+        <ul id="myTab" class="nav nav-tabs">
+           <li class="active"><a href="#testleader" data-toggle="tab">
+              当前处理</a>
+           </li>
+           <li><a href="#test" data-toggle="tab">以前处理</a></li>
+        </ul>
+
+        <div id="myTabContent" class="tab-content">
+           <div class="tab-pane fade in active" id="testleader">
+              <p>
+                {% if current_user == bugs.bug_owner and bugs.bug_status =='2' %}
+                    <p>测试经理审核</p>
+
+                    {{ wtf.quick_form(testleadedit,horizontal_columns=('lg', 2, 20)) }}
+                {% endif %}
+             </p>
+           </div>
+           <div class="tab-pane fade" id="test">
+              <p>以前意见</p>
+           </div>
+        </div>
+        </ul>
+    {% endif %}
+</ul>
+</li>

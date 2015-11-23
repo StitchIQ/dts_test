@@ -84,70 +84,53 @@
 
 
     <div class="col-md-10">
-    <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="">
-    <li> <a href="#buginfo" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-cog"></i> 问题单信息 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-        <ul id="buginfo" class="nav nav-list secondmenu collapse">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
-            <p>current user {{ current_user }}</p>
-            <p>bugs bugowner user {{ bugs.bug_owner }}</p>
-            <br>
-        </div>
-        </ul>
-        </li>
-
-      <li> <a href="#bug_audit" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-credit-card"></i> 测试经理审核 <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
-        <ul>
-            {% if bugs.bug_status =='2' and current_user == bugs.bug_owner %}
-                <ul id="bug_audit" class="nav nav-list collapse secondmenu in">
-                <p>测试经理审核</p>
-                {{ wtf.quick_form(testleadedit,horizontal_columns=('lg', 2, 20)) }}
-                </ul>
-            {% else %}
-                {{ bugs.bug_status }}
-            {% endif %}
-       </ul> </li>
-
-      <li> <a href="#deveployment" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-globe"></i> 开发定位处理 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-        <ul>
-            {% if bugs.bug_status =='3' and current_user == bugs.bug_owner %}
-                <ul id="deveployment" class="nav nav-list secondmenu collapse in">
-                <p>开发定位处理</p>
-                {{ wtf.quick_form(developedit,horizontal_columns=('lg', 2, 20)) }}
-                </ul>
-            {% else %}
-                {{ bugs.bug_status }}
-            {% endif %}
-        </ul>
+    <ul id="myTab" class="nav nav-tabs">
+       <li class="active"><a href="#bug" data-toggle="tab">问题单处理</a>
        </li>
+       <li><a href="#log" data-toggle="tab">问题单日志</a></li>
 
-      <li> <a href="#retest" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-bold"></i> 回归测试 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-            <ul>
-                {% if bugs.bug_status =='4' and current_user == bugs.bug_owner %}
-                    <ul id="retest" class="nav nav-list secondmenu collapse in">
-                    <p>回归测试</p>
-                    {{ wtf.quick_form(testleadedit2,horizontal_columns=('lg', 2, 20)) }}
-                    </ul>
-                {% else %}
-                    {{ bugs.bug_status }}
-                {% endif %}
-        </ul>
-       </li>
+    </ul>
+    <div id="myTabContent" class="tab-content">
+       <div class="tab-pane fade in active" id="bug">
 
-    <li> <a href="#bugclose" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-fire"></i> 问题关闭 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-            <ul>
-                {% if bugs.bug_status =='5' and current_user == bugs.bug_owner %}
-                    <ul id="bugclose" class="nav nav-list secondmenu collapse in">
-                     <p>问题关闭</p>
-                    {{ wtf.quick_form(bugclose,horizontal_columns=('lg', 2, 20)) }}
-                    </ul>
-                {% else %}
-                    {{ bugs.bug_status }}
-                {% endif %}
-           </ul> </li>
+          <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="">
+                  <li> <a href="#buginfo" class="nav-header collapsed" data-toggle="collapse">
+                      <i class="glyphicon glyphicon-cog"></i> 问题单信息
+                      Processed By: {{ bugs.author.username }}--Time at :{{ bugs.timestamp }}
+                      <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
+                      <ul id="buginfo" class="nav nav-list secondmenu collapse">
+                      <div class="col-md-4">
+                          {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
+                          <p>current user {{ current_user }}</p>
+                          <p>bugs bugowner user {{ bugs.bug_owner }}</p>
+                          <br>
+                      </div>
+                      </ul>
+                  </li>
 
-     </ul>
+                  {% include '_testleader_edit.html' %}
+
+                  {% include '_developer_edit.html' %}
+
+                  {% include '_retest.html' %}
+               </ul>
+
+       </div>
+       <div class="tab-pane fade" id="log">
+            {% for logs in process_log %}
+                <li>{{ logs.bugs_id }}</li>
+                <li>{{ logs.timestamp }}</li>
+            {% endfor %}
+       </div>
+
     </div>
+
+
+
+
+
+    </div>
+
    </div>
   </div>
  </body>

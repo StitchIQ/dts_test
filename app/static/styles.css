@@ -149,3 +149,7 @@ footer.duomi-page-footer .list-inline a, footer.authenticated-footer .list-inlin
 .collapsed.glyphicon-chevron-toggle:before {
 	content: "\e114";
 }
+
+.nav-tabs>li.active>a {
+	color: #0000FF;
+}

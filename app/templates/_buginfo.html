@@ -1,0 +1,13 @@
+<li> <a href="#buginfo" class="nav-header collapsed" data-toggle="collapse">
+        <i class="glyphicon glyphicon-cog"></i> 问题单信息
+        Processed By: {{ bugs.author.username }}--Time at :{{ bugs.timestamp }}
+        <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
+        <ul id="buginfo" class="nav nav-list secondmenu collapse">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
+            <p>current user {{ current_user }}</p>
+            <p>bugs bugowner user {{ bugs.bug_owner }}</p>
+            <br>
+        </div>
+        </ul>
+        </li>
