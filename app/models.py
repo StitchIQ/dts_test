@@ -21,9 +21,11 @@ class Role(db.Model):
 class Process(db.Model):
     __tablename__ = 'process'
     id = db.Column(db.Integer,primary_key=True)
+    operator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     bugs_id = db.Column(db.Integer, db.ForeignKey('bugs.id'))
-    status = db.Column(db.String(64))
+    old_status = db.Column(db.String(64))
+    new_status = db.Column(db.String(64))
     opinion = db.Column(db.Text)
     timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
 
@@ -87,7 +89,12 @@ class User(UserMixin, db.Model):
                                  foreign_keys=[Bugs.bug_owner_id],
                                  backref='bug_owner', lazy='dynamic')
 
-    process = db.relationship('Process', backref='author', lazy='dynamic')
+    process = db.relationship('Process',
+                            foreign_keys=[Process.author_id],
+                            backref='author', lazy='dynamic')
+    operators = db.relationship('Process',
+                            foreign_keys=[Process.operator_id],
+                            backref='operator', lazy='dynamic')
 
     @property
     def password(self):

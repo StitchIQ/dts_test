@@ -32,15 +32,17 @@ def newbug():
         bug_status=form.bug_status.data)
 
         db.session.add(bug)
-        db.session.commit()
+
         # bug_owner_id=form.bug_owner_id.data,
         # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-        process = Process(author=current_user._get_current_object(),
-                                 bugs=bug,
-                                 status='2',
-                                 opinion='')
+        process = Process(operator=current_user._get_current_object(),
+                            author=bug_owner_id,
+                            bugs=bug,
+                            old_status='1',
+                            new_status=form.bug_status.data,
+                            opinion='')
         db.session.add(process)
-
+        db.session.commit()
         flash('Bugs 提交成功.')
         return redirect(url_for('.bug_process', id=bug.id))
     #flash('Bugs 提交失败.')
@@ -51,8 +53,9 @@ def newbug():
 @login_required
 def bug_process(id):
     bugs = Bugs.query.get_or_404(id)
-    process_log = bugs.process.order_by(Process.timestamp.desc())
+    process_log = bugs.process.order_by(Process.timestamp.asc())
     process_list = bugs.process.order_by(Process.timestamp.desc())
+    developedit_log = bugs.process.filter_by(old_status='3').order_by(Process.timestamp.desc())
     #post.comments.order_by(Comment.timestamp.asc()) .filter_by(status='3')
     form = BugsProcess()
     testleadedit = TestLeadEdit()
@@ -64,6 +67,17 @@ def bug_process(id):
     if testleadedit.validate_on_submit() and current_user == bugs.bug_owner:
         bugs.bug_owner_id = User.query.filter_by(
             email=testleadedit.bug_owner_id.data).first().id
+
+        process = Process(operator=current_user._get_current_object(),
+                        author=User.query.filter_by(
+                                email=testleadedit.bug_owner_id.data).first(),
+                        bugs=bugs,
+                        old_status=bugs.bug_status,
+                        new_status=testleadedit.bug_status.data,
+                        opinion=testleadedit.process_opinion.data)
+        db.session.add(process)
+
+
         bugs.bug_status = testleadedit.bug_status.data
         db.session.add(bugs)
         '''
@@ -71,11 +85,7 @@ def bug_process(id):
         process.bugs = bugs
         process.status = testleadedit.bug_status.data
         process.opinion = testleadedit.process_opinion'''
-        process = Process(author=current_user._get_current_object(),
-                        bugs=bugs,
-                        status=testleadedit.bug_status.data,
-                        opinion=testleadedit.process_opinion.data)
-        db.session.add(process)
+
         #flash(process_list.timestamp)
         flash('The TestLeader has been updated.')
         return redirect(url_for('.bug_process', id=bugs.id))
@@ -83,44 +93,52 @@ def bug_process(id):
     if developedit.validate_on_submit() and current_user == bugs.bug_owner:
         bugs.bug_owner_id = User.query.filter_by(
             email=developedit.bug_owner_id.data).first().id
-        bugs.bug_status = developedit.bug_status.data
-        db.session.add(bugs)
-
-        process = Process(author=current_user._get_current_object(),
+        process = Process(operator=current_user._get_current_object(),
+                        author=User.query.filter_by(
+                                email=testleadedit.bug_owner_id.data).first(),
                         bugs=bugs,
-                        status=developedit.bug_status.data,
+                        old_status=bugs.bug_status,
+                        new_status=developedit.bug_status.data,
                         opinion=developedit.process_opinion.data)
         db.session.add(process)
+
+
+        bugs.bug_status = developedit.bug_status.data
+        db.session.add(bugs)
         flash('The Developer has been updated.')
         return redirect(url_for('.bug_process', id=bugs.id))
 
     if testleadedit2.validate_on_submit() and current_user == bugs.bug_owner:
         bugs.bug_owner_id = User.query.filter_by(
             email=testleadedit2.bug_owner_id.data).first().id
-        bugs.bug_status = testleadedit2.bug_status.data
-        db.session.add(bugs)
 
-        process = Process(author=current_user._get_current_object(),
+        process = Process(operator=current_user._get_current_object(),
+                        author=User.query.filter_by(
+                                email=testleadedit.bug_owner_id.data).first(),
                         bugs=bugs,
-                        status=testleadedit2.bug_status.data,
+                        old_status=bugs.bug_status,
+                        new_status=testleadedit2.bug_status.data,
                         opinion=testleadedit2.process_opinion.data)
         db.session.add(process)
 
+        bugs.bug_status = testleadedit2.bug_status.data
+        db.session.add(bugs)
         flash('The TestLeader2 has been updated.')
         return redirect(url_for('.bug_process', id=bugs.id))
 
     if bugclose.validate_on_submit() and current_user == bugs.bug_owner:
         #bugs.bug_owner_id = User.query.filter_by(
         #    email=bugclose.bug_owner_id.data).first().id
-        bugs.bug_status = bugclose.bug_status.data
-        db.session.add(bugs)
-
-        process = Process(author=current_user._get_current_object(),
+        process = Process(operator=current_user._get_current_object(),
+                        author=None,
                         bugs=bugs,
-                        status=bugclose.bug_status.data,
+                        old_status=bugs.bug_status,
+                        new_status=bugclose.bug_status.data,
                         opinion=bugclose.process_opinion.data)
         db.session.add(process)
 
+        bugs.bug_status = bugclose.bug_status.data
+        db.session.add(bugs)
         flash('The Tester has been updated.')
         return redirect(url_for('.bug_process', id=bugs.id))
 
@@ -148,4 +166,4 @@ def bug_process(id):
     return render_template('bugs.html', form=form, bugs=bugs,
         testleadedit=testleadedit, developedit=developedit,
         testleadedit2=testleadedit2, bugclose=bugclose,
-        process_list=process_list,process_log=process_log)
+        process_list=process_list,process_log=process_log,developedit_log=developedit_log)

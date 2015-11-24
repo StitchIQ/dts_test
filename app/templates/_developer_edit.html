@@ -4,30 +4,34 @@
 
 <ul>
     {% if bugs.bug_status >='3' %}
-        <ul id="deveployment" class="nav nav-list secondmenu collapse in">
+    <ul id="deveployment" class="nav nav-list secondmenu collapse in">
 
         <ul id="myTab" class="nav nav-tabs">
-           <li class="active"><a href="#developer" data-toggle="tab">
-              当前处理</a>
-           </li>
-           <li><a href="#others" data-toggle="tab">以前处理</a></li>
+            <li class="active"><a href="#development" data-toggle="tab">当前处理</a>
+            </li>
+            {% for log in developedit_log %}
+               <li ><a href="#{{ log.id }}" data-toggle="tab">
+                 {{ log.author.username }}</a>
+               </li>
+            {% endfor %}
         </ul>
 
-        <div id="myTabContent" class="tab-content">
-           <div class="tab-pane fade in active" id="developer">
-              <p>
-                {% if current_user == bugs.bug_owner and bugs.bug_status =='3' %}
+            <div id="myTabContent" class="tab-content">
+                <div class="tab-pane fade in active" id="development">
+                    {% if current_user == bugs.bug_owner and bugs.bug_status =='3' %}
+                        {{ wtf.quick_form(developedit,horizontal_columns=('lg', 2, 20)) }}
+                    {% endif %}
+                </div>
 
-                    <p>开发定位处理</p>
-                    {{ wtf.quick_form(developedit,horizontal_columns=('lg', 2, 20)) }}
+                {% for log in developedit_log %}
+                   <div class="tab-pane fade" id={{ log.id }}>
+                      <div>{{ log.opinion }}</div>
+                      <hr/>
+                      <lable>Processed by: {{ log.author.username }} @<i>{{ log.timestamp }}</i></lable>
+                   </div>
+                {% endfor %}
+            </div>
 
-                {% endif %}
-             </p>
-           </div>
-           <div class="tab-pane fade" id="others">
-              <p>以前意见</p>
-           </div>
-        </div>
     </ul>
     {% endif %}
 </ul>
