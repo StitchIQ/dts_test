@@ -27,7 +27,7 @@ def newbug():
         bug_show_times=form.bug_show_times.data,
         bug_title=form.bug_title.data,
         bug_descrit=form.bug_descrit.data,
-        bug_owner_id=User.query.filter_by(email=form.bug_owner_id.data).first().id,
+        bug_owner=User.query.filter_by(email=form.bug_owner_id.data).first(),
         author=current_user._get_current_object(),
         bug_status=form.bug_status.data)
 
@@ -36,7 +36,7 @@ def newbug():
         # bug_owner_id=form.bug_owner_id.data,
         # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
         process = Process(operator=current_user._get_current_object(),
-                            author=bug_owner_id,
+                            author=User.query.filter_by(email=form.bug_owner_id.data).first(),
                             bugs=bug,
                             old_status='1',
                             new_status=form.bug_status.data,
@@ -53,9 +53,13 @@ def newbug():
 @login_required
 def bug_process(id):
     bugs = Bugs.query.get_or_404(id)
+
+    # 处理日志
     process_log = bugs.process.order_by(Process.timestamp.asc())
-    process_list = bugs.process.order_by(Process.timestamp.desc())
+    testmanager_log = bugs.process.filter_by(old_status='2').order_by(Process.timestamp.desc())
     developedit_log = bugs.process.filter_by(old_status='3').order_by(Process.timestamp.desc())
+    bugtest_log = bugs.process.filter_by(old_status='4').order_by(Process.timestamp.desc())
+    retest_log = bugs.process.filter_by(old_status='5').order_by(Process.timestamp.desc())
     #post.comments.order_by(Comment.timestamp.asc()) .filter_by(status='3')
     form = BugsProcess()
     testleadedit = TestLeadEdit()
@@ -166,4 +170,5 @@ def bug_process(id):
     return render_template('bugs.html', form=form, bugs=bugs,
         testleadedit=testleadedit, developedit=developedit,
         testleadedit2=testleadedit2, bugclose=bugclose,
-        process_list=process_list,process_log=process_log,developedit_log=developedit_log)
+        testmanager_log=testmanager_log,process_log=process_log,
+        developedit_log=developedit_log,bugtest_log=bugtest_log,retest_log=retest_log)

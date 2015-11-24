@@ -96,7 +96,7 @@
           <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="">
                   <li> <a href="#buginfo" class="nav-header collapsed" data-toggle="collapse">
                       <i class="glyphicon glyphicon-cog"></i> 问题单信息
-                      Processed By: {{ bugs.author.username }}--Time at :{{ bugs.timestamp.strftime('%Y-%M-%d %H:%M:%S') }}
+                      Processed By: {{ bugs.author.username }}--Time at :{{ bugs.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
                       <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
                       <ul id="buginfo" class="nav nav-list secondmenu collapse">
                       <div class="col-md-4">
@@ -107,23 +107,19 @@
                       </div>
                       </ul>
                   </li>
-
                   {% include '_testleader_edit.html' %}
-
                   {% include '_developer_edit.html' %}
-
                   {% include '_retest.html' %}
                </ul>
-
        </div>
        <div class="tab-pane fade" id="log">
             <table class="table table-bordered">
-               <caption>边框表格布局</caption>
+               <caption>问题单操作日志</caption>
                <thead>
                   <tr>
                      <th>时间</th>
                      <th>操作用户</th>
-                     <th>处理用户</th>
+                     <th>下一流程处理人</th>
                      <th>旧状态</th>
                      <th>新状态</th>
                   </tr>
@@ -132,7 +128,7 @@
                <tbody>
                     {% for logs in process_log %}
                         <tr>
-                             <td>{{ logs.timestamp.strftime('%Y-%M-%d %H:%M:%S') }}</td>
+                             <td>{{ logs.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                              <td>{{ logs.operator.username }}</td>
                              <td>{{ logs.author.username }}</td>
                              <td>{{ logs.old_status }}</td>

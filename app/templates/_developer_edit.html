@@ -1,5 +1,9 @@
 <li> <a href="#deveployment" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-globe"></i> 开发定位处理
+        {% if developedit_log %}
+            Processed By: {{ developedit_log.first().operator.username }}
+            --Time at :{{ developedit_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+        {% endif %}
         <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
 
 <ul>
@@ -11,26 +15,27 @@
             </li>
             {% for log in developedit_log %}
                <li ><a href="#{{ log.id }}" data-toggle="tab">
-                 {{ log.author.username }}</a>
+                 {{ log.operator.username }}</a>
                </li>
             {% endfor %}
         </ul>
 
-            <div id="myTabContent" class="tab-content">
-                <div class="tab-pane fade in active" id="development">
-                    {% if current_user == bugs.bug_owner and bugs.bug_status =='3' %}
-                        {{ wtf.quick_form(developedit,horizontal_columns=('lg', 2, 20)) }}
-                    {% endif %}
-                </div>
-
-                {% for log in developedit_log %}
-                   <div class="tab-pane fade" id={{ log.id }}>
-                      <div>{{ log.opinion }}</div>
-                      <hr/>
-                      <lable>Processed by: {{ log.author.username }} @<i>{{ log.timestamp }}</i></lable>
-                   </div>
-                {% endfor %}
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade in active" id="development">
+                {% if current_user == bugs.bug_owner and bugs.bug_status =='3' %}
+                    {{ wtf.quick_form(developedit,horizontal_columns=('lg', 2, 20)) }}
+                {% endif %}
             </div>
+
+            {% for log in developedit_log %}
+               <div class="tab-pane fade" id={{ log.id }}>
+                  <div>{{ log.opinion }}</div>
+                  <hr/>
+                  <lable>Processed by: {{ log.operator.username }} @
+                    <i>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</i></lable>
+               </div>
+            {% endfor %}
+        </div>
 
     </ul>
     {% endif %}

@@ -1,31 +1,85 @@
 <li> <a href="#retest" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-bold"></i> 回归测试
+        {% if bugtest_log %}
+            Processed By: {{ bugtest_log.first().operator.username }}
+            --Time at :{{ bugtest_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+        {% endif %}
 
         <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
             <ul>
-                {% if bugs.bug_status =='4' and current_user == bugs.bug_owner %}
-                    <ul id="retest" class="nav nav-list secondmenu collapse in">
-                    <p>回归测试</p>
-                    {{ wtf.quick_form(testleadedit2,horizontal_columns=('lg', 2, 20)) }}
-                    </ul>
-                {% else %}
-                    {{ bugs.bug_status }}
-                {% endif %}
+            {% if bugs.bug_status >='4' %}
+            <ul id="retest" class="nav nav-list secondmenu collapse in">
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active"><a href="#bug_test" data-toggle="tab">当前处理</a>
+                    </li>
+                    {% for log in bugtest_log %}
+                       <li ><a href="#{{ log.id }}" data-toggle="tab">
+                         {{ log.operator.username }}</a>
+                       </li>
+                    {% endfor %}
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade in active" id="bug_test">
+                        {% if current_user == bugs.bug_owner and bugs.bug_status =='4' %}
+                            {{ wtf.quick_form(testleadedit2,horizontal_columns=('lg', 2, 20)) }}
+                        {% endif %}
+                    </div>
+
+                    {% for log in bugtest_log %}
+                       <div class="tab-pane fade" id={{ log.id }}>
+                          <div>{{ log.opinion }}</div>
+                          <hr/>
+                          <lable>Processed by: {{ log.operator.username }} @
+                            <i>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</i></lable>
+                       </div>
+                    {% endfor %}
+                </div>
+
+            </ul>
+            {% endif %}
         </ul>
 </li>
 
+
 <li> <a href="#bugclose" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-fire"></i> 问题关闭
-
+        {% if retest_log %}
+            Processed By: {{ retest_log.first().operator.username }}
+            --Time at :{{ retest_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+        {% endif %}
         <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-            <ul>
-                {% if bugs.bug_status =='5' and current_user == bugs.bug_owner %}
-                    <ul id="bugclose" class="nav nav-list secondmenu collapse in">
-                     <p>问题关闭</p>
-                    {{ wtf.quick_form(bugclose,horizontal_columns=('lg', 2, 20)) }}
-                    </ul>
-                {% else %}
-                    {{ bugs.bug_status }}
-                {% endif %}
-           </ul>
+        <ul>
+            {% if bugs.bug_status >='5' %}
+            <ul id="bugclose" class="nav nav-list secondmenu collapse in">
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active"><a href="#bug_close" data-toggle="tab">当前处理</a>
+                    </li>
+                    {% for log in retest_log %}
+                       <li ><a href="#{{ log.id }}" data-toggle="tab">
+                         {{ log.operator.username }}</a>
+                       </li>
+                    {% endfor %}
+                </ul>
+
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade in active" id="bug_close">
+                        {% if current_user == bugs.bug_owner and bugs.bug_status =='5' %}
+                            {{ wtf.quick_form(bugclose,horizontal_columns=('lg', 2, 20)) }}
+                        {% endif %}
+                    </div>
+
+                    {% for log in retest_log %}
+                       <div class="tab-pane fade" id={{ log.id }}>
+                          <div>{{ log.opinion }}</div>
+                          <hr/>
+                          <lable>Processed by: {{ log.operator.username }} @
+                            <i>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</i></lable>
+                       </div>
+                    {% endfor %}
+                </div>
+
+            </ul>
+            {% endif %}
+        </ul>
+
 </li>

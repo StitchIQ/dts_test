@@ -1,5 +1,9 @@
 <li> <a href="#bug_audit" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-credit-card"></i> 测试经理审核
+        {% if testmanager_log %}
+            Processed By: {{ testmanager_log.first().operator.username }}
+            --Time at :{{ testmanager_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+        {% endif %}
         <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
 
 <ul>
@@ -9,24 +13,31 @@
            <li class="active"><a href="#testleader" data-toggle="tab">
               当前处理</a>
            </li>
-           <li><a href="#test" data-toggle="tab">以前处理</a></li>
+           {% for log in testmanager_log %}
+              <li ><a href="#{{ log.id }}" data-toggle="tab">
+                {{ log.operator.username }}</a>
+              </li>
+           {% endfor %}
         </ul>
 
         <div id="myTabContent" class="tab-content">
-           <div class="tab-pane fade in active" id="testleader">
-              <p>
+            <div class="tab-pane fade in active" id="testleader">
                 {% if current_user == bugs.bug_owner and bugs.bug_status =='2' %}
-                    <p>测试经理审核</p>
-
                     {{ wtf.quick_form(testleadedit,horizontal_columns=('lg', 2, 20)) }}
                 {% endif %}
-             </p>
-           </div>
-           <div class="tab-pane fade" id="test">
-              <p>以前意见</p>
-           </div>
+            </div>
+
+                {% for log in testmanager_log %}
+                   <div class="tab-pane fade" id={{ log.id }}>
+                      <div>{{ log.opinion }}</div>
+                      <hr/>
+                      <lable>Processed by: {{ log.operator.username }} @
+                        <i>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</i></lable>
+                   </div>
+                {% endfor %}
         </div>
         </ul>
     {% endif %}
+
 </ul>
 </li>
