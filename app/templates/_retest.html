@@ -1,6 +1,6 @@
 <li> <a href="#retest" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-bold"></i> 回归测试
-        {% if bugtest_log %}
+        {% if bugtest_log.first() %}
             Processed By: {{ bugtest_log.first().operator.username }}
             --Time at :{{ bugtest_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
         {% endif %}
@@ -43,7 +43,7 @@
 
 <li> <a href="#bugclose" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-fire"></i> 问题关闭
-        {% if retest_log %}
+        {% if retest_log.first() %}
             Processed By: {{ retest_log.first().operator.username }}
             --Time at :{{ retest_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
         {% endif %}

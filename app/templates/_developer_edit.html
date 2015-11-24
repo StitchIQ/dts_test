@@ -1,6 +1,6 @@
 <li> <a href="#deveployment" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-globe"></i> 开发定位处理
-        {% if developedit_log %}
+        {% if developedit_log.first() %}
             Processed By: {{ developedit_log.first().operator.username }}
             --Time at :{{ developedit_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
         {% endif %}

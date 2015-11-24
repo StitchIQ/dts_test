@@ -1,6 +1,6 @@
 <li> <a href="#bug_audit" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-credit-card"></i> 测试经理审核
-        {% if testmanager_log %}
+        {% if testmanager_log.first() %}
             Processed By: {{ testmanager_log.first().operator.username }}
             --Time at :{{ testmanager_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
         {% endif %}
