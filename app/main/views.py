@@ -11,8 +11,10 @@ from ..models import Bugs, User, Process
 
 
 @main.route('/')
+@login_required
 def index():
-    return render_template('index.html')
+    bugs_list = Bugs.query.filter_by(author=current_user).all()
+    return render_template('index.html', bugs_list=bugs_list)
 
 @main.route('/newbugs/', methods=['GET', 'POST'])
 @login_required

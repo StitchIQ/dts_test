@@ -133,179 +133,18 @@
        </form><!-- bs-example -->
     </div>
     <hr>
-    <div class="form-inline">
-        <div class="form-group">
-          <div class="checkbox"><lable><input type="checkbox"></input>请选择</lable>
-          </div>
-        </div>
-    </div>
-    <table class="table table-bordered">
-       <thead>
-          <tr>
-             <th><input type="checkbox"></input></th>
-             <th>No.</th>
-             <th>问题单号</th>
-             <th>版本号</th>
-             <th>提交人</th>
-             <th>当前责任人</th>
-             <th>问题单描述</th>
-             <th>严重程度</th>
-             <th>问题状态</th>
-             <th>优先级</th>
-          </tr>
-       </thead>
-       <tbody>
-          <tr>
-             <td>Tanmay</td>
-             <td>Bangalore</td>
-             <td>560001</td>
-          </tr>
-          <tr>
-             <td>Sachin</td>
-             <td>Mumbai</td>
-             <td>400003</td>
-          </tr>
-          <tr>
-             <td>Uma</td>
-             <td>Pune</td>
-             <td>411027</td>
-          </tr>
-       </tbody>
-    </table>
 
-    <section id="collapse">
-                <div class="page-header">
-                    <h1>折叠(切换)<small>bootstrap-collapse.js</small></h1>
-                </div>
+    {% include '_buglist.html' %}
 
-                    <h3>关于</h3>
-                    <p>为可折叠的组件(比如手风琴式应用，导航栏)提供基本的样式和灵活的支持。</p>
-                    <p class="muted"><strong>*</strong> 需要包含过渡插件.</p>
-                <h2>例子</h2>
-                    <p>使用插件构造手风琴式的边栏：</p>
-                    <div class="bs-docs-example">
-                        <div class="accordion" id="accordion2">
-                            <div class="accordion-group">
-                                <div class="accordion-heading">
-                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">切换标签一</a>
-                                </div>
-                                <div id="collapseOne" class="accordion-body collapse" style="height: 0px;">
-                                    <div class="accordion-inner">
-                                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="accordion-group">
-                                <div class="accordion-heading">
-                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">切换标签二</a>
-                                </div>
-                                <div id="collapseTwo" class="accordion-body  collapse" style="height: 0px;">
-                                    <div class="accordion-inner">
-                                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="accordion-group">
-                                <div class="accordion-heading">
-                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">切换标签三</a>
-                                </div>
-                                <div id="collapseThree" class="accordion-body  in collapse" style="height: auto;">
-                                    <div class="accordion-inner">
-                                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                        </div>
-                    </div>
-                    <pre class="prettyprint linenums"><ol class="linenums"><li class="L0"><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion"</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"accordion2"</span><span class="tag">&gt;</span></li><li class="L1"><span class="pln">  </span><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-group"</span><span class="tag">&gt;</span></li><li class="L2"><span class="pln">    </span><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-heading"</span><span class="tag">&gt;</span></li><li class="L3"><span class="pln">      </span><span class="tag">&lt;a</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-toggle"</span><span class="pln"> </span><span class="atn">data-toggle</span><span class="pun">=</span><span class="atv">"collapse"</span><span class="pln"> </span><span class="atn">data-parent</span><span class="pun">=</span><span class="atv">"#accordion2"</span><span class="pln"> </span><span class="atn">href</span><span class="pun">=</span><span class="atv">"#collapseOne"</span><span class="tag">&gt;</span></li><li class="L4"><span class="pln">        Collapsible Group Item #1</span></li><li class="L5"><span class="pln">      </span><span class="tag">&lt;/a&gt;</span></li><li class="L6"><span class="pln">    </span><span class="tag">&lt;/div&gt;</span></li><li class="L7"><span class="pln">    </span><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"collapseOne"</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-body collapse in"</span><span class="tag">&gt;</span></li><li class="L8"><span class="pln">      </span><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-inner"</span><span class="tag">&gt;</span></li><li class="L9"><span class="pln">        Anim pariatur cliche...</span></li><li class="L0"><span class="pln">      </span><span class="tag">&lt;/div&gt;</span></li><li class="L1"><span class="pln">    </span><span class="tag">&lt;/div&gt;</span></li><li class="L2"><span class="pln">  </span><span class="tag">&lt;/div&gt;</span></li><li class="L3"><span class="pln">  </span><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-group"</span><span class="tag">&gt;</span></li><li class="L4"><span class="pln">    </span><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-heading"</span><span class="tag">&gt;</span></li><li class="L5"><span class="pln">      </span><span class="tag">&lt;a</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-toggle"</span><span class="pln"> </span><span class="atn">data-toggle</span><span class="pun">=</span><span class="atv">"collapse"</span><span class="pln"> </span><span class="atn">data-parent</span><span class="pun">=</span><span class="atv">"#accordion2"</span><span class="pln"> </span><span class="atn">href</span><span class="pun">=</span><span class="atv">"#collapseTwo"</span><span class="tag">&gt;</span></li><li class="L6"><span class="pln">        Collapsible Group Item #2</span></li><li class="L7"><span class="pln">      </span><span class="tag">&lt;/a&gt;</span></li><li class="L8"><span class="pln">    </span><span class="tag">&lt;/div&gt;</span></li><li class="L9"><span class="pln">    </span><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"collapseTwo"</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-body collapse"</span><span class="tag">&gt;</span></li><li class="L0"><span class="pln">      </span><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"accordion-inner"</span><span class="tag">&gt;</span></li><li class="L1"><span class="pln">        Anim pariatur cliche...</span></li><li class="L2"><span class="pln">      </span><span class="tag">&lt;/div&gt;</span></li><li class="L3"><span class="pln">    </span><span class="tag">&lt;/div&gt;</span></li><li class="L4"><span class="pln">  </span><span class="tag">&lt;/div&gt;</span></li><li class="L5"><span class="tag">&lt;/div&gt;</span></li><li class="L6"><span class="pln">...</span></li></ol></pre>
-                <p>你也可以使用插件也无需写标记. 让按钮对另一个元素进行展开和折叠.</p>
-                <pre class="prettyprint linenums"><ol class="linenums"><li class="L0"><span class="tag">&lt;button</span><span class="pln"> </span><span class="atn">type</span><span class="pun">=</span><span class="atv">"button"</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"btn btn-danger"</span><span class="pln"> </span><span class="atn">data-toggle</span><span class="pun">=</span><span class="atv">"collapse"</span><span class="pln"> </span><span class="atn">data-target</span><span class="pun">=</span><span class="atv">"#demo"</span><span class="tag">&gt;</span></li><li class="L1"><span class="pln">  simple collapsible</span></li><li class="L2"><span class="tag">&lt;/button&gt;</span></li><li class="L3"><span class="pln">&nbsp;</span></li><li class="L4"><span class="tag">&lt;div</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"demo"</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"collapse in"</span><span class="tag">&gt;</span><span class="pln"> … </span><span class="tag">&lt;/div&gt;</span></li></ol></pre>
-
-                <hr class="bs-docs-separator">
-                <h2>用法</h2>
-                    <h3>通过data属性</h3>
-                        <p>只要在元素上添加 <code>data-toggle="collapse"</code> 和 <code>data-target</code> 就能自动变成可折叠的。 <code>data-target</code> 属性接受一个css选择器，以选取元素添加折叠。 一定要在折叠元素上添加 <code>collapse</code> 。如果要默认某折叠元素是打开的，只要添加 <code>.in</code> 。</p>
-                        <p>如需要添加一个手风琴式可折叠组, 则需添加 <code>data-parent="#selector"</code>. 详情可查看上面的演示</p>
-                    <h3>通过JavaScript</h3>
-                        <p>通过javascript启用：</p>
-                        <pre class="prettyprint linenums"><ol class="linenums"><li class="L0"><span class="pln">$</span><span class="pun">(</span><span class="str">".collapse"</span><span class="pun">).</span><span class="pln">collapse</span><span class="pun">()</span></li></ol></pre>
-                    <h3>选项</h3>
-                        <p>选项的传递可通过数据属性或JavaScript. 对于数据属性, 需要附加选项名称 <code>data-</code>, 如 <code>data-parent=""</code>.</p>
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th style="width: 100px;">名称</th>
-                                    <th style="width: 50px;">类型</th>
-                                    <th style="width: 50px;">默认</th>
-                                    <th>描述</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>parent</td>
-                                    <td>选择器<p>selector</p></td>
-                                    <td>false</td>
-                                    <td>如果指定了选择器，那么在显示折叠顶时，所有被选取的元素集合中的可折叠项都被关闭（与传统的手风琴应用相似）。</td>
-                                </tr>
-                                <tr>
-                                    <td>toggle</td>
-                                    <td>布尔值</td>
-                                    <td>true</td>
-                                    <td>切换可折叠元素</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    <h3>方法</h3>
-                        <h4>.collapse(options)</h4>
-                            <p>把内容元素转换为一个可折叠组件。接受一个 <code>object</code> 对象做为可选参数。</p>
-                            <pre class="prettyprint linenums"><ol class="linenums"><li class="L0"><span class="pln">$</span><span class="pun">(</span><span class="str">'#myCollapsible'</span><span class="pun">).</span><span class="pln">collapse</span><span class="pun">({</span></li><li class="L1"><span class="pln">  toggle</span><span class="pun">:</span><span class="pln"> </span><span class="kwd">false</span></li><li class="L2"><span class="pun">})</span></li></ol></pre>
-                        <h4>.collapse('toggle')</h4>
-                            <p>切换一个可折叠元素的状态：显示还是隐藏。</p>
-                        <h4>.collapse('show')</h4>
-                            <p>显示一个可折叠元素。</p>
-                        <h4>.collapse('hide')</h4>
-                            <p>隐藏一个可折叠元素。</p>
-
-                    <h3>事件</h3>
-                        <p>Bootstrap的折叠类扩展了一组事件，可以介入折叠的某些功能实现。</p>
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th style="width: 150px;">事件</th>
-                                    <th>描述</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>show</td>
-                                    <td>该事件在调用 <code>show</code> 实例方法时立刻触发。</td>
-                                </tr>
-                                <tr>
-                                    <td>shown</td>
-                                    <td>该事件在可折叠元素已经呈现给用户后触发（等待CSS过渡效果完成）。</td>
-                                </tr>
-                                <tr>
-                                    <td>hide</td>
-                                    <td>该事件在调用 <code>hide</code> 方法时立刻触发。</td>
-                                </tr>
-                                <tr>
-                                    <td>hidden</td>
-                                    <td>该事件在可折叠元素已经在用户面前完全隐藏后触发（等待CSS过渡效果完成）。</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <pre class="prettyprint linenums"><ol class="linenums"><li class="L0"><span class="pln">$</span><span class="pun">(</span><span class="str">'#myCollapsible'</span><span class="pun">).</span><span class="pln">on</span><span class="pun">(</span><span class="str">'hidden'</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">function</span><span class="pln"> </span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span></li><li class="L1"><span class="pln">  </span><span class="com">// do something…</span></li><li class="L2"><span class="pun">})</span></li></ol></pre>
-            </section>
 
     </div>
    </div>
   </div>
  </body>
 </html>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
 {% endblock %}
