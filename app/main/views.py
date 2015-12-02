@@ -1,5 +1,5 @@
 #coding=utf-8
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, current_app
 from flask.ext.login import login_user, logout_user, login_required, \
     current_user
 from wtforms_components import read_only
@@ -14,7 +14,15 @@ from ..models import Bugs, User, Process
 @login_required
 def index():
     bugs_list = Bugs.query.filter_by(author=current_user).all()
-    return render_template('index.html', bugs_list=bugs_list)
+
+    page = request.args.get('page', 1, type=int)
+
+    pagination = Bugs.query.filter_by(author=current_user).paginate(
+            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            error_out=False)
+    posts = pagination.items
+
+    return render_template('index.html', bugs_list=posts, pagination=pagination)
 
 @main.route('/newbugs/', methods=['GET', 'POST'])
 @login_required

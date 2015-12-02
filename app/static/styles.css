@@ -153,3 +153,10 @@ footer.duomi-page-footer .list-inline a, footer.authenticated-footer .list-inlin
 .nav-tabs>li.active>a {
 	color: #0000FF;
 }
+
+div.pagination {
+    width: 100%;
+    text-align: right;
+    padding: 0px;
+    margin: 0px;
+}
