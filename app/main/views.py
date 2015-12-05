@@ -13,16 +13,50 @@ from ..models import Bugs, User, Process
 @main.route('/')
 @login_required
 def index():
-    bugs_list = Bugs.query.filter_by(author=current_user).all()
+    #bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
 
     page = request.args.get('page', 1, type=int)
 
-    pagination = Bugs.query.filter_by(author=current_user).paginate(
+    pagination1 = Bugs.query.filter_by(bug_owner=current_user).order_by( \
+            Bugs.timestamp.desc()).paginate(
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
-    posts = pagination.items
+    posts = pagination1.items
 
-    return render_template('index.html', bugs_list=posts, pagination=pagination)
+    return render_template('index.html', bugs_list=posts, pagination=pagination1)
+
+@main.route('/ss')
+@login_required
+def ss():
+    return render_template('table.html')
+
+
+@main.route('/task/<string:mytask>')
+@login_required
+def task(mytask):
+    if mytask == 'processing':
+        page = request.args.get('page', 1, type=int)
+
+        pagination2 = Bugs.query.filter_by(author=current_user).paginate(
+                page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+                error_out=False)
+        posts = pagination2.items
+
+    if mytask == 'processed':
+
+        page = request.args.get('page', 1, type=int)
+
+        # 查询的思路是表连接,要去重复值
+        pagination2 = Bugs.query.join(Process, Process.bugs_id==Bugs.id).distinct().filter(
+            Process.operator==current_user).paginate(
+                page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+                error_out=False)
+
+        posts = pagination2.items
+    flash(str(Bugs.query.join(Process, Process.bugs_id==Bugs.id).filter(
+            Process.operator==current_user)))
+    return render_template('index.html', bugs_list=posts, pagination=pagination2)
+
 
 @main.route('/newbugs/', methods=['GET', 'POST'])
 @login_required
@@ -46,7 +80,7 @@ def newbug():
         # bug_owner_id=form.bug_owner_id.data,
         # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
         process = Process(operator=current_user._get_current_object(),
-                            author=User.query.filter_by(email=form.bug_owner_id.data).first(),
+                    author=User.query.filter_by(email=form.bug_owner_id.data).first(),
                             bugs=bug,
                             old_status='1',
                             new_status=form.bug_status.data,
@@ -66,10 +100,14 @@ def bug_process(id):
 
     # 处理日志
     process_log = bugs.process.order_by(Process.timestamp.asc())
-    testmanager_log = bugs.process.filter_by(old_status='2').order_by(Process.timestamp.desc())
-    developedit_log = bugs.process.filter_by(old_status='3').order_by(Process.timestamp.desc())
-    bugtest_log = bugs.process.filter_by(old_status='4').order_by(Process.timestamp.desc())
-    retest_log = bugs.process.filter_by(old_status='5').order_by(Process.timestamp.desc())
+    testmanager_log = bugs.process.filter_by(old_status='2').order_by(
+                        Process.timestamp.desc())
+    developedit_log = bugs.process.filter_by(old_status='3').order_by(
+                        Process.timestamp.desc())
+    bugtest_log = bugs.process.filter_by(old_status='4').order_by(
+                        Process.timestamp.desc())
+    retest_log = bugs.process.filter_by(old_status='5').order_by(
+                        Process.timestamp.desc())
     #post.comments.order_by(Comment.timestamp.asc()) .filter_by(status='3')
     form = BugsProcess()
     testleadedit = TestLeadEdit()
