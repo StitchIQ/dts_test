@@ -5,15 +5,15 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    MAIL_SERVER = 'smtp.163.com'
+    MAIL_SERVER = 'smtp.qq.com'
     MAIL_PORT = 25
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('lixing0303')
-    MAIL_PASSWORD = os.environ.get('Chysx2009')
+    MAIL_USERNAME = '147457787@qq.com'
+    MAIL_PASSWORD = 'enuihxcpvyibbjeb'
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
-    FLASKY_MAIL_SENDER = 'Flasky Admin <lixing0303@163.com>'
+    FLASKY_MAIL_SENDER = 'Flasky Admin <147457787@qq.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
-    FLASKY_POSTS_PER_PAGE = 20
+    FLASKY_POSTS_PER_PAGE = 5
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 30
 

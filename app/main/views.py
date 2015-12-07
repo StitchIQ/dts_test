@@ -7,6 +7,7 @@ from .. import db
 from . import main
 from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
     TestLeadEdit2, BugClose
+from ..email import send_email
 from ..models import Bugs, User, Process
 
 
@@ -34,28 +35,28 @@ def ss():
 @main.route('/task/<string:mytask>')
 @login_required
 def task(mytask):
-    if mytask == 'processing':
+    if mytask == 'created':
         page = request.args.get('page', 1, type=int)
 
-        pagination2 = Bugs.query.filter_by(author=current_user).paginate(
+        pagination = Bugs.query.filter_by(author=current_user).paginate(
                 page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                 error_out=False)
-        posts = pagination2.items
+        #posts = pagination2.items
 
     if mytask == 'processed':
 
         page = request.args.get('page', 1, type=int)
 
         # 查询的思路是表连接,要去重复值
-        pagination2 = Bugs.query.join(Process, Process.bugs_id==Bugs.id).distinct().filter(
+        pagination = Bugs.query.join(Process, Process.bugs_id==Bugs.id).distinct().filter(
             Process.operator==current_user).paginate(
                 page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                 error_out=False)
 
-        posts = pagination2.items
+    posts = pagination.items
     flash(str(Bugs.query.join(Process, Process.bugs_id==Bugs.id).filter(
             Process.operator==current_user)))
-    return render_template('index.html', bugs_list=posts, pagination=pagination2)
+    return render_template('main.html', bugs_list=posts, pagination=pagination,mytask=mytask)
 
 
 @main.route('/newbugs/', methods=['GET', 'POST'])
@@ -158,6 +159,21 @@ def bug_process(id):
         bugs.bug_status = developedit.bug_status.data
         db.session.add(bugs)
         flash('The Developer has been updated.')
+
+        user = User.query.filter_by(email=testleadedit.bug_owner_id.data).first()
+
+        flash(testleadedit.bug_owner_id.data)
+
+        token = user.generate_confirmation_token()
+
+        send_email(user.email, 'Please Process Bugs',
+                       'main/email/bug_process', user=user, id=bugs.id, token=token)
+
+        #send_email(user.email, 'Confirm Your Account',
+        #                'auth/email/confirm', user=user, token=token)
+
+        flash('A Email send to author.' + user.email)
+
         return redirect(url_for('.bug_process', id=bugs.id))
 
     if testleadedit2.validate_on_submit() and current_user == bugs.bug_owner:
