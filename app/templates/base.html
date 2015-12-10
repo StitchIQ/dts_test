@@ -11,7 +11,7 @@
 
 
 {% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -30,7 +30,7 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ current_user.username }} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
                         <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
@@ -102,6 +102,12 @@
     </div>
    </div>
   </div>
+
+<!-- ...... -->
+        <div class="col-md-12">
+            <hr />
+            <p class="text-muted">Copyright .. 2015 Lixing0303@163.com All Rights Reserved.</p>
+        </div>
 {% endblock %}
 
 {% block scripts %}
