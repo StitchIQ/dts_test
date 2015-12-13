@@ -8,7 +8,7 @@ from . import main
 from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
     TestLeadEdit2, BugClose
 from ..email import send_email
-from ..models import Bugs, User, Process
+from ..models import Bugs, User, Process, BugStatus
 
 
 @main.route('/')
@@ -17,13 +17,16 @@ def index():
     #bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
 
     page = request.args.get('page', 1, type=int)
+    sts=BugStatus.query.filter_by(id=6).first()
 
-    pagination1 = Bugs.query.filter_by(bug_owner=current_user).order_by( \
+    pagination1 = Bugs.query.filter_by(bug_owner=current_user).filter(
+                    Bugs.current_status != sts).order_by( \
             Bugs.timestamp.desc()).paginate(
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
-    posts = pagination1.items
 
+    posts = pagination1.items
+    flash(posts)
     return render_template('index.html', bugs_list=posts, pagination=pagination1)
 
 @main.route('/ss')

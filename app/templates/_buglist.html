@@ -34,7 +34,7 @@
                 <td>{{ bugs.bug_show_times }}</td>
                 <td>{{ bugs.bug_title }}</td>
                 <td>{{ bugs.author.username }}</td>
-                <td>{{ bugs.bug_status }}</td>
+                <td>{{ bugs.current_status.bug_status_descrit }}</td>
                 <td>{{ bugs.bug_owner.username }}</td>
                 <td>{{ moment(bugs.timestamp).fromNow() }}</td>
               </tr>

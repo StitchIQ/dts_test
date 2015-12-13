@@ -24,10 +24,10 @@ class Process(db.Model):
     operator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     bugs_id = db.Column(db.Integer, db.ForeignKey('bugs.id'))
-    old_status = db.Column(db.String(64))
-    new_status = db.Column(db.String(64))
+    old_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
+    new_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
     opinion = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, index=True,default=datetime.utcnow)
 
 
 class Bugs(db.Model):
@@ -44,7 +44,7 @@ class Bugs(db.Model):
     bug_descrit = db.Column(db.Text)
     bug_descrit_html = db.Column(db.Text)
     bug_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    bug_status = db.Column(db.String(64))
+    bug_status = db.Column(db.Integer,db.ForeignKey('bugstatus.bug_status'))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     process = db.relationship('Process',
@@ -71,6 +71,17 @@ class BugStatus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     bug_status = db.Column(db.Integer)
     bug_status_descrit = db.Column(db.String(64))
+
+    old_status = db.relationship('Process',foreign_keys=[Process.old_status],
+                                backref='old',lazy='dynamic')
+
+    new_status = db.relationship('Process',foreign_keys=[Process.new_status],
+                                    backref='new',lazy='dynamic')
+
+    bug_current_status = db.relationship('Bugs',foreign_keys=[Bugs.bug_status],
+                                    backref='current_status',lazy='dynamic')
+
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'

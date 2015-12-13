@@ -7,7 +7,7 @@
 
         <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
             <ul>
-            {% if bugs.bug_status >='4' %}
+            {% if bugs.bug_status >=4 %}
             <ul id="retest" class="nav nav-list secondmenu collapse in">
                 <ul id="myTab" class="nav nav-tabs">
                     <li class="active"><a href="#bug_test" data-toggle="tab">当前处理</a>
@@ -20,7 +20,7 @@
                 </ul>
                 <div id="myTabContent" class="tab-content">
                     <div class="tab-pane fade in active" id="bug_test">
-                        {% if current_user == bugs.bug_owner and bugs.bug_status =='4' %}
+                        {% if current_user == bugs.bug_owner and bugs.bug_status ==4 %}
                             {{ wtf.quick_form(testleadedit2,horizontal_columns=('lg', 2, 20)) }}
                         {% endif %}
                     </div>
@@ -49,7 +49,7 @@
         {% endif %}
         <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
         <ul>
-            {% if bugs.bug_status >='5' %}
+            {% if bugs.bug_status >=5 %}
             <ul id="bugclose" class="nav nav-list secondmenu collapse in">
                 <ul id="myTab" class="nav nav-tabs">
                     <li class="active"><a href="#bug_close" data-toggle="tab">当前处理</a>
@@ -63,7 +63,7 @@
 
                 <div id="myTabContent" class="tab-content">
                     <div class="tab-pane fade in active" id="bug_close">
-                        {% if current_user == bugs.bug_owner and bugs.bug_status =='5' %}
+                        {% if current_user == bugs.bug_owner and bugs.bug_status ==5 %}
                             {{ wtf.quick_form(bugclose,horizontal_columns=('lg', 2, 20)) }}
                         {% endif %}
                     </div>

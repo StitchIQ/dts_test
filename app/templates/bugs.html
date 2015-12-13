@@ -52,8 +52,8 @@
                              <td>{{ logs.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                              <td>{{ logs.operator.username }}</td>
                              <td>{{ logs.author.username }}</td>
-                             <td>{{ logs.old_status }}</td>
-                             <td>{{ logs.new_status }}</td>
+                             <td>{{ logs.old.bug_status_descrit }}</td>
+                             <td>{{ logs.new.bug_status_descrit }}</td>
                         </tr>
                    {% endfor %}
                </tbody>
