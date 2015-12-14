@@ -161,3 +161,7 @@ div.pagination {
     padding: 0px;
     margin: 0px;
 }
+
+div.bugs-footer {
+    text-align: right;
+}

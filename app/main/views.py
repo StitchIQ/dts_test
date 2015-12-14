@@ -239,3 +239,53 @@ def bug_process(id):
         testleadedit2=testleadedit2, bugclose=bugclose,
         testmanager_log=testmanager_log,process_log=process_log,
         developedit_log=developedit_log,bugtest_log=bugtest_log,retest_log=retest_log)
+
+
+@main.route('/bug_edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def bug_edit(id):
+    bugs = Bugs.query.get_or_404(id)
+    process_log = bugs.process.order_by(Process.timestamp.asc())
+
+    form = StandardBug()
+
+    if form.validate_on_submit():
+        bugs.product_name = form.product_name.data
+        bugs.product_version = form.product_version.data
+        bugs.software_version = form.software_version.data
+        bugs.bug_level = form.bug_level.data
+        bugs.system_view = form.system_view.data
+        bugs.bug_show_times = form.bug_show_times.data
+        bugs.bug_title = form.bug_title.data
+        bugs.bug_descrit = form.bug_descrit.data
+        bugs.bug_owner = User.query.filter_by(email=form.bug_owner_id.data).first()
+        bugs.author = current_user._get_current_object()
+        bugs.bug_status = form.bug_status.data
+
+        db.session.add(bugs)
+
+        # bug_owner_id=form.bug_owner_id.data,
+        # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+        process = Process(operator=current_user._get_current_object(),
+                    author=User.query.filter_by(email=form.bug_owner_id.data).first(),
+                            bugs=bugs,
+                            old_status='1',
+                            new_status=form.bug_status.data,
+                            opinion='')
+        db.session.add(process)
+        db.session.commit()
+        flash(bugs.current_status.bug_status_descrit)
+        flash('Bugs 提交成功.')
+        return redirect(url_for('.bug_process', id=bugs.id))
+
+    #form.id.data = bugs.id
+    form.product_name.data = bugs.product_name
+    form.product_version.data = bugs.product_version
+    form.software_version.data = bugs.software_version
+    form.bug_level.data = bugs.bug_level
+    form.system_view.data = bugs.system_view
+    form.bug_show_times.data = bugs.bug_show_times
+    form.bug_descrit.data = bugs.bug_descrit
+    form.bug_title.data = bugs.bug_title
+    #flash(process_list.first().opinion)
+    return render_template('bug_edit.html', form=form, bugs=bugs,process_log=process_log)

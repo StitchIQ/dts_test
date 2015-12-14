@@ -6,8 +6,20 @@
         <div class="col-md-4">
             {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
             <p>current user {{ current_user }}</p>
-            <p>bugs bugowner user {{ bugs.bug_owner }}</p>
+            <p>bugs bugs owner user {{ bugs.bug_owner }}</p>
             <br>
+
+            <div class="post-footer">
+                {% if current_user == bugs.bug_owner %}
+                    <a href="{{ url_for('.bug_process', id=bugs.id) }}">
+                        <span class="label label-primary">Edit</span>
+                    </a>
+                {% elif current_user.is_administrator() %}
+                    <a href="{{ url_for('.bug_process', id=bugs.id) }}">
+                        <span class="label label-danger">Edit [Admin]</span>
+                    </a>
+                {% endif %}
+            </div>
         </div>
         </ul>
         </li>
