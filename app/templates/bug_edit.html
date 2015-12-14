@@ -19,25 +19,13 @@
                       <i class="glyphicon glyphicon-cog"></i> 问题单信息
                       Processed By: {{ bugs.author.username }}--Time at :{{ bugs.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
                       <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-                      <ul id="buginfo" class="nav nav-list secondmenu collapse">
+                      <ul id="buginfo" class="nav nav-list secondmenu collapse in">
                       <div class="col-md-4">
                           {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
                           <p>current user {{ current_user }}</p>
                           <p>bugs bugowner user {{ bugs.bug_owner }}</p>
                           <br>
                       </div>
-
-                        <div class="bugs-footer">
-                            {% if current_user == bugs.bug_owner and bugs.current_status.id==1 %}
-                                <a href="{{ url_for('.bug_edit', id=bugs.id) }}">
-                                    <span class="label label-primary">Edit</span>
-                                </a>
-                            {% elif current_user.is_administrator() %}
-                                <a href="{{ url_for('.bug_edit', id=bugs.id) }}">
-                                    <span class="label label-danger">Edit [Admin]</span>
-                                </a>
-                            {% endif %}
-                        </div>
 
                       </ul>
                   </li>
