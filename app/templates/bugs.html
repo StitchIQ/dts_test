@@ -28,7 +28,7 @@
                       </div>
 
                         <div class="bugs-footer">
-                            {% if current_user == bugs.bug_owner and bugs.current_status.id==1 %}
+                            {% if current_user == bugs.bug_owner and bugs.now_status.id==1 %}
                                 <a href="{{ url_for('.bug_edit', id=bugs.id) }}">
                                     <span class="label label-primary">Edit</span>
                                 </a>

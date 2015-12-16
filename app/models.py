@@ -107,8 +107,8 @@ class BugStatus(db.Model):
     new_status = db.relationship('Process',foreign_keys=[Process.new_status],
                                     backref='new',lazy='dynamic')
 
-    bug_current_status = db.relationship('Bugs',foreign_keys=[Bugs.bug_status],
-                                    backref='current_status',lazy='dynamic')
+    bug_now_status = db.relationship('Bugs',foreign_keys=[Bugs.bug_status],
+                                    backref='now_status',lazy='dynamic')
 
 
 

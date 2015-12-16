@@ -17,10 +17,10 @@ def index():
     #bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
 
     page = request.args.get('page', 1, type=int)
-    sts=BugStatus.query.filter_by(id=6).first()
+    # sts=BugStatus.query.filter_by(id=6).first()
 
-    pagination1 = Bugs.query.filter_by(bug_owner=current_user).filter(
-                    Bugs.current_status != sts).order_by( \
+    pagination1 = Bugs.query.filter(
+            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
             Bugs.timestamp.desc()).paginate(
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
@@ -47,7 +47,6 @@ def task(mytask):
         #posts = pagination2.items
 
     if mytask == 'processed':
-
         page = request.args.get('page', 1, type=int)
 
         # 查询的思路是表连接,要去重复值
@@ -274,7 +273,7 @@ def bug_edit(id):
                             opinion='')
         db.session.add(process)
         db.session.commit()
-        flash(bugs.current_status.bug_status_descrit)
+        flash(bugs.now_status.bug_status_descrit)
         flash('Bugs 提交成功.')
         return redirect(url_for('.bug_process', id=bugs.id))
 
@@ -287,5 +286,6 @@ def bug_edit(id):
     form.bug_show_times.data = bugs.bug_show_times
     form.bug_descrit.data = bugs.bug_descrit
     form.bug_title.data = bugs.bug_title
+    form.bug_owner_id.data = bugs.bug_owner.email
     #flash(process_list.first().opinion)
     return render_template('bug_edit.html', form=form, bugs=bugs,process_log=process_log)
