@@ -90,10 +90,39 @@ def newbug():
                             opinion='')
         db.session.add(process)
         db.session.commit()
+
+
+
+
         flash('Bugs 提交成功.')
         return redirect(url_for('.bug_process', id=bug.id))
     #flash('Bugs 提交失败.')
     return render_template("standard_bug.html", form=form)
+
+
+@main.route('/upload', methods=['GET', 'POST'])
+@login_required
+def upload():
+    import mimetypes
+    import os
+    from tempfile import mktemp
+    from werkzeug.utils import secure_filename
+    UPLOAD_FOLDER = 'static/Uploads'
+    ALLOWED_MIMETYPES = {'image/JPG','image/jpeg', 'image/png', 'image/gif'}
+
+    if request.method == 'GET':
+        return render_template('upload.html', img='')
+    elif request.method == 'POST':
+        f = request.files['file']
+        fname = mktemp(suffix='_', prefix='u', dir=UPLOAD_FOLDER) + secure_filename(f.filename)
+        f.save(fname)
+        if mimetypes.guess_type(fname)[0] in ALLOWED_MIMETYPES:
+            return render_template('upload.html', img=fname)
+        else:
+            os.remove(fname)
+            flash(mimetypes.guess_type(fname)[0])
+            return redirect(url_for('main.upload'), 302)
+
 
 
 @main.route('/bug_process/<int:id>', methods=['GET', 'POST'])
