@@ -92,8 +92,6 @@ def newbug():
         db.session.commit()
 
 
-
-
         flash('Bugs 提交成功.')
         return redirect(url_for('.bug_process', id=bug.id))
     #flash('Bugs 提交失败.')
@@ -107,22 +105,28 @@ def upload():
     import os
     from tempfile import mktemp
     from werkzeug.utils import secure_filename
-    UPLOAD_FOLDER = 'static/Uploads'
-    ALLOWED_MIMETYPES = {'image/JPG','image/jpeg', 'image/png', 'image/gif'}
+    UPLOAD_FOLDER = 'static/Uploads/'
+    app_dir = 'app/'
+    ALLOWED_MIMETYPES = {'image/JPG','image/jpeg', 'image/png', 'image/gif','image/pjpeg','image/x-png',}
 
     if request.method == 'GET':
         return render_template('upload.html', img='')
     elif request.method == 'POST':
         f = request.files['file']
-        fname = mktemp(suffix='_', prefix='u', dir=UPLOAD_FOLDER) + secure_filename(f.filename)
-        f.save(fname)
+        print 'ffff   :::::',f.filename
+        if f.filename == '':
+            flash('No select file')
+            return redirect(url_for('main.upload'), 302)
+        #fname = mktemp(suffix='_', prefix='u', dir=UPLOAD_FOLDER) + secure_filename(f.filename)
+        fname = UPLOAD_FOLDER + secure_filename(f.filename)
+        f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
         if mimetypes.guess_type(fname)[0] in ALLOWED_MIMETYPES:
+            flash(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
             return render_template('upload.html', img=fname)
         else:
-            os.remove(fname)
+            os.remove(app_dir + fname)
             flash(mimetypes.guess_type(fname)[0])
             return redirect(url_for('main.upload'), 302)
-
 
 
 @main.route('/bug_process/<int:id>', methods=['GET', 'POST'])
