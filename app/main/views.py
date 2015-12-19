@@ -3,6 +3,7 @@ from flask import render_template, redirect, request, url_for, flash, current_ap
 from flask.ext.login import login_user, logout_user, login_required, \
     current_user
 from wtforms_components import read_only
+from werkzeug import secure_filename
 from .. import db
 from . import main
 from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
@@ -90,11 +91,13 @@ def newbug():
                             opinion='')
         db.session.add(process)
         db.session.commit()
-
-
+        filename = secure_filename(form.photo.data.filename)
+        form.photo.data.save('uploads/'+filename)
         flash('Bugs 提交成功.')
+        flash(form.photo.data.filename)
         return redirect(url_for('.bug_process', id=bug.id))
     #flash('Bugs 提交失败.')
+    flash(form.photo.data)
     return render_template("standard_bug.html", form=form)
 
 
