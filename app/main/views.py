@@ -62,11 +62,11 @@ def task(mytask):
     return render_template('main.html', bugs_list=posts, pagination=pagination,mytask=mytask)
 
 
-@main.route('/newbugs/', methods=['GET', 'POST'])
+@main.route('/newbugs', methods=['GET', 'POST'])
 @login_required
 def newbug():
     form = StandardBug()
-    if form.validate_on_submit():
+    if request.method == 'POST':
         bug = Bugs(product_name=form.product_name.data,
         product_version=form.product_version.data,
         software_version=form.software_version.data,
@@ -91,12 +91,16 @@ def newbug():
                             opinion='')
         db.session.add(process)
         db.session.commit()
-        filename = secure_filename(form.photo.data.filename)
-        form.photo.data.save('uploads/'+filename)
+        UPLOAD_FOLDER = 'static/Uploads/'
+        app_dir = 'app/'
+        f = request.files['photo']
+        fname = UPLOAD_FOLDER + secure_filename(f.filename)
+        f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
+
         flash('Bugs 提交成功.')
-        flash(form.photo.data.filename)
+        flash(request.files['photo'].filename)
         return redirect(url_for('.bug_process', id=bug.id))
-    #flash('Bugs 提交失败.')
+    flash('Bugs 提交失败.')
     flash(form.photo.data)
     return render_template("standard_bug.html", form=form)
 

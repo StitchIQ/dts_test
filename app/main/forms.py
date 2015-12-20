@@ -30,7 +30,8 @@ class StandardBug(Form):
     bug_owner_id = StringField('问题处理人', validators=[Required(), Email()])
     bug_status = RadioField('选择处理', choices=[('1', '新建'),('2', '测试经理审核')], default='1')
     #save = SubmitField('保存')
-    photo = FileField('DTS phote',validators=[FileRequired(),FileAllowed(['jpg','jpeg'],'EEEE')])
+    #photo = FileField('DTS phote',validators=[FileRequired(),FileAllowed(['jpg','jpeg'],'EEEE')])
+    photo = FileField('DTS phote')
     submit = SubmitField('提交')
 
 class BugsProcess(Form):
