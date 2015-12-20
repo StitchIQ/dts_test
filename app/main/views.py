@@ -67,6 +67,12 @@ def task(mytask):
 def newbug():
     form = StandardBug()
     if request.method == 'POST':
+        UPLOAD_FOLDER = 'static/Uploads/'
+        app_dir = 'app/'
+        f = request.files['photo']
+        fname = UPLOAD_FOLDER + secure_filename(f.filename)
+        f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
+
         bug = Bugs(product_name=form.product_name.data,
         product_version=form.product_version.data,
         software_version=form.software_version.data,
@@ -77,7 +83,8 @@ def newbug():
         bug_descrit=form.bug_descrit.data,
         bug_owner=User.query.filter_by(email=form.bug_owner_id.data).first(),
         author=current_user._get_current_object(),
-        bug_status=form.bug_status.data)
+        bug_status=form.bug_status.data,
+        bug_photos=fname)
 
         db.session.add(bug)
 
@@ -91,11 +98,7 @@ def newbug():
                             opinion='')
         db.session.add(process)
         db.session.commit()
-        UPLOAD_FOLDER = 'static/Uploads/'
-        app_dir = 'app/'
-        f = request.files['photo']
-        fname = UPLOAD_FOLDER + secure_filename(f.filename)
-        f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
+
 
         flash('Bugs 提交成功.')
         flash(request.files['photo'].filename)

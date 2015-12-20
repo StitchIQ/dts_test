@@ -74,6 +74,7 @@ class Bugs(db.Model):
     bug_descrit_html = db.Column(db.Text)
     bug_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     bug_status = db.Column(db.Integer,db.ForeignKey('bugstatus.bug_status'))
+    bug_photos = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     process = db.relationship('Process',
