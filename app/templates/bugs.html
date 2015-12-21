@@ -22,6 +22,8 @@
                       <ul id="buginfo" class="nav nav-list secondmenu collapse">
                       <div class="col-md-4">
                           {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
+
+                          <!-- 显示问题单的图片 -->
                           <img src={{ request.url_root }}{{ bugs.bug_photos }} width="50%"/>
 
                           <p>current user {{ current_user }}</p>
@@ -84,7 +86,6 @@
   </div>
 
 {% endblock %}
-
 
 {% block scripts %}
 {{ super() }}
