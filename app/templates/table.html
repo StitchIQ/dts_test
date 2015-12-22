@@ -1,33 +1,34 @@
+{% block title %}D T S{% endblock %}
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <title>Flask JQuery</title>
 <!-- 插入jquery -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css')}}">
 <script src="{{url_for('static', filename='jquery.js')}}"></script>
+
 <script type=text/javascript>
 var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
+
+$.getJSON("/myjson", function(json){
+  alert("JSON Data: " + json.next);
+  alert("JSON Data: " + json.posts[0].author);
+  $("#result").text(json.posts[0].bug_descrit);
+  for(var i=0;i< json.count;i++){
+    $('#buglist').append('<tr>'+'<td>'+json.posts[i].author+'</td>'+'<td>'+json.posts[i].bug_descrit+'</td>'+'<td>'+json.posts[i].bug_level+'</td>'+'</tr>');
+}
+});
+
+
+
 </script>
-<script src="{{url_for('static', filename='table.js')}}"></script>
 
 </head>
 <body>
-<h1>jQuery Example</h1>
-<p><input type=text size=5 name=a1> +
-   <input type=text size=5 name=b1> =
-   <span id=result>?</span>
-<p><a href=# id=calculate>calculate server side</a>
 
-<p>
-    <input type=text size=5 name=a> +
-    <input type=text size=5 name=b> =
-    <span id=result5>?</span>
-</p>
-
-<span id=result6>?</span>
-<p><input type="button" id="test" value="计算"></p>
-
-<table class="table table-bordered" id=clients_list>
+<table class="table table-bordered">
        <thead>
           <tr>
              <th><input type="checkbox"></input></th>
@@ -45,6 +46,30 @@ var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
              <th>创建时间</th>
           </tr>
        </thead>
+       <tbody id="buglist">
+       </tbody>
+    </table>
+
+
+<span id=test>?</span>
+
+
+<h1>jQuery Example</h1>
+<p><input type=text size=5 name=a1> +
+   <input type=text size=5 name=b1> =
+   <span id=result>?</span>
+<p><a href=# id=calculate>calculate server side</a>
+
+<p>
+    <input type=text size=5 name=a> +
+    <input type=text size=5 name=b> =
+    <span id=result5>?</span>
+</p>
+
+<span id=result6>?</span>
+<p><input type="button" id="test" value="计算"></p>
+
+<div id="example1"></div>
 
 
 <p><input type="button" id="get_json" value="BUG_JSON"></p>
