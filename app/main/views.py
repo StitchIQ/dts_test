@@ -1,5 +1,6 @@
 #coding=utf-8
-from flask import render_template, redirect, request, url_for, flash, current_app
+from flask import render_template, redirect, request, url_for, flash, \
+    current_app, jsonify
 from flask.ext.login import login_user, logout_user, login_required, \
     current_user
 from wtforms_components import read_only
@@ -30,11 +31,52 @@ def index():
     flash(posts)
     return render_template('index.html', bugs_list=posts, pagination=pagination1)
 
+@main.route('/_add_numbers')
+@login_required
+def add_numbers():
+    a = request.args.get('a', 0, type=int)
+    b = request.args.get('b', 0, type=int)
+    return jsonify(result=a + b)
+
+
+@main.route('/add')
+@login_required
+def add_numbers2():
+    a = request.args.get('a', 0, type=int)
+    b = request.args.get('b', 0, type=int)
+    return jsonify(result=a + b)
+
+
 @main.route('/ss')
 @login_required
 def ss():
     return render_template('table.html')
 
+@main.route('/myjson')
+@login_required
+def myjson():
+    page = request.args.get('page', 1, type=int)
+    pagination = Bugs.query.filter(
+            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.timestamp.desc()).paginate(
+            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            error_out=False)
+    posts = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = url_for('main.myjson', page=page-1, _external=True)
+    next = None
+    if pagination.has_next:
+        next = url_for('main.myjson', page=page+1, _external=True)
+    a = request.args.get('a', 0, type=int)
+    b = request.args.get('b', 0, type=int)
+    #return jsonify(result=a + b)
+    return jsonify({
+        'posts': [post.to_json() for post in posts],
+        'prev': prev,
+        'next': next,
+        'count': pagination.total
+        })
 
 @main.route('/task/<string:mytask>')
 @login_required
@@ -61,6 +103,25 @@ def task(mytask):
             Process.operator==current_user)))
     return render_template('main.html', bugs_list=posts, pagination=pagination,mytask=mytask)
 
+
+
+
+@main.route('/copy_to_me/')
+@login_required
+def copy_to_me():
+    query = db.session.query(overtimemodel.Statics)
+    q = query.all()
+    from datatables import DataTable
+    table = DataTable(request.args, overtimemodel.Statics, query, [
+     ('user_name', 'user.name'),
+     'overtime_total',
+     'overtime_avail',
+     'overtime_holiday',
+     'overtime_expense',
+     'overtime_shared',
+     'invoice_lack_amount'
+    ])
+    return jsonify(table.json())
 
 @main.route('/newbugs', methods=['GET', 'POST'])
 @login_required

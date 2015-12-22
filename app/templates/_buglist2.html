@@ -1,0 +1,45 @@
+<div class="form-inline">
+    <div class="form-group">
+      <div class="checkbox"><lable><input type="checkbox"></input>请选择</lable>
+      </div>
+    </div>
+</div>
+
+    <table class="table table-bordered">
+       <thead>
+          <tr>
+             <th><input type="checkbox"></input></th>
+             <th>Num.</th>
+             <th>BugsID</th>
+             <th>产品名称</th>
+             <th>产品版本</th>
+             <th>软件版本</th>
+             <th>问题级别</th>
+             <th>出现频率</th>
+             <th>问题单描述</th>
+             <th>提交人</th>
+             <th>问题状态</th>
+             <th>当前处理人</th>
+             <th>创建时间</th>
+          </tr>
+       </thead>
+       <tbody>
+            {% for bugs in bugs_list %}
+              <tr>
+                <td><input type="checkbox"></input></td>
+                <td>{{ loop.index }}</td>
+                <td><a href="{{ url_for('.bug_process', id=bugs.id) }}" target="_blank">{{ bugs.id }}</a></td>
+                <td>{{ bugs.product_name }}</td>
+                <td>{{ bugs.product_version }}</td>
+                <td>{{ bugs.software_version }}</td>
+                <td>{{ bugs.bug_level }}</td>
+                <td>{{ bugs.bug_show_times }}</td>
+                <td>{{ bugs.bug_title }}</td>
+                <td>{{ bugs.author.username }}</td>
+                <td>{{ bugs.now_status.bug_status_descrit }}</td>
+                <td>{{ bugs.bug_owner.username }}</td>
+                <td>{{ moment(bugs.timestamp).fromNow() }}</td>
+              </tr>
+            {% endfor %}
+       </tbody>
+    </table>

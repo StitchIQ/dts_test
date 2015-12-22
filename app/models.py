@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 import bleach
 from markdown import markdown
-from flask import current_app
+from flask import current_app, url_for
 
 from flask.ext.login import UserMixin
 from . import db, login_manager
@@ -83,6 +83,18 @@ class Bugs(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.id
+
+    def to_json(self):
+        json_post = {
+            'url': url_for('main.bug_process', id=self.id, _external=True),
+            'bug_title': self.bug_title,
+            'bug_descrit': self.bug_descrit,
+            'timestamp': self.timestamp,
+            'author': self.bug_owner_id,
+            'bug_show_times': self.bug_show_times,
+            'bug_level': self.bug_level
+            }
+        return json_post
 
     @staticmethod
     def on_changed_bug_descrit(target, value, oldvalue, initiator):

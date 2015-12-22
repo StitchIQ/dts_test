@@ -63,7 +63,8 @@
         <li><a href="{{ url_for('main.task', mytask='created') }}">
             <i class="glyphicon glyphicon-asterisk"></i>&nbsp;我创建的问题</a></li>
 
-        <li><a href="#"><i class="glyphicon glyphicon-edit"></i>&nbsp;抄送我的问题</a></li>
+        <li><a href="{{ url_for('main.copy_to_me') }}">
+            <i class="glyphicon glyphicon-edit"></i>&nbsp;抄送我的问题</a></li>
 
         <li><a href="#"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;我关注的问题</a></li>
         <li><a href="#"><i class="glyphicon glyphicon-modify"></i>&nbsp;我修改的问题</a></li>
