@@ -50,7 +50,7 @@ def add_numbers2():
 @main.route('/ss')
 @login_required
 def ss():
-    return render_template('table.html')
+    return render_template('table_list.html')
 
 @main.route('/myjson')
 @login_required

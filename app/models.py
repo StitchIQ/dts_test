@@ -87,12 +87,18 @@ class Bugs(db.Model):
     def to_json(self):
         json_post = {
             'url': url_for('main.bug_process', id=self.id, _external=True),
-            'bug_title': self.bug_title,
-            'bug_descrit': self.bug_descrit,
-            'timestamp': self.timestamp,
-            'author': self.bug_owner_id,
+            'id': self.id,
+            'author': self.author.username,
+            'product_name':self.product_name,
+            'product_version':self.product_version,
+            'software_version':self.software_version,
+            'bug_level':self.bug_level,
+            'system_view':self.system_view,
             'bug_show_times': self.bug_show_times,
-            'bug_level': self.bug_level
+            'bug_title': self.bug_title,
+            'bug_owner': self.bug_owner.username,
+            'bug_status': self.now_status.bug_status_descrit,
+            'timestamp': self.timestamp
             }
         return json_post
 

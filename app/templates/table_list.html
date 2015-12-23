@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% block title %}D T S{% endblock %}
+
+{% block page_content %}
+
+<div class="col-md-9">
+     <div class="btn-group btn-group-lg" role="group" aria-label="...">
+      <a herf="{{ url_for('main.newbug') }}">
+      <button type="button" class="btn btn-primary">标准流程</button></a>
+      <button type="button" class="btn btn-info">简易流程</button>
+      <button type="button" class="btn btn-default">Right5</button>
+     </div>
+    <hr>
+    <div class="btn-group btn-group-lg">
+       <button type="button" class="btn btn-default">选择列</button>
+       <button type="button" class="btn btn-default dropdown-toggle"
+          data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">切换下拉菜单</span>
+       </button>
+       <ul class="dropdown-menu" role="menu">
+          <li><a href="#">功能</a></li>
+          <li><a href="#">另一个功能</a></li>
+          <li><a href="#">其他</a></li>
+          <li class="divider"></li>
+          <li><a href="#">分离的链接</a></li>
+       </ul>
+
+    <div class="btn-group btn-group-lg">
+       <button type="button" class="btn btn-primary">导出数据</button>
+       <button type="button" class="btn btn-primary dropdown-toggle"
+          data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">切换下拉菜单</span>
+       </button>
+       <ul class="dropdown-menu" role="menu">
+          <li><a href="#">功能</a></li>
+          <li><a href="#">另一个功能</a></li>
+          <li><input type="text" class="form-control"></input></li>
+          <li class="divider"></li>
+          <li><a href="#">分离的链接</a></li>
+        </ul>
+    </div>
+    <div class="row">
+       <form class="bs-example bs-example-form" role="form">
+        <div class="input-group">
+           <input type="text" class="form-control">
+           <span class="input-group-btn">
+              <button class="btn btn-default" type="button">
+                 Go!
+              </button>
+           </span>
+        </div><!-- /input-group -->
+       </form><!-- bs-example -->
+    </div>
+    <hr>
+
+    {% include 'table.html' %}
+
+    {% if pagination %}
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, '.index') }}
+    </div>
+    {% endif %}
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+
+<script type="text/javascript" src="static/table.js"></script>
+
+
+{% endblock %}
+

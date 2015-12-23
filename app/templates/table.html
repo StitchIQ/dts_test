@@ -1,32 +1,3 @@
-{% block title %}D T S{% endblock %}
-
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Flask JQuery</title>
-<!-- 插入jquery -->
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css')}}">
-<script src="{{url_for('static', filename='jquery.js')}}"></script>
-
-<script type=text/javascript>
-var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
-
-$.getJSON("/myjson", function(json){
-  alert("JSON Data: " + json.next);
-  alert("JSON Data: " + json.posts[0].author);
-  $("#result").text(json.posts[0].bug_descrit);
-  for(var i=0;i< json.count;i++){
-    $('#buglist').append('<tr>'+'<td>'+json.posts[i].author+'</td>'+'<td>'+json.posts[i].bug_descrit+'</td>'+'<td>'+json.posts[i].bug_level+'</td>'+'</tr>');
-}
-});
-
-
-
-</script>
-
-</head>
-<body>
 
 <table class="table table-bordered">
        <thead>
@@ -73,5 +44,4 @@ $.getJSON("/myjson", function(json){
 
 
 <p><input type="button" id="get_json" value="BUG_JSON"></p>
-</body>
-</html>
+
