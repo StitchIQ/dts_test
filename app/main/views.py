@@ -50,13 +50,16 @@ def add_numbers2():
 @main.route('/ss')
 @login_required
 def ss():
-    page = request.args.get('page', 1, type=int)
+    # http://blog.csdn.net/porschev/article/details/5943579
+    # pageIndex=1&pageSize=20
+    #page = request.args.get('page', 1, type=int)
     # sts=BugStatus.query.filter_by(id=6).first()
-
+    page = request.args.get('pageIndex', 1, type=int)
+    size = request.args.get('pageSize', 1, type=int)
     pagination1 = Bugs.query.filter(
             Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
             Bugs.timestamp.desc()).paginate(
-            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            page, per_page=size,
             error_out=False)
 
     posts = pagination1.items
@@ -66,11 +69,14 @@ def ss():
 @main.route('/myjson')
 @login_required
 def myjson():
-    page = request.args.get('page', 1, type=int)
+    #page = request.args.get('page', 1, type=int)
+    page = request.args.get('pageIndex', 1, type=int)
+    size = request.args.get('pageSize', 1, type=int)
+
     pagination = Bugs.query.filter(
             Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
             Bugs.timestamp.desc()).paginate(
-            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            page, per_page=size,
             error_out=False)
     posts = pagination.items
     prev = None
