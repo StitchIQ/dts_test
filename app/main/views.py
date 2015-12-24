@@ -50,7 +50,18 @@ def add_numbers2():
 @main.route('/ss')
 @login_required
 def ss():
-    return render_template('table_list.html')
+    page = request.args.get('page', 1, type=int)
+    # sts=BugStatus.query.filter_by(id=6).first()
+
+    pagination1 = Bugs.query.filter(
+            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.timestamp.desc()).paginate(
+            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            error_out=False)
+
+    posts = pagination1.items
+    flash(posts)
+    return render_template('table_list2.html')
 
 @main.route('/myjson')
 @login_required
@@ -68,14 +79,13 @@ def myjson():
     next = None
     if pagination.has_next:
         next = url_for('main.myjson', page=page+1, _external=True)
-    a = request.args.get('a', 0, type=int)
-    b = request.args.get('b', 0, type=int)
-    #return jsonify(result=a + b)
+
     return jsonify({
         'posts': [post.to_json() for post in posts],
         'prev': prev,
         'next': next,
-        'count': pagination.total
+        'count': pagination.total,
+        'pages': pagination.pages
         })
 
 @main.route('/task/<string:mytask>')

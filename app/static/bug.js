@@ -1,67 +1,68 @@
-$("#clients_list").dataTable({
-    serverSide: true,
-    processing: true,
-    ajax: "/api/v1/overtime",
-    columns: [
-     {
-         data: "overtime_total", 'render': function (data, type, full, meta) {
-         return '<div class="text-right">' + Math.round(data * 10) / 10 + '</div>';
-     }
-     },
-     {
-         data: "overtime_avail", 'render': function (data, type, full, meta) {
-         return '<div class="text-right">' + Math.round(data * 10) / 10 + '</div>';
-     }
-     },
-     {
-         data: "overtime_holiday", 'render': function (data, type, full, meta) {
-         return '<div class="text-right">' + Math.round(data * 10) / 10 + '</div>';
-     }
-     },
-     {
-         data: "overtime_expense", 'render': function (data, type, full, meta) {
-         return '<div class="text-right">' + Math.round(data * 10) / 10 + '</div>';
-     }
-     },
-     {
-         data: "overtime_shared", 'render': function (data, type, full, meta) {
-         return '<div class="text-right">' + Math.round(data * 100) / 100 + '</div>';
-     }
-     },
-     {
-         data: "invoice_lack_amount", 'render': function (data, type, full, meta) {
-         return '<div class="text-right">' + Math.round(data * 10) / 10 + '</div>';
-     }
-     }
-    ],
-    "paging": true,
-    "lengthChange": false,
-    "searching": false,
-    "ordering": true,
-    "info": true,
-    "autoWidth": true,
-    language: {
-     "sProcessing": "处理中...",
-     "sLengthMenu": "显示 _MENU_ 项结果",
-     "sZeroRecords": "没有匹配结果",
-     "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
-     "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
-     "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
-     "sInfoPostFix": "",
-     "sSearch": "搜索:",
-     "sUrl": "",
-     "sEmptyTable": "表中数据为空",
-     "sLoadingRecords": "载入中...",
-     "sInfoThousands": ",",
-     "oPaginate": {
-         "sFirst": "首页",
-         "sPrevious": "上页",
-         "sNext": "下页",
-         "sLast": "末页"
-     },
-     "oAria": {
-         "sSortAscending": ": 以升序排列此列",
-         "sSortDescending": ": 以降序排列此列"
-     }
-    }
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+$(function() {
+    $('a#calculate').bind('click', function() {
+      $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
+        a: $('input[name="a"]').val(),
+        b: $('input[name="b"]').val()
+      }, function(data) {
+        $("#result").text(data.result);
+      });
+      return false;
     });
+  });
+
+$(function() {
+    function submit_form2(e) {
+        $.getJSON("/myjson", {
+        page: 2,
+        },
+        function(data) {
+            $('#result5').text(data.posts[0].url);
+        });
+    };
+    // 绑定click事件
+    $('#test').bind('click', submit_form);
+});
+
+
+<script src="js/jquery.pagination.js" type="text/javascript"></script>
+
+<script language="javascript" type="text/javascript">
+ var pageIndex =0;     //页索引
+ var pageSize =20;    //每页显示的条数
+    $(function() {
+    Init(0);
+        $("#Pagination").pagination(<%=pageCount %>, {
+             callback: PageCallback,
+             prev_text: '上一页',
+             next_text: '下一页',
+             items_per_page: pageSize,
+             num_display_entries: 5,
+             current_page: pageIndex,
+             num_edge_entries: 1
+         });
+         function PageCallback(index, jq) {
+              Init(index);
+         }
+    });
+
+    function Init(pageIndex) {
+        $.ajax({
+            type: "POST",
+            dataType: "text",
+            url: 'SqlPage.aspx',
+            data: "pageIndex=" + (pageIndex + 1) + "&pageSize=" + pageSize,
+            success: function(data) {
+                if(data!=""){
+                 $("#tblData tr:gt(0)").remove();//移除所有的数据行
+                 data=$.parseJSON(data);
+                        $.each(data.News,function(index,news){
+                       $("#tblData").append("<tr bgcolor='white'><td>"+news.NewsID+"</td><td algin='left'>"+news.Title+"</td><td>"+news.SmallClassName+"</td><td>"+news.Author+"</td><td>"+news.Updatetime+"</td></tr>");  //将返回的数据追加到表格
+                    });
+                }
+            }
+        });
+
+    }
+</script>
