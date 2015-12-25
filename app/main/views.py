@@ -66,6 +66,12 @@ def ss():
     flash(posts)
     return render_template('table_list2.html')
 
+@main.route('/datatable')
+@login_required
+def datatable():
+
+    return render_template('datatable.html')
+
 @main.route('/myjson')
 @login_required
 def myjson():
@@ -94,6 +100,35 @@ def myjson():
         'pages': pagination.pages
         })
 
+
+@main.route('/myjson2')
+@login_required
+def myjson2():
+    page = request.args.get('page', 1, type=int)
+
+    pagination = Bugs.query.filter(
+            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.timestamp.desc()).paginate(
+            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            error_out=False)
+    posts = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = url_for('main.myjson', page=page-1, _external=True)
+    next = None
+    if pagination.has_next:
+        next = url_for('main.myjson', page=page+1, _external=True)
+
+    return jsonify({ "name": "Tiger Nixon", "hr": { "position": "System Architect", "salary": "$3,120", "start_date": "2011/04/25" }, "contact": [ "Edinburgh", "5421" ] })
+    '''
+    return jsonify({
+        'posts': [post.to_json() for post in posts],
+        'prev': prev,
+        'next': next,
+        'count': pagination.total,
+        'pages': pagination.pages
+        })
+    '''
 @main.route('/task/<string:mytask>')
 @login_required
 def task(mytask):
