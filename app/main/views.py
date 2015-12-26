@@ -118,17 +118,37 @@ def myjson2():
     next = None
     if pagination.has_next:
         next = url_for('main.myjson', page=page+1, _external=True)
-
-    return jsonify({ "name": "Tiger Nixon", "hr": { "position": "System Architect", "salary": "$3,120", "start_date": "2011/04/25" }, "contact": [ "Edinburgh", "5421" ] })
     '''
     return jsonify({
-        'posts': [post.to_json() for post in posts],
-        'prev': prev,
-        'next': next,
-        'count': pagination.total,
-        'pages': pagination.pages
-        })
+                "draw": 2,
+                "recordsTotal": 11,
+                "recordsFiltered": 11,
+                "data": [
+                    {
+                        "id": 1,
+                        "firstName": "Troy",
+                        "lastName": "Young"
+                    },
+                    {
+                        "id": 2,
+                        "firstName": "Alice",
+                        "lastName": "LL"
+                    },
+                    {
+                        "id": 3,
+                        "firstName": "Larry",
+                        "lastName": "Bird"
+                    }
+                ]
+            })
     '''
+    return jsonify({
+        'draw': pagination.pages,
+        'recordsTotal': pagination.total,
+        'recordsFiltered': 20,
+        'data': [post.to_json() for post in posts]
+        })
+
 @main.route('/task/<string:mytask>')
 @login_required
 def task(mytask):
