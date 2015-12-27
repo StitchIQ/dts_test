@@ -118,36 +118,30 @@ def myjson2():
     next = None
     if pagination.has_next:
         next = url_for('main.myjson', page=page+1, _external=True)
-    '''
-    return jsonify({
-                "draw": 2,
-                "recordsTotal": 11,
-                "recordsFiltered": 11,
-                "data": [
-                    {
-                        "id": 1,
-                        "firstName": "Troy",
-                        "lastName": "Young"
-                    },
-                    {
-                        "id": 2,
-                        "firstName": "Alice",
-                        "lastName": "LL"
-                    },
-                    {
-                        "id": 3,
-                        "firstName": "Larry",
-                        "lastName": "Bird"
-                    }
-                ]
-            })
-    '''
-    return jsonify({
-        'draw': pagination.pages,
-        'recordsTotal': pagination.total,
-        'recordsFiltered': 20,
-        'data': [post.to_json() for post in posts]
-        })
+
+    query = Bugs.query
+    q = query.all()
+    from datatables import DataTable
+
+    # ('bugs_owner','bug_owner.username'),
+    table = DataTable(request.args, Bugs, query, [
+        "id",
+        ('user_name', 'author.username'),
+        "bug_level",
+        "bug_owner_id",
+        "bug_show_times",
+        ('bug_status','now_status.bug_status_descrit'),
+        "bug_title",
+        "product_name",
+        "product_version",
+        "software_version",
+        "system_view",
+        "timestamp"
+    ])
+
+    return jsonify(table.json())
+
+
 
 @main.route('/task/<string:mytask>')
 @login_required

@@ -6,7 +6,11 @@ $(document).ready(function() {
             "ordering": true,
             "ajax" : "myjson2",
             "columns": [
-                {"data": "id", "orderSequence": [ "asc" ]},
+                {"data":"id", 'render':function(data, type, full, meat){
+                    return '<input type="checkbox"></input>'
+                }
+                },
+                {"data": "id", "bSortable": true},
                 {
                     "data": "url",'render': function (data, type, full, meta) {
                      return '<a herf="' + data +'">'+"id"+'</a>';
@@ -17,9 +21,9 @@ $(document).ready(function() {
                 {"data": "bug_level"},
                 {"data": "bug_show_times"},
                 {"data": "bug_title"},
-                {"data": "author"},
+                {"data": "user_name"},
                 {"data": "bug_status"},
-                {"data": "bug_owner"},
+                {"data": "bug_owner_id"},
                 {"data": "timestamp"}
             ],
             "pagingType": "full_numbers",
