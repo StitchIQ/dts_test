@@ -1,8 +1,29 @@
 $(document).ready(function() {
         $("#datatable").dataTable({
+            initComplete: function () {
+                    var api = this.api();
+                    api.columns().indexes().flatten().each( function ( i ) {
+                        var column = api.column( i );
+                        var select = $('<select><option value=""></option></select>')
+                            .appendTo( $(column.footer()).empty() )
+                            .on( 'change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+                                column
+                                    .search( val ? '^'+val+'$' : '', true, false )
+                                    .draw();
+                            } );
+                        column.data().unique().sort().each( function ( d, j ) {
+                            select.append( '<option value="'+d+'">'+d+'</option>' )
+                        } );
+                    } );
+                },
+
+
             "processing": true,
             "serverSide": true,
-            "bFilter": true,
+            "Filter": true,
             "ordering": true,
             "ajax" : "myjson2",
             "columns": [
@@ -26,10 +47,16 @@ $(document).ready(function() {
                 {"data": "bug_owner_id"},
                 {"data": "timestamp"}
             ],
+            "aaSorting": [[ 1, "desc" ]],
             "pagingType": "full_numbers",
-
-
+            "sScrollX": "100%",
+            "sScrollXInner": "110%",
+            "bScrollCollapse": true
         });
+
+
+
+
     });
 
 
