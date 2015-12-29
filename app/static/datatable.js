@@ -5,7 +5,7 @@ $(document).ready(function() {
                 api.columns().indexes().flatten().each( function ( i ) {
                     var column = api.column( i );
                     var select = $('<select><option value=""></option></select>')
-                        .appendTo( $(column.header()).empty() )
+                        .appendTo( $(column.footer()).empty() )
                         .on( 'change', function () {
                             var val = $.fn.dataTable.util.escapeRegex(
                                 $(this).val()
@@ -33,21 +33,25 @@ $(document).ready(function() {
                 }
                 },
                 {"data": "id"},
-                {"data": "id","searchable":true},
+                {"data": "id",'render':function(data, type, row, meat){
+                    return '<a href="'+ row.url+'" target="_blank">'+ row.id +'</input>'
+                }
+},
                 {"data": "product_name"},
                 {"data": "product_version"},
                 {"data": "software_version"},
                 {"data": "bug_level"},
                 {"data": "bug_show_times"},
                 {"data": "bug_title"},
-                {"data": "user_name"},
+                {"data": "author"},
                 {"data": "bug_status"},
-                {"data": "bug_owner_id"},
+                {"data": "bug_owner"},
                 {"data": "timestamp"}
             ],
             "aaSorting": [[ 1, "desc" ]],
             "pagingType": "full_numbers",
-            "sScrollX": "100%",
+            "scrollX": "80%",
+            "scrollY": "500px",
             "sScrollXInner": "110%",
             "bScrollCollapse": true,
 
