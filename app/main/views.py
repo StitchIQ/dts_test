@@ -47,9 +47,9 @@ def add_numbers2():
     return jsonify(result=a + b)
 
 
-@main.route('/ss')
+@main.route('/jsontable')
 @login_required
-def ss():
+def jsontable():
     # http://blog.csdn.net/porschev/article/details/5943579
     # pageIndex=1&pageSize=20
     #page = request.args.get('page', 1, type=int)
@@ -119,16 +119,20 @@ def myjson2():
     if pagination.has_next:
         next = url_for('main.myjson', page=page+1, _external=True)
 
-    query = Bugs.query
-    q = query.all()
-    from datatables import DataTable
 
+    #query = Bugs.query
+    query = db.session.query(Bugs).filter(
+            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.timestamp.desc())
+    #q = query.all()
+    from datatables import DataTable
+    rq = request.args
     # ('bugs_owner','bug_owner.username'),
     table = DataTable(request.args, Bugs, query, [
         "id",
-        ('user_name', 'author.username'),
+        ('user_name', 'author_id'),
         "bug_level",
-        "bug_owner_id",
+        ("bug_owner_id",'bug_owner.username'),
         "bug_show_times",
         ('bug_status','now_status.bug_status_descrit'),
         "bug_title",
@@ -139,7 +143,14 @@ def myjson2():
         "timestamp"
     ])
 
-    return jsonify(table.json())
+    return jsonify({
+        'data': [post.to_json() for post in posts],
+        "draw": 1,
+        "recordsFiltered": 43,
+        "recordsTotal": pagination.total
+        })
+
+    #return jsonify(table.json())
 
 
 
