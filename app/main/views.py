@@ -31,6 +31,19 @@ def index():
     flash(posts)
     return render_template('index.html', bugs_list=posts, pagination=pagination1)
 
+@main.route('/check_user')
+@login_required
+def check_user():
+    a = request.args.get('username', 0, type=str)
+    print a
+    status = User.query.filter_by(email=a).first()
+    #b = request.args.get('b', 0, type=int)
+    if status:
+        return status.username
+    else:
+        return '0'
+
+
 @main.route('/_add_numbers')
 @login_required
 def add_numbers():
@@ -143,10 +156,11 @@ def myjson2():
         "timestamp"
     ])
 
+
     return jsonify({
         'data': [post.to_json() for post in posts],
         "draw": 1,
-        "recordsFiltered": 43,
+        "recordsFiltered": pagination.total,
         "recordsTotal": pagination.total
         })
 
@@ -185,62 +199,63 @@ def task(mytask):
 @main.route('/copy_to_me/')
 @login_required
 def copy_to_me():
-    query = db.session.query(overtimemodel.Statics)
-    q = query.all()
-    from datatables import DataTable
-    table = DataTable(request.args, overtimemodel.Statics, query, [
-     ('user_name', 'user.name'),
-     'overtime_total',
-     'overtime_avail',
-     'overtime_holiday',
-     'overtime_expense',
-     'overtime_shared',
-     'invoice_lack_amount'
-    ])
-    return jsonify(table.json())
+    page = request.args.get('page', 1, type=int)
+    # sts=BugStatus.query.filter_by(id=6).first()
+
+    pagination1 = Bugs.query.filter(
+            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.timestamp.desc()).paginate(
+            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            error_out=False)
+
+    posts = pagination1.items
+    flash(posts)
+    return render_template('index.html', bugs_list=posts, pagination=pagination1)
+
 
 @main.route('/newbugs', methods=['GET', 'POST'])
 @login_required
 def newbug():
     form = StandardBug()
-    if request.method == 'POST':
-        UPLOAD_FOLDER = 'static/Uploads/'
-        app_dir = 'app/'
-        f = request.files['photo']
-        fname = UPLOAD_FOLDER + secure_filename(f.filename)
-        f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
+    if form.validate_on_submit():
+        if request.method == 'POST':
+            UPLOAD_FOLDER = 'static/Uploads/'
+            app_dir = 'app/'
+            f = request.files['photo']
+            fname = UPLOAD_FOLDER + secure_filename(f.filename)
+            f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
+            print form.bug_descrit.data
+            bug = Bugs(product_name=form.product_name.data,
+            product_version=form.product_version.data,
+            software_version=form.software_version.data,
+            bug_level=form.bug_level.data,
+            system_view=form.system_view.data,
+            bug_show_times=form.bug_show_times.data,
+            bug_title=form.bug_title.data,
+            bug_descrit=form.bug_descrit.data,
+            bug_owner=User.query.filter_by(email=form.bug_owner_id.data).first(),
+            author=current_user._get_current_object(),
+            bug_status=form.bug_status.data,
+            bug_photos=fname)
 
-        bug = Bugs(product_name=form.product_name.data,
-        product_version=form.product_version.data,
-        software_version=form.software_version.data,
-        bug_level=form.bug_level.data,
-        system_view=form.system_view.data,
-        bug_show_times=form.bug_show_times.data,
-        bug_title=form.bug_title.data,
-        bug_descrit=form.bug_descrit.data,
-        bug_owner=User.query.filter_by(email=form.bug_owner_id.data).first(),
-        author=current_user._get_current_object(),
-        bug_status=form.bug_status.data,
-        bug_photos=fname)
+            db.session.add(bug)
 
-        db.session.add(bug)
-
-        # bug_owner_id=form.bug_owner_id.data,
-        # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-        process = Process(operator=current_user._get_current_object(),
-                    author=User.query.filter_by(email=form.bug_owner_id.data).first(),
-                            bugs=bug,
-                            old_status='1',
-                            new_status=form.bug_status.data,
-                            opinion='')
-        db.session.add(process)
-        db.session.commit()
+            # bug_owner_id=form.bug_owner_id.data,
+            # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+            process = Process(operator=current_user._get_current_object(),
+                        author=User.query.filter_by(email=form.bug_owner_id.data).first(),
+                                bugs=bug,
+                                old_status='1',
+                                new_status=form.bug_status.data,
+                                opinion='')
+            db.session.add(process)
+            db.session.commit()
 
 
-        flash('Bugs 提交成功.')
-        flash(request.files['photo'].filename)
-        return redirect(url_for('.bug_process', id=bug.id))
-    flash('Bugs 提交失败.')
+            flash('Bugs 提交成功.')
+            flash(request.files['photo'].filename)
+            return redirect(url_for('.bug_process', id=bug.id))
+    flash('Bugs 准备提交.')
     flash(form.photo.data)
     return render_template("standard_bug.html", form=form)
 

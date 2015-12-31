@@ -22,7 +22,31 @@
     </form>
     <br>
 
+<h1>jQuery Example</h1>
+<p><input type=text size=5 name=a> +
+   <input type=text size=5 name=b> =
+   <span id=result>?</span>
+<p><a href=# id=calculate>calculate server side</a>
+
+<span id=resultjson>?</span>
+<input type=text size=5 name=a id=calculate2>
+
 </div>
+
+
+
 {% endblock %}
+
+
+
+
+
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+
+<script src="static/check_user.js" type="text/javascript"></script>
+{% endblock %}
+
 
 
