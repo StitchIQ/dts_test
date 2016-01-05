@@ -1,6 +1,6 @@
 #coding=utf-8
 from flask import render_template, redirect, request, url_for, flash, \
-    current_app, jsonify
+    current_app, jsonify, abort
 from flask.ext.login import login_user, logout_user, login_required, \
     current_user
 from wtforms_components import read_only
@@ -10,7 +10,7 @@ from . import main
 from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
     TestLeadEdit2, BugClose
 from ..email import send_email
-from ..models import Bugs, User, Process, BugStatus
+from ..models import Bugs, User, Process, BugStatus, Permission, Bug_Now_Status
 
 
 @main.route('/')
@@ -22,7 +22,7 @@ def index():
     # sts=BugStatus.query.filter_by(id=6).first()
 
     pagination1 = Bugs.query.filter(
-            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.bug_owner==current_user,Bugs.bug_status<Bug_Now_Status.CLOSED).order_by(
             Bugs.timestamp.desc()).paginate(
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
@@ -70,7 +70,7 @@ def jsontable():
     page = request.args.get('pageIndex', 1, type=int)
     size = request.args.get('pageSize', 1, type=int)
     pagination1 = Bugs.query.filter(
-            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.bug_owner==current_user,Bugs.bug_status<Bug_Now_Status.CLOSED).order_by(
             Bugs.timestamp.desc()).paginate(
             page, per_page=size,
             error_out=False)
@@ -93,7 +93,7 @@ def myjson():
     size = request.args.get('pageSize', 1, type=int)
 
     pagination = Bugs.query.filter(
-            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.bug_owner==current_user,Bugs.bug_status<Bug_Now_Status.CLOSED).order_by(
             Bugs.timestamp.desc()).paginate(
             page, per_page=size,
             error_out=False)
@@ -120,7 +120,7 @@ def myjson2():
     page = request.args.get('page', 1, type=int)
 
     pagination = Bugs.query.filter(
-            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.bug_owner==current_user,Bugs.bug_status<Bug_Now_Status.CLOSED).order_by(
             Bugs.timestamp.desc()).paginate(
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
@@ -135,7 +135,7 @@ def myjson2():
 
     #query = Bugs.query
     query = db.session.query(Bugs).filter(
-            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.bug_owner==current_user,Bugs.bug_status<Bug_Now_Status.CLOSED).order_by(
             Bugs.timestamp.desc())
     #q = query.all()
     from datatables import DataTable
@@ -203,7 +203,7 @@ def copy_to_me():
     # sts=BugStatus.query.filter_by(id=6).first()
 
     pagination1 = Bugs.query.filter(
-            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
+            Bugs.bug_owner==current_user,Bugs.bug_status<Bug_Now_Status.CLOSED).order_by(
             Bugs.timestamp.desc()).paginate(
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
@@ -298,13 +298,13 @@ def bug_process(id):
 
     # 处理日志
     process_log = bugs.process.order_by(Process.timestamp.asc())
-    testmanager_log = bugs.process.filter_by(old_status='2').order_by(
+    testmanager_log = bugs.process.filter_by(old_status=Bug_Now_Status.TESTLEADER_AUDIT).order_by(
                         Process.timestamp.desc())
-    developedit_log = bugs.process.filter_by(old_status='3').order_by(
+    developedit_log = bugs.process.filter_by(old_status=Bug_Now_Status.DEVELOPMENT).order_by(
                         Process.timestamp.desc())
-    bugtest_log = bugs.process.filter_by(old_status='4').order_by(
+    bugtest_log = bugs.process.filter_by(old_status=Bug_Now_Status.TESTLEADER_REGESSION).order_by(
                         Process.timestamp.desc())
-    retest_log = bugs.process.filter_by(old_status='5').order_by(
+    retest_log = bugs.process.filter_by(old_status=Bug_Now_Status.REGRESSION_TESTING).order_by(
                         Process.timestamp.desc())
     #post.comments.order_by(Comment.timestamp.asc()) .filter_by(status='3')
     form = BugsProcess()
@@ -325,6 +325,7 @@ def bug_process(id):
                         old_status=bugs.bug_status,
                         new_status=testleadedit.bug_status.data,
                         opinion=testleadedit.process_opinion.data)
+        bugs.ping()
         db.session.add(process)
 
 
@@ -428,7 +429,7 @@ def bug_process(id):
     read_only(form.bug_descrit)
 
     #flash(process_list.first().opinion)
-    return render_template('bugs.html', form=form, bugs=bugs,
+    return render_template('bugs_process.html', form=form, bugs=bugs,
         testleadedit=testleadedit, developedit=developedit,
         testleadedit2=testleadedit2, bugclose=bugclose,
         testmanager_log=testmanager_log,process_log=process_log,
@@ -439,6 +440,11 @@ def bug_process(id):
 @login_required
 def bug_edit(id):
     bugs = Bugs.query.get_or_404(id)
+    print bugs.now_status.id
+    if current_user != bugs.bug_owner or bugs.now_status.id != Bug_Now_Status.CREATED and \
+            not current_user.can(Permission.ADMINISTER):
+        abort(403)
+
     process_log = bugs.process.order_by(Process.timestamp.asc())
 
     form = StandardBug()

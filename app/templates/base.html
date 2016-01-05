@@ -26,6 +26,7 @@
             <a class="navbar-brand" href="{{ url_for('main.jsontable') }}">JsonTable</a>
             <a class="navbar-brand" href="{{ url_for('main.upload') }}">Upload</a>
             <a class="navbar-brand" href="{{ url_for('main.datatable') }}">Datatable</a>
+            <a class="navbar-brand" href="{{ url_for('mang.index') }}">Mang</a>
         </div>
         <div class="navbar-collapse collapse">
 
@@ -95,6 +96,7 @@
 
     {% block page_content %}
     {% endblock %}
+
         {% for message in get_flashed_messages() %}
         <div class="alert alert-warning">
             <button type="button" class="close" data-dismiss="alert">&times;</button>

@@ -8,12 +8,23 @@ from flask import current_app, url_for
 from flask.ext.login import UserMixin
 from . import db, login_manager
 
+
+
+
 class Permission:
     FOLLOW = 0x01
     COMMENT = 0x02
     WRITE_ARTICLES = 0x04
     MODERATE_COMMENTS = 0x08
     ADMINISTER = 0x80
+
+class Bug_Now_Status:
+    CREATED = 1
+    TESTLEADER_AUDIT = 2
+    DEVELOPMENT = 3
+    TESTLEADER_REGESSION = 4
+    REGRESSION_TESTING = 5
+    CLOSED = 6
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -76,6 +87,7 @@ class Bugs(db.Model):
     bug_status = db.Column(db.Integer,db.ForeignKey('bugstatus.bug_status'))
     bug_photos = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    bug_last_update = db.Column(db.DateTime(), default=datetime.utcnow)
 
     process = db.relationship('Process',
                             foreign_keys=[Process.bugs_id],
@@ -101,6 +113,10 @@ class Bugs(db.Model):
             'timestamp': self.timestamp
             }
         return json_post
+
+    def ping(self):
+        self.bug_last_update = datetime.utcnow()
+        db.session.add(self)
 
     @staticmethod
     def on_changed_bug_descrit(target, value, oldvalue, initiator):
