@@ -70,6 +70,14 @@ class Process(db.Model):
     timestamp = db.Column(db.DateTime, index=True,default=datetime.utcnow)
 
 
+class ProductInfo(db.Model):
+    __tablename__ = 'productinfo'
+    product_id = db.Column(db.Integer, primary_key=True)
+    product_name = db.Column(db.String(64),unique=True)
+    product_version = db.Column(db.Text)
+    product_software = db.Column(db.Text)
+
+
 class Bugs(db.Model):
     __tablename__ = 'bugs'
     id = db.Column(db.Integer, primary_key=True)

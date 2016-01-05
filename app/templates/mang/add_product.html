@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% import "_macros.html" as macros %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}DTS Manager{% endblock %}
 
 {% block page_content %}
 
 <div class="col-md-9">
-    {% include '_buglist.html' %}
+    {{ wtf.quick_form(add_product) }}
 </div>
 
     {% if pagination %}
