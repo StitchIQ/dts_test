@@ -10,7 +10,8 @@ from . import main
 from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
     TestLeadEdit2, BugClose
 from ..email import send_email
-from ..models import Bugs, User, Process, BugStatus, Permission, Bug_Now_Status
+from ..models import Bugs, User, Process, BugStatus, Permission, \
+    Bug_Now_Status, ProductInfo
 
 
 @main.route('/')
@@ -43,6 +44,16 @@ def check_user():
     else:
         return '0'
 
+
+@main.route('/get_product')
+@login_required
+def get_product():
+    product_info = ProductInfo.query.all()
+
+    #return jsonify({
+    #    'product_info': [post.product_name_json() for post in product_info]
+    #    })
+    return '''[{"name": "BTS3000"},{"name": "IPC"}]'''
 
 @main.route('/_add_numbers')
 @login_required

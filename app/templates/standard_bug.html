@@ -11,6 +11,7 @@
         {{ wtf.form_field(form.product_name) }}
         {{ wtf.form_field(form.product_version) }}
         {{ wtf.form_field(form.software_version) }}
+        {{ wtf.form_field(form.bug_level) }}
         {{ wtf.form_field(form.system_view) }}
         {{ wtf.form_field(form.bug_show_times) }}
         {{ wtf.form_field(form.bug_title) }}
@@ -46,6 +47,7 @@
 {{ moment.include_moment() }}
 
 <script src="static/check_user.js" type="text/javascript"></script>
+<script src="static/standard_bug.js" type="text/javascript"></script>
 {% endblock %}
 
 

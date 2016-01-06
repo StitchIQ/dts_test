@@ -77,6 +77,12 @@ class ProductInfo(db.Model):
     product_version = db.Column(db.Text)
     product_software = db.Column(db.Text)
 
+    def product_name_json(self):
+        json_post = {
+            'name': self.product_name,
+            }
+        return json_post
+
 
 class Bugs(db.Model):
     __tablename__ = 'bugs'

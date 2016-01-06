@@ -1,7 +1,7 @@
 #coding=utf-8
 from flask.ext.wtf import Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-        TextAreaField, RadioField, SelectField,FileField
+        TextAreaField, RadioField, SelectField,FileField, validators
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
 from flask.ext.pagedown.fields import PageDownField
@@ -17,9 +17,13 @@ class NameForm(Form):
 
 
 class StandardBug(Form):
-    product_name = StringField('产品名称', validators=[Required(), Length(1, 64)])
-    product_version = StringField('产品版本号', validators=[Required(), Length(1, 64)])
-    software_version = StringField('软件版本号', validators=[Required(), Length(1, 64)])
+    #product_name = StringField('产品名称', validators=[Required(), Length(1, 64)])
+    #product_version = StringField('产品版本号', validators=[Required(), Length(1, 64)])
+    #software_version = StringField('软件版本号', validators=[Required(), Length(1, 64)])
+    product_name = SelectField('产品名称', choices=[])
+    product_version = SelectField('产品版本号',  choices=[])
+    software_version = SelectField('软件版本号', choices=[])
+
     #bug_level = StringField('严重程度', validators=[Required(), Length(1, 64)])
     bug_level = SelectField('严重程度', choices=[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')])
     system_view = StringField('系统表现', validators=[Required(), Length(1, 64)])
