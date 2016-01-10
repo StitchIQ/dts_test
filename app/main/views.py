@@ -55,6 +55,30 @@ def get_product():
     #    })
     return '''[{"name": "BTS3000"},{"name": "IPC"}]'''
 
+@main.route('/get_software')
+@login_required
+def get_software():
+    a = request.args.get('product', 0, type=str)
+    software = ProductInfo.query.filter_by(product_name=a)
+
+    #return jsonify({
+    #    'product_info': [post.product_name_json() for post in product_info]
+    #    })
+    return '''[{"name": "V100"},{"name": "V200"}]'''
+
+@main.route('/get_version')
+@login_required
+def get_version():
+    a = request.args.get('version', 0, type=str)
+    software = ProductInfo.query.filter_by(product_version=a)
+
+    #return jsonify({
+    #    'product_info': [post.product_name_json() for post in product_info]
+    #    })
+    #return '''['B101','B020','B030']'''
+    return '''[{"name": "B010"},{"name": "B020"}]'''
+
+
 @main.route('/_add_numbers')
 @login_required
 def add_numbers():
