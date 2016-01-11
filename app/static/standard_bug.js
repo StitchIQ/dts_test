@@ -36,8 +36,10 @@ function initPro() {
         });
     };
 
+    //此处有bug，选择第一级菜单，会导致此函数执行多次
     function selectVersion(data) {
-        var option3 = "<option id=-1>-----</option>";
+        var option3 = "";
+        option3 = "<option id=-1>-----</option>";
         var selectedIndex = $("#product_version :selected").text();
 
         $("#software_version").empty();
@@ -53,6 +55,7 @@ function initPro() {
             option3 += "<option id=" + indexItems.name + ">" + indexItems.name + "</option>";
                 //alert(indexItems.name)
         });
+        $("#software_version").empty();
         $("#software_version").append(option3);
         });
     };

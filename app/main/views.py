@@ -53,7 +53,8 @@ def get_product():
     #return jsonify({
     #    'product_info': [post.product_name_json() for post in product_info]
     #    })
-    return '''[{"name": "BTS3000"},{"name": "IPC"}]'''
+    #return '''[{"name": ""},{"name": "IPC"}]'''
+    return '''[{id:"1",name:"pro001"},{id:"1",name:"pro002"}]'''
 
 @main.route('/get_software')
 @login_required
@@ -63,8 +64,9 @@ def get_software():
 
     #return jsonify({
     #    'product_info': [post.product_name_json() for post in product_info]
-    #    })
-    return '''[{"name": "V100"},{"name": "V200"}]'''
+    #    })  [{id:"1",name:"amdin"},{id:"1",name:"amdin"}]
+    #return '''[{"name": "V100"},{"name": "V200"}]'''
+    return '''[{id:"1",name:"soft001"},{id:"1",name:"soft002"}]'''
 
 @main.route('/get_version')
 @login_required
@@ -76,7 +78,8 @@ def get_version():
     #    'product_info': [post.product_name_json() for post in product_info]
     #    })
     #return '''['B101','B020','B030']'''
-    return '''[{"name": "B010"},{"name": "B020"}]'''
+    #return '''[{"name": "B010"},{"name": "B020"}]'''
+    return '''[{id:"1",name:"ver001"},{id:"1",name:"ver002"}]'''
 
 
 @main.route('/_add_numbers')
