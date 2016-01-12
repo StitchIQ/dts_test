@@ -53,8 +53,8 @@ def get_product():
     #return jsonify({
     #    'product_info': [post.product_name_json() for post in product_info]
     #    })
-    #return '''[{"name": ""},{"name": "IPC"}]'''
-    return '''[{id:"1",name:"pro001"},{id:"1",name:"pro002"}]'''
+    return '''[{"name": "NVR"},{"name": "IPC"}]'''
+    #return '''[{id:"1",name:"pro001"},{id:"1",name:"pro002"}]'''
 
 @main.route('/get_software')
 @login_required
@@ -65,8 +65,8 @@ def get_software():
     #return jsonify({
     #    'product_info': [post.product_name_json() for post in product_info]
     #    })  [{id:"1",name:"amdin"},{id:"1",name:"amdin"}]
-    #return '''[{"name": "V100"},{"name": "V200"}]'''
-    return '''[{id:"1",name:"soft001"},{id:"1",name:"soft002"}]'''
+    return '''[{"name": "V100"},{"name": "V200"}]'''
+    #return '''[{id:"1",name:"soft001"},{id:"1",name:"soft002"}]'''
 
 @main.route('/get_version')
 @login_required
@@ -78,8 +78,8 @@ def get_version():
     #    'product_info': [post.product_name_json() for post in product_info]
     #    })
     #return '''['B101','B020','B030']'''
-    #return '''[{"name": "B010"},{"name": "B020"}]'''
-    return '''[{id:"1",name:"ver001"},{id:"1",name:"ver002"}]'''
+    return '''[{"name": "B010"},{"name": "B020"}]'''
+    #return '''[{id:"1",name:"ver001"},{id:"1",name:"ver002"}]'''
 
 
 @main.route('/_add_numbers')
@@ -95,7 +95,39 @@ def add_numbers():
 def add_numbers2():
     a = request.args.get('a', 0, type=int)
     b = request.args.get('b', 0, type=int)
-    return jsonify(result=a + b)
+    return '''[
+    {
+        "product_name": "NVR",
+        "version_list": [
+            {
+                "product_verison": "V100",
+                "soft_version": [
+                    "B101",
+                    "B102"
+                ]
+            },
+            {
+                "product_verison": "V222",
+                "soft_version": [
+                    "B201",
+                    "B202"
+                ]
+            }
+        ]
+    },
+    {
+        "product_name": "IPC",
+        "version_list": [
+            {
+                "product_verison": "V300",
+                "soft_version": [
+                    "B111",
+                    "B121"
+                ]
+            }
+        ]
+    }
+]'''
 
 
 @main.route('/jsontable')
@@ -255,14 +287,15 @@ def copy_to_me():
 @login_required
 def newbug():
     form = StandardBug()
-    if form.validate_on_submit():
-        if request.method == 'POST':
+    #if form.validate_on_submit():
+    if request.method == 'POST':
             UPLOAD_FOLDER = 'static/Uploads/'
             app_dir = 'app/'
             f = request.files['photo']
             fname = UPLOAD_FOLDER + secure_filename(f.filename)
             f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
             print form.bug_descrit.data
+            print 'ssss',form.product_name.data
             bug = Bugs(product_name=form.product_name.data,
             product_version=form.product_version.data,
             software_version=form.software_version.data,
@@ -487,7 +520,9 @@ def bug_edit(id):
 
     form = StandardBug()
 
-    if form.validate_on_submit():
+    #if form.validate_on_submit():
+    if request.method == 'POST':
+
         bugs.product_name = form.product_name.data
         bugs.product_version = form.product_version.data
         bugs.software_version = form.software_version.data
@@ -499,7 +534,6 @@ def bug_edit(id):
         bugs.bug_owner = User.query.filter_by(email=form.bug_owner_id.data).first()
         bugs.author = current_user._get_current_object()
         bugs.bug_status = form.bug_status.data
-
         db.session.add(bugs)
 
         # bug_owner_id=form.bug_owner_id.data,

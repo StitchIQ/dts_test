@@ -71,5 +71,7 @@
 
 {% block scripts %}
 {{ super() }}
+<script src="/static/check_user.js" type="text/javascript"></script>
+<script src="/static/standard_bug.js" type="text/javascript"></script>
 {{ pagedown.include_pagedown() }}
 {% endblock %}

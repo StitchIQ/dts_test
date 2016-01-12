@@ -74,14 +74,24 @@ class ProductInfo(db.Model):
     __tablename__ = 'productinfo'
     product_id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(64),unique=True)
-    product_version = db.Column(db.Text)
-    product_software = db.Column(db.Text)
+    product_descrit = db.Column(db.Text)
+
 
     def product_name_json(self):
         json_post = {
             'name': self.product_name,
             }
         return json_post
+
+
+class VersionInfo(db.Model):
+    __tablename__ = 'versioninfo'
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = (db.Integer, db.ForeignKey('productinfo.product_id'))
+    version_name = db.Column(db.Text)
+    version_descrit = db.Column(db.Text)
+    software_version = db.Column(db.Text)
+
 
 
 class Bugs(db.Model):

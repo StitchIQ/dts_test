@@ -1,15 +1,14 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}DTS Manager{% endblock %}
+{% block title %}DTS Add Software{% endblock %}
 
 {% block page_content %}
 
 <div class="col-md-4">
-    {{ wtf.quick_form(add_product) }}
+    {{ wtf.quick_form(software) }}
 </div>
 
-<div class="col-md-4">
-</div>
+
 
 {% endblock %}

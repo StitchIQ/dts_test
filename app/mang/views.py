@@ -3,40 +3,43 @@ from flask import render_template, redirect, request, url_for, flash, \
     current_app, jsonify
 from flask.ext.login import login_user, logout_user, login_required, \
     current_user
+from wtforms_components import read_only
 from .. import db
 from . import mang
-from .forms import Add_Product
-from ..models import Bugs, User, Process, BugStatus, ProductInfo
+from .forms import Add_Product, Add_Software
+from ..models import Bugs, User, Process, BugStatus, ProductInfo, VersionInfo
 
 
-@mang.route('/')
+@mang.route('/add-software/<int:id>', methods=['GET', 'POST'])
 @login_required
-def index():
-    #bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
+def add_software(id):
+    product = ProductInfo.query.get_or_404(id)
 
-    page = request.args.get('page', 1, type=int)
-    # sts=BugStatus.query.filter_by(id=6).first()
+    software = Add_Software()
+    if software.validate_on_submit():
+        software_info = VersionInfo(product_id=product.product_id,
+                                    version_name=software.version_name.data,
+                                    version_descrit=software.version_descrit.data,
+                                    software_version=software.software_version.data)
 
-    pagination1 = Bugs.query.filter(
-            Bugs.bug_owner==current_user,Bugs.bug_status<6).order_by(
-            Bugs.timestamp.desc()).paginate(
-            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-            error_out=False)
+        db.session.add(software_info)
+        db.session.commit()
+        flash('Softare 提交成功.')
+        return render_template('mang/add_softare.html', software=software)
+    software.product_name.data = product.product_name
+    software.product_descrit.data = product.product_descrit
 
-    posts = pagination1.items
-    flash(posts)
-    return render_template('mang/add_product.html', bugs_list=posts, pagination=pagination1)
-    #return render_template('mang/add_product.html')
+    read_only(software.product_name)
+    read_only(software.product_descrit)
+    return render_template('mang/add_softare.html', software=software)
 
 @mang.route('/add-product', methods=['GET', 'POST'])
 @login_required
 def add_product():
     add_product = Add_Product()
     if add_product.validate_on_submit():
-        print add_product.product_name
         product_info = ProductInfo(product_name=add_product.product_name.data,
-                                   product_version=add_product.product_version.data,
-                                product_software=add_product.software_version.data)
+                                   product_descrit=add_product.product_descrit.data)
 
         db.session.add(product_info)
         db.session.commit()
