@@ -10,6 +10,13 @@ from .forms import Add_Product, Add_Software
 from ..models import Bugs, User, Process, BugStatus, ProductInfo, VersionInfo
 
 
+@mang.route('/productlist', methods=['GET', 'POST'])
+@login_required
+def productlist():
+    product = ProductInfo.query.all()
+
+    return render_template('mang/productlist.html', product=product)
+
 @mang.route('/add-software/<int:id>', methods=['GET', 'POST'])
 @login_required
 def add_software(id):
@@ -45,4 +52,27 @@ def add_product():
         db.session.commit()
         flash('Bugs 提交成功.')
         return render_template('mang/add_product.html', add_product=add_product)
+    return render_template('mang/add_product.html', add_product=add_product)
+
+
+@mang.route('/product-edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def product_edit(id):
+    product = ProductInfo.query.get_or_404(id)
+    add_product = Add_Product()
+    if add_product.validate_on_submit():
+
+        product.product_name = add_product.product_name.data
+        product.product_descrit = add_product.product_descrit.data
+        product.product_status = add_product.product_status.data
+        db.session.add(product)
+        db.session.commit()
+        flash('产品信息更新成功.')
+        #return render_template('mang/add_product.html', add_product=add_product)
+        return redirect(url_for('mang.productlist'))
+
+    add_product.product_name.data = product.product_name
+    add_product.product_descrit.data = product.product_descrit
+    #add_product.product_status.data = product.product_status
+    add_product.product_status.checked = '0'
     return render_template('mang/add_product.html', add_product=add_product)

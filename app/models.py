@@ -75,6 +75,7 @@ class ProductInfo(db.Model):
     product_id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(64),unique=True)
     product_descrit = db.Column(db.Text)
+    product_status = db.Column(db.Boolean, default=False)
 
 
     def product_name_json(self):

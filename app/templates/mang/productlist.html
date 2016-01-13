@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}D T S-Product List{% endblock %}
+
+{% block page_content %}
+<div class="col-md-4">
+    <table class="table table-hover table-striped  table-bordered table-condensed">
+       <thead>
+          <tr>
+             <th>Num.</th>
+             <th>产品名称</th>
+             <th>产品说明</th>
+             <th>产品状态</th>
+             <th>修改状态</th>
+             <th>增加版本</th>
+          </tr>
+       </thead>
+       <tbody>
+            {% for p in product %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ p.product_name }}</td>
+                <td>{{ p.product_descrit }}</td>
+                <td>
+                    {% if p.product_status %}
+                        <span class="label label-success">启用</span>
+                    {% else %}
+                        <span class="label label-default">禁用</span>
+                    {% endif %}
+                </td>
+                <td class="host_buttom">
+                        <a class="btn btn-warning btn-xs"  href="{{ url_for('mang.product_edit', id=p.product_id) }}">修改状态</a>
+                </td>
+                <td class="host_buttom">
+                        <a class="btn btn-warning btn-xs"  href="{{ url_for('mang.add_software', id=p.product_id) }}">增加版本</a>
+                </td>
+              </tr>
+            {% endfor %}
+       </tbody>
+    </table>
+
+</div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+{% endblock %}
+
+
+
