@@ -7,6 +7,32 @@
 
 <div class="col-md-4">
     {{ wtf.quick_form(software) }}
+
+    <table class="table table-hover table-striped  table-bordered table-condensed">
+       <thead>
+          <tr>
+             <th>Num.</th>
+             <th>产品名称</th>
+             <th>版本名称</th>
+             <th>版本描述</th>
+             <th>软件版本</th>
+          </tr>
+       </thead>
+       <tbody>
+            {% for p in software_list %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ p.software.product_name }}</td>
+                <td>{{ p.version_name }}</td>
+                <td>{{ p.version_descrit }}</td>
+                <td>{{ p.software_version }}</td>
+              </tr>
+            {% endfor %}
+       </tbody>
+    </table>
+
+</div>
+</div>
 </div>
 
 

@@ -6,14 +6,18 @@ $(document).ready(function () {
         //alert(data);
         //对请求返回的JSON格式进行分解加载
         $("#product_name").append($("<option/>").text("--请选择--").attr("value","-1"));
-        $(data).each(function () {
-            $("#product_name").append($("<option/>").text(this.name).attr("value",this.id));
+        //alert(data.product_info[0].name);
+
+        $.each(data.product_info, function (i,item) {
+            //alert(item.name);
+            $("#product_name").append($("<option/>").text(item.name));
             //alert(this.name);
         });
     });
 
         //一级下拉联动二级下拉
-
+        var temp = "";
+        var temp2 = "";
         $("#product_name").change(function () {
 
             //清除二级下拉列表
@@ -24,42 +28,47 @@ $(document).ready(function () {
             $("#software_version").append($("<option/>").text("--请选择--").attr("value","-1"));
             //要请求的二级下拉JSON获取页面
 
-            var url="/add";
             //将选中的一级下拉列表项的id传过去
-            $.getJSON(url, { id:"lzp" },function (data) {
+            $.getJSON("/get_software", { product:$("#product_name :selected").text() },function (data) {
             //对请求返回的JSON格式进行分解加载
-            $(data).each(function () {
-                if( this.product_name == $("#product_name :selected").text())
-                {   //alert("lzp");
-                    $.each(this.version_list, function(i, item){
-                        //alert("zdq");
-                        //alert(i);alert(item.product_verison);
-                        $("#product_version").append($("<option/>").text(item.product_verison).attr("value",i));
-                    });
-                };
+            //alert(data.soft_info[0].software);
+            temp = data;
+            $(data.soft_info).each(function () {
+                //alert(this.software);
+                $("#product_version").append($("<option/>").text(this.software).attr("value",this.index));
             });
 
             });
-
         });
 
     //二级下拉联动三级下拉
-
     $("#product_version").change(function () {
 
         //清除三级下拉列表
         $("#software_version").empty();
         $("#software_version").append($("<option/>").text("--请选择--").attr("value","-1"));
         //要请求的三级下拉JSON获取页面
+        $(temp.soft_info).each(function () {
+                //alert(this.software);
+                if(this.software == $("#product_version :selected").text()){
+                    $.each((this.version.split(";")),function (i,item) {
+                        //alert(item);
+                        $("#software_version").append($("<option/>").text(item));
+                    });
+                    //$("#software_version").append($("<option/>").text(this.software).attr("value",this.index));
+                };
+        });
 
+        /*
         var url="/get_version";
         //将选择的二级下拉列表项的id传过去
-        $.getJSON(url, { id:$(this).attr("value") },function (data) {
+        alert($("#product_version:selected").text());
+        $.getJSON(url, { version:$("#product_version :selected").text() },function (data) {
             //对请求返回的JSON格式进行分解加载
             $(data).each(function () {
                 $("#software_version").append($("<option/>").text(this.name).attr("value",this.id));
             });
-        });
+        });*/
     });
 
 });

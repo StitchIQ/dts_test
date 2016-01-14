@@ -12,7 +12,7 @@
              <th>产品名称</th>
              <th>产品说明</th>
              <th>产品状态</th>
-             <th>修改状态</th>
+             <th>修改信息</th>
              <th>增加版本</th>
           </tr>
        </thead>
@@ -30,10 +30,10 @@
                     {% endif %}
                 </td>
                 <td class="host_buttom">
-                        <a class="btn btn-warning btn-xs"  href="{{ url_for('mang.product_edit', id=p.product_id) }}">修改状态</a>
+                        <a class="btn btn-warning btn-xs"  href="{{ url_for('mang.product_edit', id=p.id) }}">修改信息</a>
                 </td>
                 <td class="host_buttom">
-                        <a class="btn btn-warning btn-xs"  href="{{ url_for('mang.add_software', id=p.product_id) }}">增加版本</a>
+                        <a class="btn btn-warning btn-xs"  href="{{ url_for('mang.add_software', id=p.id) }}">增加版本</a>
                 </td>
               </tr>
             {% endfor %}

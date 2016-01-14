@@ -11,7 +11,7 @@ from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
     TestLeadEdit2, BugClose
 from ..email import send_email
 from ..models import Bugs, User, Process, BugStatus, Permission, \
-    Bug_Now_Status, ProductInfo
+    Bug_Now_Status, ProductInfo, VersionInfo
 
 
 @main.route('/')
@@ -50,30 +50,39 @@ def check_user():
 def get_product():
     product_info = ProductInfo.query.all()
 
-    #return jsonify({
-    #    'product_info': [post.product_name_json() for post in product_info]
-    #    })
-    return '''[{"name": "NVR"},{"name": "IPC"}]'''
+    return jsonify({
+        'product_info': [post.product_name_json() for post in product_info]
+        })
+    #return '''[{"name": "NVR"},{"name": "IPC"}]'''
     #return '''[{id:"1",name:"pro001"},{id:"1",name:"pro002"}]'''
 
 @main.route('/get_software')
 @login_required
 def get_software():
     a = request.args.get('product', 0, type=str)
-    software = ProductInfo.query.filter_by(product_name=a)
+    #software = VersionInfo.query.filter_by(product_name=a)
+    print 'sssss:',a
+    software = VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
+                ProductInfo.product_name==a).all()
+    #对于外键，在连接时还是要使用原来的值
+    print str(VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
+                ProductInfo.product_name==a))
 
+    return jsonify({
+        'soft_info': [soft.software_to_json() for soft in software]
+        })
     #return jsonify({
     #    'product_info': [post.product_name_json() for post in product_info]
     #    })  [{id:"1",name:"amdin"},{id:"1",name:"amdin"}]
-    return '''[{"name": "V100"},{"name": "V200"}]'''
+    #return '''[{"name": "V100"},{"name": "V200"}]'''
     #return '''[{id:"1",name:"soft001"},{id:"1",name:"soft002"}]'''
 
 @main.route('/get_version')
 @login_required
 def get_version():
     a = request.args.get('version', 0, type=str)
-    software = ProductInfo.query.filter_by(product_version=a)
-
+    version = VersionInfo.query.filter_by(version_name=a).all()
+    print 'DDDDD::',len(version)
     #return jsonify({
     #    'product_info': [post.product_name_json() for post in product_info]
     #    })

@@ -10,12 +10,13 @@ class Add_Product(Form):
     product_name = StringField('产品名称', validators=[Required(), Length(1, 64)])
     product_descrit = StringField('产品描述', validators=[Required(), Length(1, 64)])
     product_status = RadioField('产品状态', choices=[('1', '正常'),('0', '禁用')], default='1')
-    #bug_status = RadioField('选择处理', choices=[('1', '新建'),('2', '测试经理审核')], default='1')
+
     submit = SubmitField('提交')
 
 class Add_Software(Form):
     product_name = StringField('产品名称')
     product_descrit = StringField('产品描述')
+    product_status = RadioField('产品状态', choices=[('1', '正常'),('0', '禁用')], default='1')
     version_name = StringField('版本名称', validators=[Required(), Length(1, 64)])
     version_descrit = StringField('版本描述', validators=[Required(), Length(1, 64)])
     software_version = StringField('软件版本列表', validators=[Required()])

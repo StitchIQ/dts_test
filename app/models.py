@@ -32,6 +32,7 @@ class Role(db.Model):
     name = db.Column(db.String(64), unique=True)
     default = db.Column(db.Boolean, default=False, index=True)
     permissions = db.Column(db.Integer)
+
     users = db.relationship('User', backref='role', lazy='dynamic')
 
     @staticmethod
@@ -58,6 +59,42 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.name
 
+class VersionInfo(db.Model):
+    __tablename__ = 'versioninfo'
+    id = db.Column(db.Integer, primary_key=True)
+    product = db.Column(db.Integer, db.ForeignKey('productinfo.id'))
+    version_name = db.Column(db.Text)
+    version_descrit = db.Column(db.Text)
+    software_version = db.Column(db.Text)
+    create_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+
+    def software_to_json(self):
+        json_post = {
+            'software': self.version_name,
+            'version': self.software_version,
+            }
+        return json_post
+
+class ProductInfo(db.Model):
+    __tablename__ = 'productinfo'
+    id = db.Column(db.Integer, primary_key=True)
+    product_name = db.Column(db.String(64),unique=True)
+    product_descrit = db.Column(db.Text)
+    product_status = db.Column(db.Boolean, default=False)
+    create_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+
+    p_id = db.relationship('VersionInfo',
+                            foreign_keys=[VersionInfo.product],
+                            backref='software', lazy='dynamic')
+
+    def product_name_json(self):
+        json_post = {
+            'name': self.product_name,
+            }
+        return json_post
+
 class Process(db.Model):
     __tablename__ = 'process'
     id = db.Column(db.Integer,primary_key=True)
@@ -68,31 +105,6 @@ class Process(db.Model):
     new_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
     opinion = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True,default=datetime.utcnow)
-
-
-class ProductInfo(db.Model):
-    __tablename__ = 'productinfo'
-    product_id = db.Column(db.Integer, primary_key=True)
-    product_name = db.Column(db.String(64),unique=True)
-    product_descrit = db.Column(db.Text)
-    product_status = db.Column(db.Boolean, default=False)
-
-
-    def product_name_json(self):
-        json_post = {
-            'name': self.product_name,
-            }
-        return json_post
-
-
-class VersionInfo(db.Model):
-    __tablename__ = 'versioninfo'
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = (db.Integer, db.ForeignKey('productinfo.product_id'))
-    version_name = db.Column(db.Text)
-    version_descrit = db.Column(db.Text)
-    software_version = db.Column(db.Text)
-
 
 
 class Bugs(db.Model):
@@ -109,7 +121,7 @@ class Bugs(db.Model):
     bug_descrit = db.Column(db.Text)
     bug_descrit_html = db.Column(db.Text)
     bug_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    bug_status = db.Column(db.Integer,db.ForeignKey('bugstatus.bug_status'))
+    bug_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
     bug_photos = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     bug_last_update = db.Column(db.DateTime(), default=datetime.utcnow)
