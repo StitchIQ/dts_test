@@ -48,7 +48,7 @@ def check_user():
 @main.route('/get_product')
 @login_required
 def get_product():
-    product_info = ProductInfo.query.all()
+    product_info = ProductInfo.query.filter_by(product_status=True).all()
 
     return jsonify({
         'product_info': [post.product_name_json() for post in product_info]
