@@ -27,6 +27,7 @@
             <a class="navbar-brand" href="{{ url_for('main.upload') }}">Upload</a>
             <a class="navbar-brand" href="{{ url_for('main.datatable') }}">Datatable</a>
             <a class="navbar-brand" href="{{ url_for('mang.add_product') }}">Add-Product</a>
+            <a class="navbar-brand" href="{{ url_for('main.charts') }}">Charts</a>
         </div>
         <div class="navbar-collapse collapse">
 
@@ -76,7 +77,7 @@
       <li> <a href="#configSetting" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-credit-card"></i> 问题单浏览 <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
            <ul id="configSetting" class="nav nav-list collapse secondmenu">
-            <li class="active"><a href="#"><i class="glyphicon glyphicon-globe"></i>&nbsp;全局缺省配置</a></li>
+            <li class="active"><a href="{{ url_for('main.charts') }}"><i class="glyphicon glyphicon-globe"></i>&nbsp;问题单报表</a></li>
             <li><a href="#"><i class="glyphicon glyphicon-star-empty"></i>&nbsp;未开通用户配置</a></li>
             <li><a href="#"><i class="glyphicon glyphicon-star"></i>&nbsp;退订用户配置</a></li>
             <li><a href="#"><i class="glyphicon glyphicon-text-width"></i>&nbsp;试用用户配置</a></li>

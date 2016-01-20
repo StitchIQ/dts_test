@@ -571,3 +571,19 @@ def bug_edit(id):
     form.bug_owner_id.data = bugs.bug_owner.email
     #flash(process_list.first().opinion)
     return render_template('bug_edit.html', form=form, bugs=bugs,process_log=process_log)
+
+
+@main.route('/charts', methods=['GET'])
+@login_required
+def charts():
+    return render_template('charts.html')
+
+
+@main.route('/chartsdata', methods=['GET'])
+@login_required
+def chartsdata():
+    return '''{
+                            "name":"销量",
+                            "type":"line",
+                            "data":[5, 20, 40, 10, 10, 20]
+                        }'''
