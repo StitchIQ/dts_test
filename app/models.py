@@ -130,6 +130,7 @@ class Bugs(db.Model):
                             foreign_keys=[Process.bugs_id],
                             backref='bugs', lazy='dynamic')
 
+
     def __repr__(self):
         return '<User %r>' % self.id
 

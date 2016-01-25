@@ -576,7 +576,7 @@ def bug_edit(id):
 @main.route('/charts', methods=['GET'])
 @login_required
 def charts():
-    return render_template('charts.html')
+    return render_template('reports/charts.html')
 
 
 @main.route('/chartsdata', methods=['GET'])
@@ -585,5 +585,31 @@ def chartsdata():
     return '''{
                             "name":"销量",
                             "type":"line",
-                            "data":[5, 20, 40, 10, 10, 20]
+                            "data":[5, 20, 40, 10, 10, 20, 15, 18, 19, 25, 30]
                         }'''
+
+
+@main.route('/dailycharts', methods=['GET'])
+@login_required
+def dailycharts():
+    return render_template('reports/dailycharts.html')
+
+
+@main.route('/dailydatas', methods=['GET'])
+@login_required
+def dailydatas():
+    daily_bugs = Bugs.query.group_by(Bugs.timestamp).all()
+    #daily_bugs2 = Bugs.query(db.func.count(Bugs.id)).filter(db.func.count(Bugs.id)).group_by(Bugs.timestamp).all()
+    #daily_bugs2 = Bugs.query(Bugs.timestamp.label('date'), db.func.count(Bugs.id).label('total')).group_by(Bugs.timestamp).group_by(Bugs.timestamp).all()
+    rr = db.session.query(db.func.strftime(
+            '%Y.%m.%d',Bugs.timestamp).label('date'), db.func.count(
+            Bugs.id).label('total')).group_by(db.func.strftime('%Y.%m.%d',Bugs.timestamp)).all()
+    #ss = db.session.execute("select strftime('%Y.%m.%d',timestamp) as date,count(id) as total from bugs GROUP BY strftime('%Y.%m.%d',timestamp)")
+
+
+    return jsonify({
+        'name': "数量",
+        'type': "line",
+        'data': [s.total for s in rr],
+        'date': [s.date for s in rr]
+        })
