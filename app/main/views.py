@@ -583,10 +583,10 @@ def charts():
 @login_required
 def chartsdata():
     return '''{
-                            "name":"销量",
-                            "type":"line",
-                            "data":[5, 20, 40, 10, 10, 20, 15, 18, 19, 25, 30]
-                        }'''
+            "name":"销量",
+            "type":"line",
+            "data":[5, 20, 40, 10, 10, 20, 15, 18, 19, 25, 30]
+            }'''
 
 
 @main.route('/dailycharts', methods=['GET'])
@@ -598,18 +598,42 @@ def dailycharts():
 @main.route('/dailydatas', methods=['GET'])
 @login_required
 def dailydatas():
-    daily_bugs = Bugs.query.group_by(Bugs.timestamp).all()
-    #daily_bugs2 = Bugs.query(db.func.count(Bugs.id)).filter(db.func.count(Bugs.id)).group_by(Bugs.timestamp).all()
-    #daily_bugs2 = Bugs.query(Bugs.timestamp.label('date'), db.func.count(Bugs.id).label('total')).group_by(Bugs.timestamp).group_by(Bugs.timestamp).all()
-    rr = db.session.query(db.func.strftime(
+    #daily_bugs2 = Bugs.query.with_entities(db.func.strftime(
+    #        '%Y.%m.%d',Bugs.timestamp).label('date'), db.func.count(Bugs.id).label('total')).group_by(db.func.strftime(
+    #       '%Y.%m.%d',Bugs.timestamp).label('date')).all()
+
+    daily_bugs = db.session.query(db.func.strftime(
             '%Y.%m.%d',Bugs.timestamp).label('date'), db.func.count(
             Bugs.id).label('total')).group_by(db.func.strftime('%Y.%m.%d',Bugs.timestamp)).all()
     #ss = db.session.execute("select strftime('%Y.%m.%d',timestamp) as date,count(id) as total from bugs GROUP BY strftime('%Y.%m.%d',timestamp)")
 
+    return jsonify({
+        'name': "Bugs数",
+        'type': "bar",
+        'data': [s.total for s in daily_bugs],
+        'date': [s.date for s in daily_bugs]
+        })
+
+@main.route('/productcharts', methods=['GET'])
+@login_required
+def productcharts():
+    product = ProductInfo.query.all()
+
+    return render_template('reports/productcharts.html', product=product)
+
+@main.route('/productdatas', methods=['GET'])
+@login_required
+def productdatas():
+    prd=request.args.get('product')
+    print prd
+    daily_bugs = Bugs.query.with_entities(db.func.strftime(
+            '%Y.%m.%d',Bugs.timestamp).label('date'),
+            db.func.count(Bugs.id).label('total')).filter(Bugs.product_name == prd).group_by(db.func.strftime(
+            '%Y.%m.%d',Bugs.timestamp).label('date')).all()
 
     return jsonify({
-        'name': "数量",
-        'type': "line",
-        'data': [s.total for s in rr],
-        'date': [s.date for s in rr]
+        'name': "Bugs2",
+        'type': "bar",
+        'data': [s.total for s in daily_bugs],
+        'date': [s.date for s in daily_bugs]
         })

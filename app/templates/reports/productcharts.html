@@ -3,8 +3,28 @@
 {% block title %}Bug-Charts{% endblock %}
 
 {% block page_content %}
+
 <div class="col-md-9">
-<body>
+    <div class="col-md-4">
+    <table class="table table-hover table-striped  table-bordered table-condensed">
+       <thead>
+          <tr>
+             <th>Num.</th>
+             <th>产品名称</th>
+          </tr>
+       </thead>
+       <tbody>
+            {% for p in product %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td><a href="#" id={{ p.product_name }}>{{ p.product_name }}</a></td>
+              </tr>
+            {% endfor %}
+       </tbody>
+    </table>
+    </div>
+
+<div class="col-md-9">
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <div id="main" style="height:400px"></div>
     <!-- ECharts单文件引入 -->
@@ -21,7 +41,8 @@
         require(
             [
                 'echarts',
-                'echarts/chart/line' // 使用柱状图就加载bar模块，按需加载
+                'echarts/chart/line',
+                'echarts/chart/bar' // 使用柱状图就加载bar模块，按需加载
             ],
             function (ec) {
                 // 基于准备好的dom，初始化echarts图表
@@ -32,7 +53,7 @@
                         show: true
                     },
                     legend: {
-                        data:['销量']
+                        data:['每日问题单报表']
                     },
                     toolbox: {
                         show : true,
@@ -44,10 +65,10 @@
                             //saveAsImage : {show: true}
                         }
                     },
-                    xAxis : [
+                     xAxis : [
                         {
                             type : 'category',
-                            data : ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+                            data : []
                         }
                     ],
                     yAxis : [
@@ -55,17 +76,27 @@
                             type : 'value'
                         }
                     ],
-                    series : []
+                    series : [{name:'',type:'',data:[]}]
                 };
-                // 为echarts对象加载数据
-                $.getJSON("/chartsdata", function(data) {
-                 option.series[0] = data;
-                 myChart.setOption(option);
-                 });
+
+                //有bug，不能动弹刷新
+                $(function() {
+                    $('tr td a').bind('click', function() {
+                        //alert($(this).closest('tr').find('td:eq(1)').text());
+                      $.getJSON("/productdatas", {
+                            product: $(this).closest('tr').find('td:eq(1)').text(),
+                        },function(data) {
+                         alert(data.date);
+                         option.xAxis[0].data = data.date;
+                         option.series[0] = data;
+                         myChart.setOption(option);
+                        });
+                    });
+                });
             }
         );
-    </script>
-</body>
+</script>
+</div>
 
 </div>
 

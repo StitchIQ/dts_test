@@ -17,6 +17,7 @@ def productlist():
 
     return render_template('mang/productlist.html', product=product)
 
+
 @mang.route('/add-software/<int:id>', methods=['GET', 'POST'])
 @login_required
 def add_software(id):
