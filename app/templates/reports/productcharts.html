@@ -79,7 +79,6 @@
                     series : [{name:'',type:'bar',data:[]}]
                 };
 
-                //有bug，不能动弹刷新
                 $(function() {
                     $('tr td a').bind('click', function() {
                         //alert($(this).closest('tr').find('td:eq(1)').text());
@@ -90,6 +89,8 @@
                          option.xAxis[0].data = data.date;
                          option.series[0].name = data.name;
                          option.series[0].data = data.data;
+                         myChart.clear();//清空绘画内容，清空后实例可用
+                         myChart.hideLoading();//清除无数据时动画显示
                          myChart.setOption(option);
                          //myChart.setSeries(data.data);
                         });
