@@ -53,7 +53,7 @@
                         show: true
                     },
                     legend: {
-                        data:['每日问题单报表']
+                        data:['Bugs2']
                     },
                     toolbox: {
                         show : true,
@@ -76,7 +76,7 @@
                             type : 'value'
                         }
                     ],
-                    series : [{name:'',type:'',data:[]}]
+                    series : [{name:'',type:'bar',data:[]}]
                 };
 
                 //有bug，不能动弹刷新
@@ -86,10 +86,12 @@
                       $.getJSON("/productdatas", {
                             product: $(this).closest('tr').find('td:eq(1)').text(),
                         },function(data) {
-                         alert(data.date);
+                         //alert(data.date);
                          option.xAxis[0].data = data.date;
-                         option.series[0] = data;
+                         option.series[0].name = data.name;
+                         option.series[0].data = data.data;
                          myChart.setOption(option);
+                         //myChart.setSeries(data.data);
                         });
                     });
                 });

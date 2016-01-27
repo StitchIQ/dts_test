@@ -633,7 +633,6 @@ def productdatas():
 
     return jsonify({
         'name': "Bugs2",
-        'type': "bar",
         'data': [s.total for s in daily_bugs],
         'date': [s.date for s in daily_bugs]
         })
