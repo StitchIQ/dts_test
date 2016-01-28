@@ -6,101 +6,40 @@
 
 <div class="col-md-9">
     <div class="col-md-4">
-    <table class="table table-hover table-striped  table-bordered table-condensed">
-       <thead>
-          <tr>
-             <th>Num.</th>
-             <th>产品名称</th>
-          </tr>
-       </thead>
-       <tbody>
-            {% for p in product %}
+        <table class="table table-hover table-striped  table-bordered table-condensed">
+           <thead>
               <tr>
-                <td>{{ loop.index }}</td>
-                <td><a href="#" id={{ p.product_name }}>{{ p.product_name }}</a></td>
+                 <th>Num.</th>
+                 <th>产品名称</th>
               </tr>
-            {% endfor %}
-       </tbody>
-    </table>
+           </thead>
+           <tbody>
+                {% for p in product %}
+                  <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><a href="#" id={{ p.product_name }}>{{ p.product_name }}</a></td>
+                  </tr>
+                {% endfor %}
+           </tbody>
+        </table>
     </div>
 
 <div class="col-md-9">
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <div id="main" style="height:400px"></div>
-    <!-- ECharts单文件引入 -->
-    <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
-    <script type="text/javascript">
-        // 路径配置
-        require.config({
-            paths: {
-                echarts: 'http://echarts.baidu.com/build/dist'
-            }
-        });
-
-        // 使用
-        require(
-            [
-                'echarts',
-                'echarts/chart/line',
-                'echarts/chart/bar' // 使用柱状图就加载bar模块，按需加载
-            ],
-            function (ec) {
-                // 基于准备好的dom，初始化echarts图表
-                var myChart = ec.init(document.getElementById('main'));
-
-                var option = {
-                    tooltip: {
-                        show: true
-                    },
-                    legend: {
-                        data:['Bugs2']
-                    },
-                    toolbox: {
-                        show : true,
-                        feature : {
-                            mark : {show: true},
-                            dataView : {show: true, readOnly: false},
-                            magicType : {show: true, type: ['line', 'bar']},
-                            restore : {show: true},
-                            //saveAsImage : {show: true}
-                        }
-                    },
-                     xAxis : [
-                        {
-                            type : 'category',
-                            data : []
-                        }
-                    ],
-                    yAxis : [
-                        {
-                            type : 'value'
-                        }
-                    ],
-                    series : [{name:'',type:'bar',data:[]}]
-                };
-
-                $(function() {
-                    $('tr td a').bind('click', function() {
-                        //alert($(this).closest('tr').find('td:eq(1)').text());
-                      $.getJSON("/productdatas", {
-                            product: $(this).closest('tr').find('td:eq(1)').text(),
-                        },function(data) {
-                         //alert(data.date);
-                         option.xAxis[0].data = data.date;
-                         option.series[0].name = data.name;
-                         option.series[0].data = data.data;
-                         myChart.clear();//清空绘画内容，清空后实例可用
-                         myChart.hideLoading();//清除无数据时动画显示
-                         myChart.setOption(option);
-                         //myChart.setSeries(data.data);
-                        });
-                    });
-                });
-            }
-        );
-</script>
+    <div id="serious" style="height:400px"></div>
+    <div id="status" style="height:400px"></div>
 </div>
 
-</div>
 
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<!-- ECharts单文件引入 -->
+<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+<script  src="static/charts/productcharts.js" type="text/javascript"></script>
+<script  src="static/charts/seriouscharts.js" type="text/javascript"></script>
+<script  src="static/charts/statuscharts.js" type="text/javascript"></script>
 {% endblock %}

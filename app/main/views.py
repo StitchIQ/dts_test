@@ -625,7 +625,7 @@ def productcharts():
 @login_required
 def productdatas():
     prd=request.args.get('product')
-    print prd
+    #print prd
     daily_bugs = Bugs.query.with_entities(db.func.strftime(
             '%Y.%m.%d',Bugs.timestamp).label('date'),
             db.func.count(Bugs.id).label('total')).filter(Bugs.product_name == prd).group_by(db.func.strftime(
@@ -633,6 +633,55 @@ def productdatas():
 
     return jsonify({
         'name': "Bugs2",
+        'type': "bar",
         'data': [s.total for s in daily_bugs],
         'date': [s.date for s in daily_bugs]
+        })
+
+@main.route('/seriousdatas', methods=['GET'])
+@login_required
+def seriousdatas():
+    prd=request.args.get('product')
+    daily_bugs = Bugs.query.with_entities(Bugs.bug_level.label('level'),
+            db.func.count(Bugs.id).label('total')).filter(
+            Bugs.product_name == prd).group_by(Bugs.bug_level.label('level')).all()
+
+    return jsonify({
+        'name': "Bugs",
+        'type': "bar",
+        'data': [s.total for s in daily_bugs],
+        'level': [s.level for s in daily_bugs]
+        })
+
+@main.route('/statusdatas', methods=['GET'])
+@login_required
+def statusdatas():
+    prd=request.args.get('product')
+    #prd = "IPC"
+    daily_bugs = Bugs.query.with_entities(Bugs.bug_status.label('status'),
+                db.func.count(Bugs.id).label('total')).group_by(Bugs.bug_status).all()
+
+
+    dd = db.session.query(db.func.count(Bugs.id).label('total'),BugStatus.bug_status_descrit.label('status'))
+    ss = dd.join(BugStatus, BugStatus.bug_status==Bugs.bug_status).filter(Bugs.product_name==prd).group_by(Bugs.bug_status).all()
+    #ss = db.session.query(db.func.count(Bugs.id).label('total'),BugStatus.bug_status_descrit.label('status')).filter(Bugs.product_name==prd).filter(Bugs.bug_status==BugStatus.bug_status).group_by(Bugs.bug_status).all()
+    print '44'*20
+    print str(ss)
+    print '44'*20
+    print str(daily_bugs)
+                #VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
+                #ProductInfo.product_name==a)
+
+    #daily_bugs = db.session.execute("SELECT bugstatus.bug_status_descrit as bugs_bug_status, count(bugs.id) as total FROM bugs, bugstatus on bugs.bug_status=bugstatus.bug_status WHERE bugs.product_name ='IPC' GROUP BY bugstatus.bug_status")
+
+    #print 'ssss  ',daily_bugs
+    #print 'dddd ',[s.total for s in daily_bugs]
+    #print 'dddd ',[s.bugs_bug_status for s in daily_bugs]
+    #return 'eeee'['新建','测试经理审核','开发人员定位','问题关闭']
+
+    return jsonify({
+        'name': "Bugs",
+        'type': "bar",
+        'data': [s.total for s in ss],
+        'status': [s.status for s in ss]
         })
