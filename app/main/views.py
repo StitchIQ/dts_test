@@ -663,8 +663,6 @@ def seriousdataspie():
 
     data = [{"value":s.total,"name":s.level} for s in daily_bugs]
 
-    print data
-
     return jsonify({
         'name': "Bugs",
         'type': "bar",
