@@ -61,12 +61,13 @@ def get_product():
 def get_software():
     a = request.args.get('product', 0, type=str)
     #software = VersionInfo.query.filter_by(product_name=a)
-    print 'sssss:',a
+    #print 'sssss:',a
     software = VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
                 ProductInfo.product_name==a).all()
+
     #对于外键，在连接时还是要使用原来的值
-    print str(VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
-                ProductInfo.product_name==a))
+    #print str(VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
+    #            ProductInfo.product_name==a))
 
     return jsonify({
         'soft_info': [soft.software_to_json() for soft in software]
@@ -298,43 +299,44 @@ def newbug():
     form = StandardBug()
     #if form.validate_on_submit():
     if request.method == 'POST':
-            UPLOAD_FOLDER = 'static/Uploads/'
-            app_dir = 'app/'
-            f = request.files['photo']
+        UPLOAD_FOLDER = 'static/Uploads/'
+        app_dir = 'app/'
+        f = request.files['photo']
+        fname = ''
+        if f.filename !='':
+            print  'DDDDDDDDD'
             fname = UPLOAD_FOLDER + secure_filename(f.filename)
             f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
-            print form.bug_descrit.data
-            print 'ssss',form.product_name.data
-            bug = Bugs(product_name=form.product_name.data,
-            product_version=form.product_version.data,
-            software_version=form.software_version.data,
-            bug_level=form.bug_level.data,
-            system_view=form.system_view.data,
-            bug_show_times=form.bug_show_times.data,
-            bug_title=form.bug_title.data,
-            bug_descrit=form.bug_descrit.data,
-            bug_owner=User.query.filter_by(email=form.bug_owner_id.data).first(),
-            author=current_user._get_current_object(),
-            bug_status=form.bug_status.data,
-            bug_photos=fname)
+        bug = Bugs(product_name=form.product_name.data,
+        product_version=form.product_version.data,
+        software_version=form.software_version.data,
+        bug_level=form.bug_level.data,
+        system_view=form.system_view.data,
+        bug_show_times=form.bug_show_times.data,
+        bug_title=form.bug_title.data,
+        bug_descrit=form.bug_descrit.data,
+        bug_owner=User.query.filter_by(email=form.bug_owner_id.data).first(),
+        author=current_user._get_current_object(),
+        bug_status=form.bug_status.data,
+        bug_photos=fname)
 
-            db.session.add(bug)
+        db.session.add(bug)
 
-            # bug_owner_id=form.bug_owner_id.data,
-            # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-            process = Process(operator=current_user._get_current_object(),
-                        author=User.query.filter_by(email=form.bug_owner_id.data).first(),
-                                bugs=bug,
-                                old_status='1',
-                                new_status=form.bug_status.data,
-                                opinion='')
-            db.session.add(process)
-            db.session.commit()
+        # bug_owner_id=form.bug_owner_id.data,
+        # bug.timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+        process = Process(operator=current_user._get_current_object(),
+                    author=User.query.filter_by(email=form.bug_owner_id.data).first(),
+                            bugs=bug,
+                            old_status='1',
+                            new_status=form.bug_status.data,
+                            opinion='')
+        db.session.add(process)
+        db.session.commit()
 
 
-            flash('Bugs 提交成功.')
-            flash(request.files['photo'].filename)
-            return redirect(url_for('.bug_process', id=bug.id))
+        flash('Bugs 提交成功.')
+        flash(request.files['photo'].filename)
+        return redirect(url_for('.bug_process', id=bug.id))
     flash('Bugs 准备提交.')
     flash(form.photo.data)
     return render_template("standard_bug.html", form=form)
@@ -509,6 +511,7 @@ def bug_process(id):
     read_only(form.bug_descrit)
 
     #flash(process_list.first().opinion)
+    flash(bugs.bug_photos)
     return render_template('bugs_process.html', form=form, bugs=bugs,
         testleadedit=testleadedit, developedit=developedit,
         testleadedit2=testleadedit2, bugclose=bugclose,
@@ -520,7 +523,7 @@ def bug_process(id):
 @login_required
 def bug_edit(id):
     bugs = Bugs.query.get_or_404(id)
-    print bugs.now_status.id
+    #print bugs.now_status.id
     if current_user != bugs.bug_owner or bugs.now_status.id != Bug_Now_Status.CREATED and \
             not current_user.can(Permission.ADMINISTER):
         abort(403)
@@ -531,7 +534,6 @@ def bug_edit(id):
 
     #if form.validate_on_submit():
     if request.method == 'POST':
-
         bugs.product_name = form.product_name.data
         bugs.product_version = form.product_version.data
         bugs.software_version = form.software_version.data

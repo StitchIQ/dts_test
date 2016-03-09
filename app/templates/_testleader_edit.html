@@ -1,18 +1,21 @@
 <li> <a href="#bug_audit" class="nav-header collapsed" data-toggle="collapse">
-        <i class="glyphicon glyphicon-credit-card"></i> 测试经理审核
-        {% if testmanager_log.first() %}
-            Processed By: {{ testmanager_log.first().operator.username }}
-            --Time at :{{ testmanager_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
-        {% endif %}
-        <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
+    <i class="glyphicon glyphicon-credit-card"></i> 测试经理审核
+    {% if testmanager_log.first() %}
+        Processed By: {{ testmanager_log.first().operator.username }}
+        --Time at :{{ testmanager_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+    {% endif %}
+    <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
 
 <ul>
     {% if bugs.bug_status >=2 %}
         <ul id="bug_audit" class="nav nav-list collapse secondmenu in">
         <ul id="myTab" class="nav nav-tabs">
-           <li class="active"><a href="#testleader" data-toggle="tab">
-              当前处理</a>
-           </li>
+          {% if current_user == bugs.bug_owner and bugs.bug_status ==2 %}
+            <li class="active">
+                <a href="#testleader" data-toggle="tab">当前处理</a>
+            </li>
+          {% endif %}
+
            {% for log in testmanager_log %}
               <li ><a href="#{{ log.id }}" data-toggle="tab">
                 {{ log.operator.username }}</a>
@@ -21,11 +24,13 @@
         </ul>
 
         <div id="myTabContent" class="tab-content">
-            <div class="tab-pane fade in active" id="testleader">
+
                 {% if current_user == bugs.bug_owner and bugs.bug_status ==2 %}
+                    <div class="tab-pane fade in active" id="testleader">
                     {{ wtf.quick_form(testleadedit,horizontal_columns=('lg', 2, 20)) }}
+                     </div>
                 {% endif %}
-            </div>
+
 
                 {% for log in testmanager_log %}
                    <div class="tab-pane fade" id={{ log.id }}>
