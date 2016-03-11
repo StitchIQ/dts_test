@@ -391,7 +391,8 @@ def bug_process(id):
     #post.comments.order_by(Comment.timestamp.asc()) .filter_by(status='3')
     form = BugsProcess()
     testleadedit = TestLeadEdit()
-    developedit = DevelopEdit()
+    ss = "[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')]"
+    developedit = DevelopEdit(ss)
     testleadedit2 = TestLeadEdit2()
     bugclose = BugClose()
 
@@ -424,6 +425,7 @@ def bug_process(id):
         return redirect(url_for('.bug_process', id=bugs.id))
 
     if developedit.validate_on_submit() and current_user == bugs.bug_owner:
+        print 'sdddddd',developedit.names.data
         bugs.bug_owner_id = User.query.filter_by(
             email=developedit.bug_owner_id.data).first().id
         process = Process(operator=current_user._get_current_object(),

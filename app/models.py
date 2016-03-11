@@ -125,6 +125,7 @@ class Bugs(db.Model):
     bug_photos = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     bug_last_update = db.Column(db.DateTime(), default=datetime.utcnow)
+    resolve_version = db.Column(db.String(64))
 
     process = db.relationship('Process',
                             foreign_keys=[Process.bugs_id],
