@@ -5,7 +5,10 @@ $(document).ready(function () {
     $.getJSON(url,function (data) {
         //alert(data);
         //对请求返回的JSON格式进行分解加载
-        $("#product_name").append($("<option/>").text("--请选择--").attr("value","-1"));
+        $("#product_name").append($("<option/>").text("--请选择 产品名称--").attr("value","-1"));
+        $("#product_version").append($("<option/>").text("--请选择 产品版本--").attr("value","-1"));
+        $("#software_version").append($("<option/>").text("--请选择 软件版本--").attr("value","-1"));
+        $("#version_features").append($("<option/>").text("--请选择 软件特性--").attr("value","-1"));
         //alert(data.product_info[0].name);
 
         $.each(data.product_info, function (i,item) {
@@ -26,8 +29,10 @@ $(document).ready(function () {
             //清除三级下拉列表
             $("#software_version").empty();
             $("#software_version").append($("<option/>").text("--请选择--").attr("value","-1"));
-            //要请求的二级下拉JSON获取页面
+            $("#version_features").empty();
+            $("#version_features").append($("<option/>").text("--请选择--").attr("value","-1"));
 
+            //要请求的二级下拉JSON获取页面
             //将选中的一级下拉列表项的id传过去
             $.getJSON("/get_software", { product:$("#product_name :selected").text() },function (data) {
             //对请求返回的JSON格式进行分解加载
@@ -47,6 +52,8 @@ $(document).ready(function () {
         //清除三级下拉列表
         $("#software_version").empty();
         $("#software_version").append($("<option/>").text("--请选择--").attr("value","-1"));
+        $("#version_features").empty();
+        $("#version_features").append($("<option/>").text("--请选择--").attr("value","-1"));
         //要请求的三级下拉JSON获取页面
         $(temp.soft_info).each(function () {
                 //alert(this.software);
@@ -54,6 +61,10 @@ $(document).ready(function () {
                     $.each((this.version.split(";")),function (i,item) {
                         //alert(item);
                         $("#software_version").append($("<option/>").text(item));
+                    });
+                    $.each((this.features.split(";")),function (i,item) {
+                        //alert(item);
+                        $("#version_features").append($("<option/>").text(item));
                     });
                     //$("#software_version").append($("<option/>").text(this.software).attr("value",this.index));
                 };

@@ -22,7 +22,7 @@ class StandardBug(Form):
     product_name = SelectField('产品名称',coerce=str, choices=[])
     product_version = SelectField('产品版本号', coerce=str, choices=[])
     software_version = SelectField('软件版本号', coerce=str, choices=[])
-
+    version_features = SelectField('软件特性', choices=[])
     #bug_level = StringField('严重程度', validators=[Required(), Length(1, 64)])
     bug_level = SelectField('严重程度', choices=[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')])
     system_view = StringField('系统表现', validators=[Required(), Length(1, 64)])
@@ -42,6 +42,7 @@ class BugsProcess(Form):
     product_name = StringField('产品名称')
     product_version = StringField('产品版本号')
     software_version = StringField('软件版本号')
+    version_features = StringField('软件特性')
     bug_level = StringField('严重程度')
     system_view = StringField('系统表现')
     bug_show_times = StringField('出现频率')

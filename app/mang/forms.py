@@ -20,4 +20,5 @@ class Add_Software(Form):
     version_name = StringField('版本名称', validators=[Required(), Length(1, 64)])
     version_descrit = StringField('版本描述', validators=[Required(), Length(1, 64)])
     software_version = StringField('软件版本列表', validators=[Required()])
+    version_features = StringField('软件特性列表', validators=[Required()])
     submit = SubmitField('提交')

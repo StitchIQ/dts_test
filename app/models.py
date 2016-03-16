@@ -5,7 +5,7 @@ import bleach
 from markdown import markdown
 from flask import current_app, url_for
 
-from flask.ext.login import UserMixin
+from flask.ext.login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
 
 
@@ -66,6 +66,7 @@ class VersionInfo(db.Model):
     version_name = db.Column(db.Text)
     version_descrit = db.Column(db.Text)
     software_version = db.Column(db.Text)
+    version_features  = db.Column(db.Text)
     create_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
     update_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
 
@@ -73,6 +74,7 @@ class VersionInfo(db.Model):
         json_post = {
             'software': self.version_name,
             'version': self.software_version,
+            'features': self.version_features,
             }
         return json_post
 
@@ -114,6 +116,7 @@ class Bugs(db.Model):
     product_name = db.Column(db.String(64))
     product_version = db.Column(db.String(64))
     software_version = db.Column(db.String(64))
+    version_features = db.Column(db.String(64))
     bug_level = db.Column(db.String(64))
     system_view = db.Column(db.String(64))
     bug_show_times = db.Column(db.String(64))
@@ -235,6 +238,22 @@ class User(UserMixin, db.Model):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
         return s.dumps({'confirm': self.id})
 
+    def generate_reset_token(self, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'reset': self.id})
+
+    def reset_password(self, token, new_password):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return False
+        if data.get('reset') != self.id:
+            return False
+        self.password = new_password
+        db.session.add(self)
+        return True
+
     def confirm(self, token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
@@ -267,6 +286,11 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+class AnonymousUser(AnonymousUserMixin):
+    def can(self, permissions):
+        return False
 
+    def is_administrator(self):
+        return False
 
-
+login_manager.anonymous_user = AnonymousUser

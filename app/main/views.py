@@ -302,14 +302,15 @@ def newbug():
         UPLOAD_FOLDER = 'static/Uploads/'
         app_dir = 'app/'
         f = request.files['photo']
-        fname = ''
-        if f.filename !='':
+        fname = None
+        if f.filename != '':
             print  'DDDDDDDDD'
             fname = UPLOAD_FOLDER + secure_filename(f.filename)
             f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
         bug = Bugs(product_name=form.product_name.data,
         product_version=form.product_version.data,
         software_version=form.software_version.data,
+        version_features=form.version_features.data,
         bug_level=form.bug_level.data,
         system_view=form.system_view.data,
         bug_show_times=form.bug_show_times.data,
@@ -497,6 +498,7 @@ def bug_process(id):
     form.product_name.data = bugs.product_name
     form.product_version.data = bugs.product_version
     form.software_version.data = bugs.software_version
+    form.version_features.data = bugs.version_features
     form.bug_level.data = bugs.bug_level
     form.system_view.data = bugs.system_view
     form.bug_show_times.data = bugs.bug_show_times
@@ -507,13 +509,19 @@ def bug_process(id):
     read_only(form.product_name)
     read_only(form.product_version)
     read_only(form.software_version)
+    read_only(form.version_features)
     read_only(form.bug_level)
     read_only(form.system_view)
     read_only(form.bug_show_times)
     read_only(form.bug_descrit)
 
     #flash(process_list.first().opinion)
-    flash(bugs.bug_photos)
+    if bugs.bug_photos == None:
+        print 'dddd'
+        print 'photo :',bugs.bug_photos
+    if bugs.bug_photos !=None:
+        print 'ssss'
+        flash(bugs.bug_photos)
     return render_template('bugs_process.html', form=form, bugs=bugs,
         testleadedit=testleadedit, developedit=developedit,
         testleadedit2=testleadedit2, bugclose=bugclose,
@@ -539,6 +547,7 @@ def bug_edit(id):
         bugs.product_name = form.product_name.data
         bugs.product_version = form.product_version.data
         bugs.software_version = form.software_version.data
+        bugs.version_features = form.version_features.data
         bugs.bug_level = form.bug_level.data
         bugs.system_view = form.system_view.data
         bugs.bug_show_times = form.bug_show_times.data
@@ -567,6 +576,7 @@ def bug_edit(id):
     form.product_name.data = bugs.product_name
     form.product_version.data = bugs.product_version
     form.software_version.data = bugs.software_version
+    form.version_features.data = bugs.version_features
     form.bug_level.data = bugs.bug_level
     form.system_view.data = bugs.system_view
     form.bug_show_times.data = bugs.bug_show_times

@@ -28,7 +28,8 @@ def add_software(id):
         software_info = VersionInfo(product=product.id,
                                     version_name=software.version_name.data,
                                     version_descrit=software.version_descrit.data,
-                                    software_version=software.software_version.data)
+                                    software_version=software.software_version.data,
+                                    version_features=add_product.version_features.data)
 
         db.session.add(software_info)
         db.session.commit()
@@ -40,7 +41,7 @@ def add_software(id):
 
     read_only(software.product_name)
     read_only(software.product_descrit)
-    flash(software_list)
+    # flash(software_list)
     return render_template('mang/add_softare.html', software=software, software_list=software_list)
 
 @mang.route('/add-product', methods=['GET', 'POST'])
@@ -58,7 +59,8 @@ def add_product():
         software_info = VersionInfo(product=product_info.id,
                                     version_name=add_product.version_name.data,
                                     version_descrit=add_product.version_descrit.data,
-                                    software_version=add_product.software_version.data)
+                                    software_version=add_product.software_version.data,
+                                    version_features=add_product.version_features.data)
         db.session.add(software_info)
         db.session.commit()
         flash('增加产品和版本成功.')
