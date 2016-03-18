@@ -126,9 +126,11 @@ class Bugs(db.Model):
     bug_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     bug_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
     bug_photos = db.Column(db.Text)
+    resolve_version = db.Column(db.String(64))
+    regression_test_version = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     bug_last_update = db.Column(db.DateTime(), default=datetime.utcnow)
-    resolve_version = db.Column(db.String(64))
+
 
     process = db.relationship('Process',
                             foreign_keys=[Process.bugs_id],

@@ -60,16 +60,16 @@ class TestLeadEdit(Form):
 
 class DevelopEdit(Form):
     process_opinion = TextAreaField('处理意见', validators=[Required()])
-    resolve_verson = SelectField('解决版本', choices=[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')])
-    names = FieldList(StringField('名称'), label='物品列表', min_entries=1)
+    resolve_verson = SelectField('解决版本',choices=[])
+    # names = FieldList(StringField('名称'), label='物品列表', min_entries=1)
     bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     #resolve_verson = SelectField('解决版本', choices=[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')])
     bug_status = RadioField('选择处理', choices=[('2', '返回测试经理'),('3', '转交其他开发人员处理'),('4', '测试经理组织回归测试')],default='4')
     submit = SubmitField('Submit')
 
-    def __init__(self, ss):
+    def __init__(self):
         Form.__init__(self)
-        self.resolve_verson = SelectField('解决版本', choices=ss)
+        #self.resolve_verson = SelectField('解决版本', choices=ss)
 
 
 class TestLeadEdit2(Form):

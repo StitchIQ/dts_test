@@ -393,12 +393,17 @@ def bug_process(id):
     form = BugsProcess()
     testleadedit = TestLeadEdit()
     ss = "[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')]"
-    developedit = DevelopEdit(ss)
+    developedit = DevelopEdit()
+    developedit.resolve_verson.choices  = [('B001','B001'),('B002','B002'),('B003','B003'),('B004','B004')]
     testleadedit2 = TestLeadEdit2()
     bugclose = BugClose()
 
+    if request.method == 'POST':
+        print request
+        print 'GGGGGGGGGGGGGGGGGGGG'
 
     if testleadedit.validate_on_submit() and current_user == bugs.bug_owner:
+        print 'testleaderedit'
         bugs.bug_owner_id = User.query.filter_by(
             email=testleadedit.bug_owner_id.data).first().id
 
@@ -426,7 +431,7 @@ def bug_process(id):
         return redirect(url_for('.bug_process', id=bugs.id))
 
     if developedit.validate_on_submit() and current_user == bugs.bug_owner:
-        print 'sdddddd',developedit.names.data
+        print 'developedit'
         bugs.bug_owner_id = User.query.filter_by(
             email=developedit.bug_owner_id.data).first().id
         process = Process(operator=current_user._get_current_object(),
@@ -438,8 +443,9 @@ def bug_process(id):
                         opinion=developedit.process_opinion.data)
         db.session.add(process)
 
-
         bugs.bug_status = developedit.bug_status.data
+        bugs.resolve_version = developedit.resolve_verson.data
+        print 'CCCCC: :' ,developedit.resolve_verson.data
         db.session.add(bugs)
         flash('The Developer has been updated.')
 
@@ -460,6 +466,7 @@ def bug_process(id):
         return redirect(url_for('.bug_process', id=bugs.id))
 
     if testleadedit2.validate_on_submit() and current_user == bugs.bug_owner:
+        print 'testleadedit2'
         bugs.bug_owner_id = User.query.filter_by(
             email=testleadedit2.bug_owner_id.data).first().id
 

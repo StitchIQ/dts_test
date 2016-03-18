@@ -93,4 +93,18 @@
 {% block scripts %}
 {{ super() }}
 {{ pagedown.include_pagedown() }}
+<script type="text/javascript">
+    var div=document.getElementById("test");
+    $(document).ready(function () {
+        $("#bug_status-0").click(function () {
+            div.style.display="none";
+        });
+        $("#bug_status-1").click(function () {
+            div.style.display="none";
+        });
+        $("#bug_status-2").click(function () {
+            div.style.display="block";
+        });
+    });
+</script>
 {% endblock %}
