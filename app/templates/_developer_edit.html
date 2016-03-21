@@ -24,7 +24,6 @@
             <div class="tab-pane fade in active" id="development">
                 {% if current_user == bugs.bug_owner and bugs.bug_status ==3 %}
                     {{ wtf.quick_form(developedit) }}
-
                 {% endif %}
             </div>
 

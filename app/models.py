@@ -78,6 +78,9 @@ class VersionInfo(db.Model):
             }
         return json_post
 
+    def software_to_turple(self):
+        return [(soft,soft)for soft in self.software_version.split(';')]
+
 class ProductInfo(db.Model):
     __tablename__ = 'productinfo'
     id = db.Column(db.Integer, primary_key=True)

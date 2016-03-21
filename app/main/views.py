@@ -392,15 +392,20 @@ def bug_process(id):
     #post.comments.order_by(Comment.timestamp.asc()) .filter_by(status='3')
     form = BugsProcess()
     testleadedit = TestLeadEdit()
-    ss = "[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')]"
     developedit = DevelopEdit()
-    developedit.resolve_verson.choices  = [('B001','B001'),('B002','B002'),('B003','B003'),('B004','B004')]
+    #developedit.resolve_verson.choices  = [('B001','B001'),('B002','B002'),('B003','B003'),('B004','B004')]
     testleadedit2 = TestLeadEdit2()
+
     bugclose = BugClose()
+    software = VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
+                ProductInfo.product_name==bugs.product_name,bugs.product_version==VersionInfo.version_name).first()
+    bugclose.regression_test_version.choices = software.software_to_turple()
+    developedit.resolve_verson.choices = software.software_to_turple()
 
     if request.method == 'POST':
         print request
         print 'GGGGGGGGGGGGGGGGGGGG'
+        print developedit.validate_on_submit()
 
     if testleadedit.validate_on_submit() and current_user == bugs.bug_owner:
         print 'testleaderedit'
@@ -441,6 +446,7 @@ def bug_process(id):
                         old_status=bugs.bug_status,
                         new_status=developedit.bug_status.data,
                         opinion=developedit.process_opinion.data)
+        bugs.ping()
         db.session.add(process)
 
         bugs.bug_status = developedit.bug_status.data
@@ -496,6 +502,7 @@ def bug_process(id):
         db.session.add(process)
 
         bugs.bug_status = bugclose.bug_status.data
+        bugs.regression_test_version = bugclose.regression_test_version.data
         db.session.add(bugs)
         flash('The Tester has been updated.')
         return redirect(url_for('.bug_process', id=bugs.id))

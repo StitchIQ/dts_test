@@ -55,17 +55,17 @@ class TestLeadEdit(Form):
     process_opinion = TextAreaField('处理意见', validators=[Required()])
     bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     bug_status = RadioField('选择处理', choices=[('1', '返回修改'),('3', '开发人员修改')], default='3')
-    submit = SubmitField('Submit')
+    submit = SubmitField('提交')
 
 
 class DevelopEdit(Form):
     process_opinion = TextAreaField('处理意见', validators=[Required()])
-    resolve_verson = SelectField('解决版本',choices=[])
+    resolve_verson = SelectField('解决版本',choices=[],validators=[Required()])
     # names = FieldList(StringField('名称'), label='物品列表', min_entries=1)
     bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     #resolve_verson = SelectField('解决版本', choices=[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')])
-    bug_status = RadioField('选择处理', choices=[('2', '返回测试经理'),('3', '转交其他开发人员处理'),('4', '测试经理组织回归测试')],default='4')
-    submit = SubmitField('Submit')
+    bug_status = RadioField('选择处理', choices=[('2', '返回测试经理'),('3', '转交其他开发人员处理'),('4', '测试经理组织回归测试')],default='4',validators=[Required()])
+    submit = SubmitField('提交')
 
     def __init__(self):
         Form.__init__(self)
@@ -76,10 +76,11 @@ class TestLeadEdit2(Form):
     process_opinion = TextAreaField('处理意见', validators=[Required()])
     bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     bug_status = RadioField('选择处理', choices=[('3', '返回开发人员修改'),('5', '测试人员回归')],default='5')
-    submit = SubmitField('Submit')
+    submit = SubmitField('提交')
 
 class BugClose(Form):
+    regression_test_version = SelectField('回归测试版本',choices=[])
     process_opinion = TextAreaField('处理意见', validators=[Required()])
     #bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     bug_status = RadioField('选择处理', choices=[('6', '问题关闭'),('4', '测试经理组织回归测试')], default='6')
-    submit = SubmitField('Submit')
+    submit = SubmitField('提交')
