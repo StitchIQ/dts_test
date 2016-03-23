@@ -14,15 +14,25 @@ class NameForm(Form):
     name = StringField('What is your name?', validators=[Required(), Email()])
     submit = SubmitField('Submit')
 
+class MySelectField(SelectField):
+
+    def pre_validate(self, form):
+        print 'myselcect ssssss'
+        print self.data
+        print 'ssssss222222'
+        if str(self.data) != '-1':
+            pass
+        else:
+            raise ValueError(self.gettext('Not a valid choice44444'))
 
 class StandardBug(Form):
     #product_name = StringField('产品名称', validators=[Required(), Length(1, 64)])
     #product_version = StringField('产品版本号', validators=[Required(), Length(1, 64)])
     #software_version = StringField('软件版本号', validators=[Required(), Length(1, 64)])
     product_name = SelectField('产品名称',coerce=str, choices=[])
-    product_version = SelectField('产品版本号', coerce=str, choices=[])
-    software_version = SelectField('软件版本号', coerce=str, choices=[])
-    version_features = SelectField('软件特性', choices=[])
+    product_version = MySelectField('产品版本号', coerce=str, choices=[])
+    software_version = MySelectField('软件版本号', coerce=str, choices=[('-1',u'请选择产品')])
+    version_features = MySelectField('软件特性', choices=[])
     #bug_level = StringField('严重程度', validators=[Required(), Length(1, 64)])
     bug_level = SelectField('严重程度', choices=[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')])
     system_view = StringField('系统表现', validators=[Required(), Length(1, 64)])
@@ -52,14 +62,14 @@ class BugsProcess(Form):
     #bug_owner_id = StringField('问题处理人')
 
 class TestLeadEdit(Form):
-    process_opinion = TextAreaField('处理意见', validators=[Required()])
+    test_process_opinion = TextAreaField('处理意见', validators=[Required()])
     bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     bug_status = RadioField('选择处理', choices=[('1', '返回修改'),('3', '开发人员修改')], default='3')
     submit = SubmitField('提交')
 
 
 class DevelopEdit(Form):
-    process_opinion = TextAreaField('处理意见', validators=[Required()])
+    deve_process_opinion = TextAreaField('处理意见', validators=[Required()])
     resolve_verson = SelectField('解决版本',choices=[],validators=[Required()])
     # names = FieldList(StringField('名称'), label='物品列表', min_entries=1)
     bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])

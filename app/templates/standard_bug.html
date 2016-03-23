@@ -8,6 +8,7 @@
 
     <form action="newbugs" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
         {{ wtf.form_field(form.product_name) }}
         {{ wtf.form_field(form.product_version) }}
         {{ wtf.form_field(form.software_version) }}

@@ -5,15 +5,15 @@ $(document).ready(function () {
     $.getJSON(url,function (data) {
         //alert(data);
         //对请求返回的JSON格式进行分解加载
-        $("#product_name").append($("<option/>").text("--请选择 产品名称--").attr("value","-1"));
-        $("#product_version").append($("<option/>").text("--请选择 产品版本--").attr("value","-1"));
-        $("#software_version").append($("<option/>").text("--请选择 软件版本--").attr("value","-1"));
+        //$("#product_name").append($("<option/>").text("--请选择 产品名称--").attr("value","-1"));
+        //$("#product_version").append($("<option/>").text("--请选择 产品版本--").attr("value","-1"));
+       // $("#software_version").append($("<option/>").text("--请选择 软件版本--").attr("value","-1"));
         $("#version_features").append($("<option/>").text("--请选择 软件特性--").attr("value","-1"));
         //alert(data.product_info[0].name);
 
         $.each(data.product_info, function (i,item) {
             //alert(item.name);
-            $("#product_name").append($("<option/>").text(item.name));
+            //$("#product_name").append($("<option/>").text(item.name).attr("value",item.name));
             //alert(this.name);
         });
     });

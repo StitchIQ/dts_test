@@ -297,8 +297,27 @@ def copy_to_me():
 @login_required
 def newbug():
     form = StandardBug()
+    print form.validate_on_submit()
+    print form.errors
+    print form.product_name.data
+
+    product_info = ProductInfo.query.filter_by(product_status=True).all()
+    print [post.product_name_turple() for post in product_info]
+    form.product_name.choices = [('-1',u'请选择产品')]+[post.product_name_turple() for post in product_info]
+    form.product_version.choices = [('-1',u'请选择产品')]
+    #form.software_version.choices = [('-1',u'请选择产品')]
+
     #if form.validate_on_submit():
+    #TODO: 此处动态添加的select选项，无法通过检查
+    # 可以使用重写validation函数来改变验证函数
     if request.method == 'POST':
+        print 'POST'
+        print form.validate_on_submit()
+        print form.errors
+        print form.product_name.data
+        if len(form.errors) !=0:
+            return render_template("standard_bug.html", form=form)
+
         UPLOAD_FOLDER = 'static/Uploads/'
         app_dir = 'app/'
         f = request.files['photo']
@@ -395,20 +414,24 @@ def bug_process(id):
     developedit = DevelopEdit()
     #developedit.resolve_verson.choices  = [('B001','B001'),('B002','B002'),('B003','B003'),('B004','B004')]
     testleadedit2 = TestLeadEdit2()
-
     bugclose = BugClose()
-    software = VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
-                ProductInfo.product_name==bugs.product_name,bugs.product_version==VersionInfo.version_name).first()
-    bugclose.regression_test_version.choices = software.software_to_turple()
-    developedit.resolve_verson.choices = software.software_to_turple()
 
-    if request.method == 'POST':
+    software = VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
+                ProductInfo.product_name==bugs.product_name,bugs.product_version==VersionInfo.version_name).first().software_to_turple()
+    bugclose.regression_test_version.choices = software
+    developedit.resolve_verson.choices = software
+
+    if request.method == 'POST' and form.validate():
         print request
-        print 'GGGGGGGGGGGGGGGGGGGG'
         print developedit.validate_on_submit()
+        print testleadedit.validate_on_submit()
+        print testleadedit2.validate_on_submit()
+        print bugclose.validate_on_submit()
 
     if testleadedit.validate_on_submit() and current_user == bugs.bug_owner:
         print 'testleaderedit'
+        print testleadedit.bug_status.data
+        print developedit.bug_status.data
         bugs.bug_owner_id = User.query.filter_by(
             email=testleadedit.bug_owner_id.data).first().id
 
@@ -418,7 +441,7 @@ def bug_process(id):
                         bugs=bugs,
                         old_status=bugs.bug_status,
                         new_status=testleadedit.bug_status.data,
-                        opinion=testleadedit.process_opinion.data)
+                        opinion=testleadedit.test_process_opinion.data)
         bugs.ping()
         db.session.add(process)
 
@@ -445,7 +468,7 @@ def bug_process(id):
                         bugs=bugs,
                         old_status=bugs.bug_status,
                         new_status=developedit.bug_status.data,
-                        opinion=developedit.process_opinion.data)
+                        opinion=developedit.deve_process_opinion.data)
         bugs.ping()
         db.session.add(process)
 

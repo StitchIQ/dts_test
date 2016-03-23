@@ -23,7 +23,18 @@
         <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade in active" id="development">
                 {% if current_user == bugs.bug_owner and bugs.bug_status ==3 %}
-                    {{ wtf.quick_form(developedit) }}
+
+                    <form method="post" class="form" role="form">
+                        {{ form.hidden_tag() }}
+                        {{ form.csrf_token }}
+                        {{ wtf.form_field(developedit.deve_process_opinion) }}
+                        <div id="test" style="display:none;">
+                            {{ wtf.form_field(developedit.resolve_verson) }}
+                        </div>
+                        {{ wtf.form_field(developedit.bug_owner_id) }}
+                        {{ wtf.form_field(developedit.bug_status) }}
+                        {{ wtf.form_field(developedit.submit) }}
+                    </form>
                 {% endif %}
             </div>
 

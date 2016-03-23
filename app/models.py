@@ -1,3 +1,4 @@
+#coding=utf-8
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -79,7 +80,12 @@ class VersionInfo(db.Model):
         return json_post
 
     def software_to_turple(self):
-        return [(soft,soft)for soft in self.software_version.split(';')]
+        dd = [('-1',u'请选择版本')]
+
+        for soft in self.software_version.split(';'):
+            dd.append((soft,soft))
+        #print dd
+        return dd
 
 class ProductInfo(db.Model):
     __tablename__ = 'productinfo'
@@ -99,6 +105,10 @@ class ProductInfo(db.Model):
             'name': self.product_name,
             }
         return json_post
+
+    def product_name_turple(self):
+
+        return (self.product_name, self.product_name)
 
 class Process(db.Model):
     __tablename__ = 'process'
