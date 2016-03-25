@@ -25,8 +25,8 @@
 
                           <!-- 显示问题单的图片 -->
                          {% if bugs.bug_photos !=None %}
-                          <img src={{ request.url_root }}{{ bugs.bug_photos }} width="50%"/>
-                          <p>current user {{ current_user }}</p>
+                            <img src={{ request.url_root }}{{ bugs.bug_photos }} width="50%"/>
+                            <p>current user {{ current_user }}</p>
                           {% endif %}
                           <!-- 调试使用，后续删除 -->
                           <p>current user {{ current_user }}</p>

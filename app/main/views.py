@@ -305,12 +305,11 @@ def newbug():
     print [post.product_name_turple() for post in product_info]
     form.product_name.choices = [('-1',u'请选择产品')]+[post.product_name_turple() for post in product_info]
     form.product_version.choices = [('-1',u'请选择产品')]
-    #form.software_version.choices = [('-1',u'请选择产品')]
+    form.software_version.choices = [('-1',u'请选择产品')]
 
-    #if form.validate_on_submit():
-    #TODO: 此处动态添加的select选项，无法通过检查
-    # 可以使用重写validation函数来改变验证函数
-    if request.method == 'POST':
+    # 可以使用重写validation函数来改变验证函数，检查产品版本，只要值不为-1即可
+    if form.validate_on_submit():
+    #if request.method == 'POST':
         print 'POST'
         print form.validate_on_submit()
         print form.errors
@@ -428,37 +427,41 @@ def bug_process(id):
         print testleadedit2.validate_on_submit()
         print bugclose.validate_on_submit()
 
-    if testleadedit.validate_on_submit() and current_user == bugs.bug_owner:
-        print 'testleaderedit'
-        print testleadedit.bug_status.data
-        print developedit.bug_status.data
-        bugs.bug_owner_id = User.query.filter_by(
-            email=testleadedit.bug_owner_id.data).first().id
+    if bugs.bug_status == Bug_Now_Status.TESTLEADER_AUDIT \
+        and current_user == bugs.bug_owner:
+        print 'testleaderedit test'
+        if testleadedit.validate_on_submit():
+            print 'testleaderedit'
+            print testleadedit.bug_status.data
+            print developedit.bug_status.data
+            bugs.bug_owner_id = User.query.filter_by(
+                email=testleadedit.bug_owner_id.data).first().id
 
-        process = Process(operator=current_user._get_current_object(),
-                        author=User.query.filter_by(
-                                email=testleadedit.bug_owner_id.data).first(),
-                        bugs=bugs,
-                        old_status=bugs.bug_status,
-                        new_status=testleadedit.bug_status.data,
-                        opinion=testleadedit.test_process_opinion.data)
-        bugs.ping()
-        db.session.add(process)
+            process = Process(operator=current_user._get_current_object(),
+                            author=User.query.filter_by(
+                                    email=testleadedit.bug_owner_id.data).first(),
+                            bugs=bugs,
+                            old_status=bugs.bug_status,
+                            new_status=testleadedit.bug_status.data,
+                            opinion=testleadedit.test_process_opinion.data)
+            bugs.ping()
+            db.session.add(process)
 
 
-        bugs.bug_status = testleadedit.bug_status.data
-        db.session.add(bugs)
-        '''
-        process.author = current_user._get_current_object()
-        process.bugs = bugs
-        process.status = testleadedit.bug_status.data
-        process.opinion = testleadedit.process_opinion'''
+            bugs.bug_status = testleadedit.bug_status.data
+            db.session.add(bugs)
+            '''
+            process.author = current_user._get_current_object()
+            process.bugs = bugs
+            process.status = testleadedit.bug_status.data
+            process.opinion = testleadedit.process_opinion'''
 
-        #flash(process_list.timestamp)
-        flash('The TestLeader has been updated.')
-        return redirect(url_for('.bug_process', id=bugs.id))
+            #flash(process_list.timestamp)
+            flash('The TestLeader has been updated.')
+            return redirect(url_for('.bug_process', id=bugs.id))
 
-    if developedit.validate_on_submit() and current_user == bugs.bug_owner:
+    if developedit.validate_on_submit() and current_user == bugs.bug_owner \
+        and bugs.bug_status == Bug_Now_Status.DEVELOPMENT:
         print 'developedit'
         bugs.bug_owner_id = User.query.filter_by(
             email=developedit.bug_owner_id.data).first().id
@@ -494,7 +497,8 @@ def bug_process(id):
 
         return redirect(url_for('.bug_process', id=bugs.id))
 
-    if testleadedit2.validate_on_submit() and current_user == bugs.bug_owner:
+    if testleadedit2.validate_on_submit() and current_user == bugs.bug_owner \
+        and bugs.bug_status == Bug_Now_Status.TESTLEADER_REGESSION:
         print 'testleadedit2'
         bugs.bug_owner_id = User.query.filter_by(
             email=testleadedit2.bug_owner_id.data).first().id
@@ -513,7 +517,8 @@ def bug_process(id):
         flash('The TestLeader2 has been updated.')
         return redirect(url_for('.bug_process', id=bugs.id))
 
-    if bugclose.validate_on_submit() and current_user == bugs.bug_owner:
+    if bugclose.validate_on_submit() and current_user == bugs.bug_owner \
+        and bugs.bug_status == Bug_Now_Status.REGRESSION_TESTING:
         #bugs.bug_owner_id = User.query.filter_by(
         #    email=bugclose.bug_owner_id.data).first().id
         process = Process(operator=current_user._get_current_object(),
@@ -579,8 +584,26 @@ def bug_edit(id):
 
     form = StandardBug()
 
-    #if form.validate_on_submit():
-    if request.method == 'POST':
+    product_info = ProductInfo.query.filter_by(product_status=True).all()
+    form.product_name.choices = [('-1',u'--请选择 产品名称--')]+[post.product_name_turple() for post in product_info]
+    form.product_name.selected = bugs.product_name
+    #初始化selectfiled,默认值设置为原来bug的值
+    #TODO 这里需要优化，添加默认的版本列表和特性列表
+    form.product_version.choices = [('-1',u'--请选择 产品版本--')] +[(bugs.product_version,bugs.product_version)]
+    form.product_version.selected = bugs.product_version
+    form.software_version.choices = [('-1',u'--请选择 软件版本--')]+[(bugs.software_version,bugs.software_version)]
+    form.software_version.selected = bugs.software_version
+    form.version_features.choices = [('-1',u'--请选择 软件特性--')]+[(bugs.version_features,bugs.version_features)]
+
+    if form.validate_on_submit():
+    #if request.method == 'POST':
+        UPLOAD_FOLDER = 'static/Uploads/'
+        app_dir = 'app/'
+        f = request.files['photo']
+        fname = None
+        if f.filename != '':
+            fname = UPLOAD_FOLDER + secure_filename(f.filename)
+            f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
         bugs.product_name = form.product_name.data
         bugs.product_version = form.product_version.data
         bugs.software_version = form.software_version.data
@@ -593,6 +616,7 @@ def bug_edit(id):
         bugs.bug_owner = User.query.filter_by(email=form.bug_owner_id.data).first()
         bugs.author = current_user._get_current_object()
         bugs.bug_status = form.bug_status.data
+        bugs.bug_photos = fname
         db.session.add(bugs)
 
         # bug_owner_id=form.bug_owner_id.data,
@@ -620,6 +644,7 @@ def bug_edit(id):
     form.bug_descrit.data = bugs.bug_descrit
     form.bug_title.data = bugs.bug_title
     form.bug_owner_id.data = bugs.bug_owner.email
+    #form.photo.data = bugs.bug_photos
     #flash(process_list.first().opinion)
     return render_template('bug_edit.html', form=form, bugs=bugs,process_log=process_log)
 

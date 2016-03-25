@@ -15,15 +15,12 @@ class NameForm(Form):
     submit = SubmitField('Submit')
 
 class MySelectField(SelectField):
-
+    #重写验证函数，只要值不为-1，就通过
     def pre_validate(self, form):
-        print 'myselcect ssssss'
-        print self.data
-        print 'ssssss222222'
         if str(self.data) != '-1':
             pass
         else:
-            raise ValueError(self.gettext('Not a valid choice44444'))
+            raise ValueError(self.gettext('Not a valid choice'))
 
 class StandardBug(Form):
     #product_name = StringField('产品名称', validators=[Required(), Length(1, 64)])
@@ -31,8 +28,8 @@ class StandardBug(Form):
     #software_version = StringField('软件版本号', validators=[Required(), Length(1, 64)])
     product_name = SelectField('产品名称',coerce=str, choices=[])
     product_version = MySelectField('产品版本号', coerce=str, choices=[])
-    software_version = MySelectField('软件版本号', coerce=str, choices=[('-1',u'请选择产品')])
-    version_features = MySelectField('软件特性', choices=[])
+    software_version = MySelectField('软件版本号', coerce=str, choices=[])
+    version_features = MySelectField('软件特性', coerce=str, choices=[])
     #bug_level = StringField('严重程度', validators=[Required(), Length(1, 64)])
     bug_level = SelectField('严重程度', choices=[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')])
     system_view = StringField('系统表现', validators=[Required(), Length(1, 64)])
@@ -42,11 +39,15 @@ class StandardBug(Form):
     bug_descrit = PageDownField('问题描述', validators=[Required()])
     #bug_descrit = StringField('问题描述', validators=[Required(), Length(1, 64)])
     bug_owner_id = StringField('问题处理人', validators=[Required(), Email()])
-    bug_status = RadioField('选择处理', choices=[('1', '新建'),('2', '测试经理审核')], default='1')
+    bug_status = RadioField('选择处理', choices=[('1', '新建'),('2', '测试经理审核')], default='2')
     #save = SubmitField('保存')
     #photo = FileField('DTS phote',validators=[FileRequired(),FileAllowed(['jpg','jpeg'],'EEEE')])
     photo = FileField('DTS phote')
     submit = SubmitField('提交')
+
+    def validate_product_version(form, field):
+        if str(field.data) == '-1':
+            raise ValidationError("We're sorry, you must be 13 or older to register")
 
 class BugsProcess(Form):
     product_name = StringField('产品名称')
@@ -89,7 +90,7 @@ class TestLeadEdit2(Form):
     submit = SubmitField('提交')
 
 class BugClose(Form):
-    regression_test_version = SelectField('回归测试版本',choices=[])
+    regression_test_version = MySelectField('回归测试版本',choices=[])
     process_opinion = TextAreaField('处理意见', validators=[Required()])
     #bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     bug_status = RadioField('选择处理', choices=[('6', '问题关闭'),('4', '测试经理组织回归测试')], default='6')

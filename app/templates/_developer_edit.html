@@ -11,8 +11,12 @@
     <ul id="deveployment" class="nav nav-list secondmenu collapse in">
 
         <ul id="myTab" class="nav nav-tabs">
-            <li class="active"><a href="#development" data-toggle="tab">当前处理</a>
-            </li>
+            {% if current_user == bugs.bug_owner and bugs.bug_status ==3 %}
+                <li class="active">
+                    <a href="#development" data-toggle="tab">当前处理</a>
+                </li>
+            {% endif %}
+
             {% for log in developedit_log %}
                <li ><a href="#{{ log.id }}" data-toggle="tab">
                  {{ log.operator.username }}</a>
@@ -28,7 +32,7 @@
                         {{ form.hidden_tag() }}
                         {{ form.csrf_token }}
                         {{ wtf.form_field(developedit.deve_process_opinion) }}
-                        <div id="test" style="display:none;">
+                        <div id="test" style="display:block;">
                             {{ wtf.form_field(developedit.resolve_verson) }}
                         </div>
                         {{ wtf.form_field(developedit.bug_owner_id) }}
