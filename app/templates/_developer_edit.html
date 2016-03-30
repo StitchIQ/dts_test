@@ -29,13 +29,13 @@
                 {% if current_user == bugs.bug_owner and bugs.bug_status ==3 %}
 
                     <form method="post" class="form" role="form">
-                        {{ form.hidden_tag() }}
-                        {{ form.csrf_token }}
-                        {{ wtf.form_field(developedit.deve_process_opinion) }}
+                        {{ developedit.hidden_tag() }}
                         <div id="test" style="display:block;">
-                            {{ wtf.form_field(developedit.resolve_verson) }}
+                            {{ wtf.form_field(developedit.dresolve_version) }}
+                            {{ wtf.form_field(developedit.dversion_features) }}
                         </div>
-                        {{ wtf.form_field(developedit.bug_owner_id) }}
+                        {{ wtf.form_field(developedit.deve_process_opinion) }}
+                        {{ wtf.form_field(developedit.dbug_owner_id) }}
                         {{ wtf.form_field(developedit.bug_status) }}
                         {{ wtf.form_field(developedit.submit) }}
                     </form>

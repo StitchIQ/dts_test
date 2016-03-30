@@ -397,28 +397,12 @@ def upload():
 def bug_process(id):
     bugs = Bugs.query.get_or_404(id)
 
-    # 处理日志
-    process_log = bugs.process.order_by(Process.timestamp.asc())
-    testmanager_log = bugs.process.filter_by(old_status=Bug_Now_Status.TESTLEADER_AUDIT).order_by(
-                        Process.timestamp.desc())
-    developedit_log = bugs.process.filter_by(old_status=Bug_Now_Status.DEVELOPMENT).order_by(
-                        Process.timestamp.desc())
-    bugtest_log = bugs.process.filter_by(old_status=Bug_Now_Status.TESTLEADER_REGESSION).order_by(
-                        Process.timestamp.desc())
-    retest_log = bugs.process.filter_by(old_status=Bug_Now_Status.REGRESSION_TESTING).order_by(
-                        Process.timestamp.desc())
-    #post.comments.order_by(Comment.timestamp.asc()) .filter_by(status='3')
     form = BugsProcess()
     testleadedit = TestLeadEdit()
     developedit = DevelopEdit()
-    #developedit.resolve_verson.choices  = [('B001','B001'),('B002','B002'),('B003','B003'),('B004','B004')]
+    #developedit.resolve_version.choices  = [('B001','B001'),('B002','B002'),('B003','B003'),('B004','B004')]
     testleadedit2 = TestLeadEdit2()
     bugclose = BugClose()
-
-    software = VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
-                ProductInfo.product_name==bugs.product_name,bugs.product_version==VersionInfo.version_name).first().software_to_turple()
-    bugclose.regression_test_version.choices = software
-    developedit.resolve_verson.choices = software
 
     if request.method == 'POST' and form.validate():
         print request
@@ -426,6 +410,8 @@ def bug_process(id):
         print testleadedit.validate_on_submit()
         print testleadedit2.validate_on_submit()
         print bugclose.validate_on_submit()
+        print developedit.errors
+        print developedit.dversion_features.data
 
     if bugs.bug_status == Bug_Now_Status.TESTLEADER_AUDIT \
         and current_user == bugs.bug_owner:
@@ -463,11 +449,12 @@ def bug_process(id):
     if developedit.validate_on_submit() and current_user == bugs.bug_owner \
         and bugs.bug_status == Bug_Now_Status.DEVELOPMENT:
         print 'developedit'
+        print testleadedit.bug_owner_id.data
         bugs.bug_owner_id = User.query.filter_by(
-            email=developedit.bug_owner_id.data).first().id
+            email=developedit.dbug_owner_id.data).first().id
         process = Process(operator=current_user._get_current_object(),
                         author=User.query.filter_by(
-                                email=testleadedit.bug_owner_id.data).first(),
+                                email=developedit.dbug_owner_id.data).first(),
                         bugs=bugs,
                         old_status=bugs.bug_status,
                         new_status=developedit.bug_status.data,
@@ -476,11 +463,13 @@ def bug_process(id):
         db.session.add(process)
 
         bugs.bug_status = developedit.bug_status.data
-        bugs.resolve_version = developedit.resolve_verson.data
-        print 'CCCCC: :' ,developedit.resolve_verson.data
+        bugs.resolve_version = developedit.dresolve_version.data
+        bugs.version_features = developedit.dversion_features.data
+        print 'CCCCC: :' ,developedit.dresolve_version.data
         db.session.add(bugs)
         flash('The Developer has been updated.')
-
+        '''
+        发送更新邮件，功能暂未实现
         user = User.query.filter_by(email=testleadedit.bug_owner_id.data).first()
 
         flash(testleadedit.bug_owner_id.data)
@@ -494,7 +483,7 @@ def bug_process(id):
         #                'auth/email/confirm', user=user, token=token)
 
         flash('A Email send to author.' + user.email)
-
+        '''
         return redirect(url_for('.bug_process', id=bugs.id))
 
     if testleadedit2.validate_on_submit() and current_user == bugs.bug_owner \
@@ -505,7 +494,7 @@ def bug_process(id):
 
         process = Process(operator=current_user._get_current_object(),
                         author=User.query.filter_by(
-                                email=testleadedit.bug_owner_id.data).first(),
+                                email=testleadedit2.bug_owner_id.data).first(),
                         bugs=bugs,
                         old_status=bugs.bug_status,
                         new_status=testleadedit2.bug_status.data,
@@ -535,6 +524,30 @@ def bug_process(id):
         flash('The Tester has been updated.')
         return redirect(url_for('.bug_process', id=bugs.id))
 
+    # 处理日志
+    process_log = bugs.process.order_by(Process.timestamp.asc())
+    testmanager_log = bugs.process.filter_by(old_status=Bug_Now_Status.TESTLEADER_AUDIT).order_by(
+                        Process.timestamp.desc())
+    developedit_log = bugs.process.filter_by(old_status=Bug_Now_Status.DEVELOPMENT).order_by(
+                        Process.timestamp.desc())
+    bugtest_log = bugs.process.filter_by(old_status=Bug_Now_Status.TESTLEADER_REGESSION).order_by(
+                        Process.timestamp.desc())
+    retest_log = bugs.process.filter_by(old_status=Bug_Now_Status.REGRESSION_TESTING).order_by(
+                        Process.timestamp.desc())
+    #post.comments.order_by(Comment.timestamp.asc()) .filter_by(status='3')
+
+
+    software_version = VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
+                ProductInfo.product_name==bugs.product_name,bugs.product_version==VersionInfo.version_name).first()
+    #设置selectfield的默认值，使用.data直接赋值，即可
+    developedit.dresolve_version.choices = [('-1',u'--请选择 软件版本--')] + software_version.software_to_turple()
+    developedit.dresolve_version.data = bugs.software_version
+
+    developedit.dversion_features.choices = [('-1',u'--请选择 软件特性--')] + software_version.features_to_turple()
+    developedit.dversion_features.data = bugs.version_features
+
+    bugclose.regression_test_version.choices = [('-1',u'--请选择 软件版本--')] + software_version.software_to_turple()
+    bugclose.regression_test_version.data = bugs.resolve_version
 
     #form.id.data = bugs.id
     form.product_name.data = bugs.product_name
@@ -587,13 +600,23 @@ def bug_edit(id):
     product_info = ProductInfo.query.filter_by(product_status=True).all()
     form.product_name.choices = [('-1',u'--请选择 产品名称--')]+[post.product_name_turple() for post in product_info]
     form.product_name.selected = bugs.product_name
+
     #初始化selectfiled,默认值设置为原来bug的值
-    #TODO 这里需要优化，添加默认的版本列表和特性列表
-    form.product_version.choices = [('-1',u'--请选择 产品版本--')] +[(bugs.product_version,bugs.product_version)]
-    form.product_version.selected = bugs.product_version
-    form.software_version.choices = [('-1',u'--请选择 软件版本--')]+[(bugs.software_version,bugs.software_version)]
-    form.software_version.selected = bugs.software_version
-    form.version_features.choices = [('-1',u'--请选择 软件特性--')]+[(bugs.version_features,bugs.version_features)]
+    #设置selectedfield的默认值，直接使用.data属性即可
+    product_version = VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
+                ProductInfo.product_name==bugs.product_name).all()
+
+    form.product_version.choices = [('-1', u'--请选择 产品版本--')] + [s.version_to_turple() for s in product_version]
+    #form.product_version.selected = bugs.product_version
+
+    software_version = VersionInfo.query.join(ProductInfo, ProductInfo.id==VersionInfo.product).filter(
+                ProductInfo.product_name==bugs.product_name,bugs.product_version==VersionInfo.version_name).first()
+
+    form.software_version.choices = [('-1',u'--请选择 软件版本--')] + software_version.software_to_turple()
+    #form.software_version.selected = bugs.software_version
+
+    form.version_features.choices = [('-1',u'--sss--')] + software_version.features_to_turple()
+    #form.version_features.selected = bugs.version_features
 
     if form.validate_on_submit():
     #if request.method == 'POST':

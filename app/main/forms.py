@@ -20,13 +20,13 @@ class MySelectField(SelectField):
         if str(self.data) != '-1':
             pass
         else:
-            raise ValueError(self.gettext('Not a valid choice'))
+            raise ValueError(self.gettext('Not a valid choice33'))
 
 class StandardBug(Form):
     #product_name = StringField('产品名称', validators=[Required(), Length(1, 64)])
     #product_version = StringField('产品版本号', validators=[Required(), Length(1, 64)])
     #software_version = StringField('软件版本号', validators=[Required(), Length(1, 64)])
-    product_name = SelectField('产品名称',coerce=str, choices=[])
+    product_name = SelectField('产品名称', coerce=str, choices=[])
     product_version = MySelectField('产品版本号', coerce=str, choices=[])
     software_version = MySelectField('软件版本号', coerce=str, choices=[])
     version_features = MySelectField('软件特性', coerce=str, choices=[])
@@ -70,17 +70,13 @@ class TestLeadEdit(Form):
 
 
 class DevelopEdit(Form):
+    dresolve_version = MySelectField('解决版本',  coerce=str, choices=[])
+    dversion_features = MySelectField('软件特性', coerce=str, choices=[])
     deve_process_opinion = TextAreaField('处理意见', validators=[Required()])
-    resolve_verson = SelectField('解决版本',choices=[],validators=[Required()])
-    # names = FieldList(StringField('名称'), label='物品列表', min_entries=1)
-    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
+    dbug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     #resolve_verson = SelectField('解决版本', choices=[('致命','致命'),('严重','严重'),('一般','一般'),('提示','提示')])
     bug_status = RadioField('选择处理', choices=[('2', '返回测试经理'),('3', '转交其他开发人员处理'),('4', '测试经理组织回归测试')],default='4',validators=[Required()])
     submit = SubmitField('提交')
-
-    def __init__(self):
-        Form.__init__(self)
-        #self.resolve_verson = SelectField('解决版本', choices=ss)
 
 
 class TestLeadEdit2(Form):
@@ -90,7 +86,7 @@ class TestLeadEdit2(Form):
     submit = SubmitField('提交')
 
 class BugClose(Form):
-    regression_test_version = MySelectField('回归测试版本',choices=[])
+    regression_test_version = MySelectField('回归测试版本',coerce=str,choices=[])
     process_opinion = TextAreaField('处理意见', validators=[Required()])
     #bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     bug_status = RadioField('选择处理', choices=[('6', '问题关闭'),('4', '测试经理组织回归测试')], default='6')

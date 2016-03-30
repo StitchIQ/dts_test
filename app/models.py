@@ -79,12 +79,23 @@ class VersionInfo(db.Model):
             }
         return json_post
 
-    def software_to_turple(self):
-        dd = [('-1',u'请选择版本')]
+    #返回版本的信息
+    def version_to_turple(self):
 
+        return (self.version_name, self.version_name)
+
+    #返回软件版本的信息
+    def software_to_turple(self):
+        dd = []
         for soft in self.software_version.split(';'):
             dd.append((soft,soft))
-        #print dd
+        return dd
+
+    #返回软件特性的信息
+    def features_to_turple(self):
+        dd = []
+        for features in self.version_features.split(';'):
+            dd.append((features,features))
         return dd
 
 class ProductInfo(db.Model):
