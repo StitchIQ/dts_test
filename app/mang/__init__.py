@@ -1,3 +1,4 @@
+# coding=utf-8
 from flask import Blueprint
 
 mang = Blueprint('mang', __name__, static_folder='static')

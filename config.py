@@ -1,7 +1,8 @@
+# coding=utf-8
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-
+'''
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
@@ -17,6 +18,27 @@ class Config:
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 30
 
+
+    @staticmethod
+    def init_app(app):
+        pass
+'''
+
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    MAIL_SERVER = 'smtp.kedacom.com'
+    MAIL_PORT = 25
+    MAIL_USE_TLS = False
+    MAIL_USERNAME = 'sqlmail@kedacom.com'
+    MAIL_PASSWORD = '888'
+    FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
+    FLASKY_MAIL_SENDER = 'Flasky Admin <sqlmail@kedacom.com>'
+    FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
+    FLASKY_POSTS_PER_PAGE = 25
+    FLASKY_FOLLOWERS_PER_PAGE = 50
+    FLASKY_COMMENTS_PER_PAGE = 30
 
     @staticmethod
     def init_app(app):

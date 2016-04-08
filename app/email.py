@@ -1,3 +1,4 @@
+# coding=utf-8
 from threading import Thread
 from flask import current_app, render_template
 from flask.ext.mail import Message
@@ -9,6 +10,7 @@ def send_async_email(app, msg):
         mail.send(msg)
 
 
+# TODO 需要添加邮件模板
 def send_email(to, subject, template, **kwargs):
     app = current_app._get_current_object()
     msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + ' ' + subject,

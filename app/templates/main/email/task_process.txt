@@ -1,6 +1,5 @@
 Dear {{ user.username }},
 
-Welcome to Flasky!
 
 To confirm your account please click on the following link:
 

@@ -3,30 +3,11 @@ $(function(){
         $.get("check_user",{
             username:$("#bug_owner_id").val()
         },function(data,status){
-            if(status != '0'){
-                $("#result").text(data);
-                alert(data);
-            }
-            else{
-            $("#result").text(data);
-            alert('NOT');
-            alert(data);
+            if(data == 'Not Found'){
+                alert("输入的邮件地址找不到");
             };
-
         });
     });
 });
-
-  $(function() {
-    $('a#calculate').bind('click', function() {
-      $.getJSON('/_add_numbers', {
-        a: $('input[name="a"]').val(),
-        b: $('input[name="b"]').val()
-      }, function(data) {
-        $("#result").text(data.result);
-      });
-      return false;
-    });
-  });
 
 

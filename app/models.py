@@ -1,4 +1,4 @@
-#coding=utf-8
+# coding=utf-8
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -10,14 +10,13 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
 
 
-
-
 class Permission:
     FOLLOW = 0x01
     COMMENT = 0x02
     WRITE_ARTICLES = 0x04
     MODERATE_COMMENTS = 0x08
     ADMINISTER = 0x80
+
 
 class Bug_Now_Status:
     CREATED = 1
@@ -26,6 +25,7 @@ class Bug_Now_Status:
     TESTLEADER_REGESSION = 4
     REGRESSION_TESTING = 5
     CLOSED = 6
+
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -60,6 +60,7 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.name
 
+
 class VersionInfo(db.Model):
     __tablename__ = 'versioninfo'
     id = db.Column(db.Integer, primary_key=True)
@@ -67,9 +68,9 @@ class VersionInfo(db.Model):
     version_name = db.Column(db.Text)
     version_descrit = db.Column(db.Text)
     software_version = db.Column(db.Text)
-    version_features  = db.Column(db.Text)
-    create_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
-    update_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+    version_features = db.Column(db.Text)
+    create_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     def software_to_json(self):
         json_post = {
@@ -79,37 +80,37 @@ class VersionInfo(db.Model):
             }
         return json_post
 
-    #返回版本的信息
+    # 返回版本的信息
     def version_to_turple(self):
-
         return (self.version_name, self.version_name)
 
-    #返回软件版本的信息
+    # 返回软件版本的信息
     def software_to_turple(self):
         dd = []
         for soft in self.software_version.split(';'):
-            dd.append((soft,soft))
+            dd.append((soft, soft))
         return dd
 
-    #返回软件特性的信息
+    # 返回软件特性的信息
     def features_to_turple(self):
         dd = []
         for features in self.version_features.split(';'):
-            dd.append((features,features))
+            dd.append((features, features))
         return dd
+
 
 class ProductInfo(db.Model):
     __tablename__ = 'productinfo'
     id = db.Column(db.Integer, primary_key=True)
-    product_name = db.Column(db.String(64),unique=True)
+    product_name = db.Column(db.String(64), unique=True)
     product_descrit = db.Column(db.Text)
     product_status = db.Column(db.Boolean, default=False)
-    create_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
-    update_time = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+    create_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     p_id = db.relationship('VersionInfo',
-                            foreign_keys=[VersionInfo.product],
-                            backref='software', lazy='dynamic')
+                           foreign_keys=[VersionInfo.product],
+                           backref='software', lazy='dynamic')
 
     def product_name_json(self):
         json_post = {
@@ -121,16 +122,17 @@ class ProductInfo(db.Model):
 
         return (self.product_name, self.product_name)
 
+
 class Process(db.Model):
     __tablename__ = 'process'
-    id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     operator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     bugs_id = db.Column(db.Integer, db.ForeignKey('bugs.id'))
     old_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
     new_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
     opinion = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
 class Bugs(db.Model):
@@ -154,12 +156,9 @@ class Bugs(db.Model):
     regression_test_version = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     bug_last_update = db.Column(db.DateTime(), default=datetime.utcnow)
-
-
     process = db.relationship('Process',
-                            foreign_keys=[Process.bugs_id],
-                            backref='bugs', lazy='dynamic')
-
+                              foreign_keys=[Process.bugs_id],
+                              backref='bugs', lazy='dynamic')
 
     def __repr__(self):
         return '<User %r>' % self.id
@@ -169,11 +168,11 @@ class Bugs(db.Model):
             'url': url_for('main.bug_process', id=self.id, _external=True),
             'id': self.id,
             'author': self.author.username,
-            'product_name':self.product_name,
-            'product_version':self.product_version,
-            'software_version':self.software_version,
-            'bug_level':self.bug_level,
-            'system_view':self.system_view,
+            'product_name': self.product_name,
+            'product_version': self.product_version,
+            'software_version': self.software_version,
+            'bug_level': self.bug_level,
+            'system_view': self.system_view,
             'bug_show_times': self.bug_show_times,
             'bug_title': self.bug_title,
             'bug_owner': self.bug_owner.username,
@@ -203,16 +202,12 @@ class BugStatus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     bug_status = db.Column(db.Integer)
     bug_status_descrit = db.Column(db.String(64))
-
-    old_status = db.relationship('Process',foreign_keys=[Process.old_status],
-                                backref='old',lazy='dynamic')
-
-    new_status = db.relationship('Process',foreign_keys=[Process.new_status],
-                                    backref='new',lazy='dynamic')
-
-    bug_now_status = db.relationship('Bugs',foreign_keys=[Bugs.bug_status],
-                                    backref='now_status',lazy='dynamic')
-
+    old_status = db.relationship('Process', foreign_keys=[Process.old_status],
+                                 backref='old', lazy='dynamic')
+    new_status = db.relationship('Process', foreign_keys=[Process.new_status],
+                                 backref='new', lazy='dynamic')
+    bug_now_status = db.relationship('Bugs', foreign_keys=[Bugs.bug_status],
+                                     backref='now_status', lazy='dynamic')
 
 
 class User(UserMixin, db.Model):
@@ -234,12 +229,11 @@ class User(UserMixin, db.Model):
                                  backref='bug_owner', lazy='dynamic')
 
     process = db.relationship('Process',
-                            foreign_keys=[Process.author_id],
-                            backref='author', lazy='dynamic')
+                              foreign_keys=[Process.author_id],
+                              backref='author', lazy='dynamic')
     operators = db.relationship('Process',
-                            foreign_keys=[Process.operator_id],
-                            backref='operator', lazy='dynamic')
-
+                                foreign_keys=[Process.operator_id],
+                                backref='operator', lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
