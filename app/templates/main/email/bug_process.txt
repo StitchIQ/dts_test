@@ -1,10 +1,12 @@
 Dear {{ user.username }},
 
-Welcome to Flasky!
+Welcome to DTS!
 
-To confirm your account please click on the following link:
+Please process this case:
+Please process this case: <a href="{{ url_for('main.bug_process', id=id, token=token, _external=True) }}">click here</a>.
 
-{{ url_for('auth.confirm', token=token, _external=True) }}
+
+Alternatively, you can paste the following link in your browser's address bar:
 {{ url_for('main.bug_process', id=id, token=token, _external=True) }}
 
 Sincerely,

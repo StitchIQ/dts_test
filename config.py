@@ -32,9 +32,9 @@ class Config:
     MAIL_PORT = 25
     MAIL_USE_TLS = False
     MAIL_USERNAME = 'sqlmail@kedacom.com'
-    MAIL_PASSWORD = '888'
-    FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
-    FLASKY_MAIL_SENDER = 'Flasky Admin <sqlmail@kedacom.com>'
+    MAIL_PASSWORD = 'password'
+    FLASKY_MAIL_SUBJECT_PREFIX = '[DTS]'
+    FLASKY_MAIL_SENDER = 'DTS Admin <sqlmail@kedacom.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     FLASKY_POSTS_PER_PAGE = 25
     FLASKY_FOLLOWERS_PER_PAGE = 50
@@ -60,12 +60,13 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-
+    #SQLALCHEMY_DATABASE_URI = "mysql://dts:password@127.0.0.1:3306/dts"
+    #SQLALCHEMY_ECHO = True
 
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
 
-    'default': DevelopmentConfig
+    'default': ProductionConfig
 }

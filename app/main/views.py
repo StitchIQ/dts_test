@@ -20,6 +20,7 @@ sys.setdefaultencoding("utf-8")
 @main.route('/')
 @login_required
 def index():
+    # TODO 数据库初始化后，无管理员账户，无法操作
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
 
     page = request.args.get('page', 1, type=int)
@@ -370,11 +371,7 @@ def newbug():
         db.session.commit()
 
         flash(u'Bugs 提交成功.')
-        user = User.query.filter_by(email=form.bug_owner_id.data).first()
-        token = user.generate_confirmation_token()
-        send_email(user.email, 'Please Process Bugs',
-                   'main/email/bug_process',
-                   user=user, id=bug.id, token=token)
+
         # flash(request.files['photo'].filename)
         return redirect(url_for('.bug_process', id=bug.id))
     # flash('Bugs 准备提交.')
@@ -459,6 +456,7 @@ def bug_process(id):
 
             bugs.bug_status = testleadedit.bug_status.data
             db.session.add(bugs)
+            db.session.commit()
             '''
             process.author = current_user._get_current_object()
             process.bugs = bugs
@@ -467,12 +465,6 @@ def bug_process(id):
 
             # flash(process_list.timestamp)
             flash('The TestLeader has been updated.')
-            user = User.query.filter_by(
-                                email=testleadedit.bug_owner_id.data).first()
-            token = user.generate_confirmation_token()
-            send_email(user.email, 'Please Process Bugs',
-                       'main/email/bug_process',
-                       user=user, id=bugs.id, token=token)
 
             return redirect(url_for('.bug_process', id=bugs.id))
 
@@ -497,20 +489,8 @@ def bug_process(id):
         bugs.version_features = developedit.dversion_features.data
         print 'CCCCC: :', developedit.dresolve_version.data
         db.session.add(bugs)
+        db.session.commit()
         flash('The Developer has been updated.')
-
-        # 发送更新邮件，功能暂未实现
-        # TODO 邮件功能待实现
-        user = User.query.filter_by(
-                    email=developedit.dbug_owner_id.data).first()
-        token = user.generate_confirmation_token()
-        send_email(user.email, 'Please Process Bugs',
-                   'main/email/bug_process',
-                   user=user, id=bugs.id, token=token)
-
-        # send_email(user.email, 'Confirm Your Account',
-        #                'auth/email/confirm', user=user, token=token)
-        # flash('A Email send to author.' + user.email)
 
         return redirect(url_for('.bug_process', id=bugs.id))
 
@@ -531,14 +511,8 @@ def bug_process(id):
 
         bugs.bug_status = testleadedit2.bug_status.data
         db.session.add(bugs)
+        db.session.commit()
         flash('The TestLeader2 has been updated.')
-
-        user = User.query.filter_by(
-                email=testleadedit2.bug_owner_id.data).first()
-        token = user.generate_confirmation_token()
-        send_email(user.email, 'Please Process Bugs',
-                   'main/email/bug_process',
-                   user=user, id=bugs.id, token=token)
 
         return redirect(url_for('.bug_process', id=bugs.id))
 
@@ -558,6 +532,7 @@ def bug_process(id):
         bugs.bug_status = bugclose.bug_status.data
         bugs.regression_test_version = bugclose.regression_test_version.data
         db.session.add(bugs)
+        db.session.commit()
         flash('The Tester has been updated.')
         return redirect(url_for('.bug_process', id=bugs.id))
 

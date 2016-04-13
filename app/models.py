@@ -8,6 +8,7 @@ from flask import current_app, url_for
 
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
+from .email import send_email
 
 
 class Permission:
@@ -134,6 +135,18 @@ class Process(db.Model):
     opinion = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
+    @staticmethod
+    def after_insert(mapper, connection, target):
+        print "new insert process " ,target.opinion
+        print "new insert process " ,target.author_id
+        user = User.query.filter_by(id=target.author_id).first()
+        if user:
+            token = user.generate_confirmation_token()
+            send_email(user.email, 'Please Process Bugs ' + str(target.bugs_id),
+                       'main/email/bug_process',
+                       user=user, id=target.bugs_id, target=target, token=token)
+
+db.event.listen(Process, 'after_insert', Process.after_insert)
 
 class Bugs(db.Model):
     __tablename__ = 'bugs'
@@ -200,7 +213,7 @@ db.event.listen(Bugs.bug_descrit, 'set', Bugs.on_changed_bug_descrit)
 class BugStatus(db.Model):
     __tablename__ = 'bugstatus'
     id = db.Column(db.Integer, primary_key=True)
-    bug_status = db.Column(db.Integer)
+    bug_status = db.Column(db.Integer, index=True)
     bug_status_descrit = db.Column(db.String(64))
     old_status = db.relationship('Process', foreign_keys=[Process.old_status],
                                  backref='old', lazy='dynamic')
