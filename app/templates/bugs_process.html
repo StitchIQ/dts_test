@@ -36,11 +36,11 @@
 
                         <div class="bugs-footer">
                             {% if current_user == bugs.bug_owner and bugs.now_status.id==1 %}
-                                <a href="{{ url_for('.bug_edit', id=bugs.id) }}">
+                                <a href="{{ url_for('.bug_edit', id=bugs.bug_id) }}">
                                     <span class="label label-primary">Edit</span>
                                 </a>
                             {% elif current_user.is_administrator() %}
-                                <a href="{{ url_for('.bug_edit', id=bugs.id) }}">
+                                <a href="{{ url_for('.bug_edit', id=bugs.bug_id) }}">
                                     <span class="label label-danger">Edit [Admin]</span>
                                 </a>
                             {% endif %}

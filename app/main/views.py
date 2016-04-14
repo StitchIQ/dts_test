@@ -21,7 +21,6 @@ sys.setdefaultencoding("utf-8")
 @main.route('/')
 @login_required
 def index():
-    # TODO 数据库初始化后，无管理员账户，无法操作
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
 
     page = request.args.get('page', 1, type=int)
@@ -283,8 +282,8 @@ def task(mytask):
                     error_out=False)
 
     posts = pagination.items
-    flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.bug_id).filter(
-            Process.operator == current_user)))
+    # flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.bug_id).filter(
+    #        Process.operator == current_user)))
     return render_template('main.html', bugs_list=posts,
                            pagination=pagination, mytask=mytask)
 
@@ -616,10 +615,12 @@ def bug_process(id):
                            retest_log=retest_log)
 
 
-@main.route('/bug_edit/<int:id>', methods=['GET', 'POST'])
+@main.route('/bug_edit/<string:id>', methods=['GET', 'POST'])
 @login_required
 def bug_edit(id):
-    bugs = Bugs.query.get_or_404(id)
+    print id
+    # bugs = Bugs.query.get_or_404(id)
+    bugs = Bugs.query.filter_by(bug_id=id).first()
     # print bugs.now_status.id
     if current_user != bugs.bug_owner or \
             bugs.now_status.id != Bug_Now_Status.CREATED and \
@@ -630,36 +631,10 @@ def bug_edit(id):
 
     form = StandardBug()
 
-    product_info = ProductInfo.query.filter_by(product_status=True).all()
-    form.product_name.choices = [('-1', u'--请选择 产品名称--')] + \
-        [post.product_name_turple() for post in product_info]
-    form.product_name.selected = bugs.product_name
 
-    # 初始化selectfiled,默认值设置为原来bug的值
-    # 设置selectedfield的默认值，直接使用.data属性即可
-    product_version = VersionInfo.query.join(
-            ProductInfo,
-            ProductInfo.id == VersionInfo.product).filter(
-            ProductInfo.product_name == bugs.product_name).all()
 
-    form.product_version.choices = [('-1', u'--请选择 产品版本--')] + \
-        [s.version_to_turple() for s in product_version]
-    # form.product_version.selected = bugs.product_version
-
-    software_version = VersionInfo.query.join(
-                ProductInfo,
-                ProductInfo.id == VersionInfo.product).filter(
-                ProductInfo.product_name == bugs.product_name,
-                bugs.product_version == VersionInfo.version_name).first()
-
-    form.software_version.choices = [('-1', u'--请选择 软件版本--')] + \
-        software_version.software_to_turple()
-    # form.software_version.selected = bugs.software_version
-
-    form.version_features.choices = [('-1', u'--sss--')] + \
-        software_version.features_to_turple()
-    # form.version_features.selected = bugs.version_features
-
+    print form.errors
+    print form.validate_on_submit()
     if form.validate_on_submit():
         # if request.method == 'POST':
         UPLOAD_FOLDER = 'static/Uploads/'
@@ -699,7 +674,38 @@ def bug_edit(id):
         db.session.commit()
         flash(bugs.now_status.bug_status_descrit)
         flash('Bugs 提交成功.')
-        return redirect(url_for('.bug_process', id=bugs.id))
+        return redirect(url_for('.bug_process', id=bugs.bug_id))
+
+
+    product_info = ProductInfo.query.filter_by(product_status=True).all()
+    form.product_name.choices = [('-1', u'--请选择 产品名称--')] + \
+        [post.product_name_turple() for post in product_info]
+    form.product_name.selected = bugs.product_name
+
+    # 初始化selectfiled,默认值设置为原来bug的值
+    # 设置selectedfield的默认值，直接使用.data属性即可
+    product_version = VersionInfo.query.join(
+            ProductInfo,
+            ProductInfo.id == VersionInfo.product).filter(
+            ProductInfo.product_name == bugs.product_name).all()
+
+    form.product_version.choices = [('-1', u'--请选择 产品版本--')] + \
+        [s.version_to_turple() for s in product_version]
+    # form.product_version.selected = bugs.product_version
+
+    software_version = VersionInfo.query.join(
+                ProductInfo,
+                ProductInfo.id == VersionInfo.product).filter(
+                ProductInfo.product_name == bugs.product_name,
+                bugs.product_version == VersionInfo.version_name).first()
+
+    form.software_version.choices = [('-1', u'--请选择 软件版本--')] + \
+        software_version.software_to_turple()
+    # form.software_version.selected = bugs.software_version
+
+    form.version_features.choices = [('-1', u'--sss--')] + \
+        software_version.features_to_turple()
+    # form.version_features.selected = bugs.version_features
 
     # form.id.data = bugs.id
     form.product_name.data = bugs.product_name

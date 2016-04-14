@@ -21,8 +21,8 @@ class MySelectField(SelectField):
 
 
 class StandardBug(Form):
-    bugs_id = StringField(u'问题单号', validators=[Required(), Length(1, 64)])
-    product_name = SelectField(u'产品名称', coerce=str, choices=[])
+    bugs_id = StringField(u'问题单号')
+    product_name = MySelectField(u'产品名称', coerce=str, choices=[])
     product_version = MySelectField(u'产品版本号', coerce=str, choices=[])
     software_version = MySelectField(u'软件版本号', coerce=str, choices=[])
     version_features = MySelectField(u'软件特性', coerce=str, choices=[])
