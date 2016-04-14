@@ -1,7 +1,7 @@
 # coding=utf-8
 from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField, TextAreaField, RadioField, \
-        SelectField
+        SelectField, IntegerField
 from wtforms.validators import Required, Length, Email
 from wtforms import ValidationError
 from flask.ext.pagedown.fields import PageDownField
@@ -21,6 +21,7 @@ class MySelectField(SelectField):
 
 
 class StandardBug(Form):
+    bugs_id = StringField(u'问题单号', validators=[Required(), Length(1, 64)])
     product_name = SelectField(u'产品名称', coerce=str, choices=[])
     product_version = MySelectField(u'产品版本号', coerce=str, choices=[])
     software_version = MySelectField(u'软件版本号', coerce=str, choices=[])
@@ -44,6 +45,16 @@ class StandardBug(Form):
     # save = SubmitField('保存')
     photo = FileField('DTS phote')
     submit = SubmitField(u'提交')
+
+    '''
+    def __init__(self):
+        Form.__init__(self)
+        StandardBug.bugs_num += 1
+        self.bugs_id.data = StandardBug.bugs_num
+        print 'StandardBug.bugs_id : ', StandardBug.bugs_num
+    '''
+    def validate_bugs_num(form, field):
+        print 'OOOOK'
 
     # 自定义的验证函数也可以生效
     def validate_product_name(form, field):

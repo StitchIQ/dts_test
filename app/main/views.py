@@ -12,6 +12,7 @@ from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
 from ..email import send_email
 from ..models import Bugs, User, Process, BugStatus, Permission, \
     Bug_Now_Status, ProductInfo, VersionInfo
+from datetime import datetime
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -276,13 +277,13 @@ def task(mytask):
         # 查询的思路是表连接,要去重复值
         pagination = Bugs.query.join(
                     Process,
-                    Process.bugs_id == Bugs.id).distinct().filter(
+                    Process.bugs_id == Bugs.bug_id).distinct().filter(
                     Process.operator == current_user).paginate(
                     page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                     error_out=False)
 
     posts = pagination.items
-    flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.id).filter(
+    flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.bug_id).filter(
             Process.operator == current_user)))
     return render_template('main.html', bugs_list=posts,
                            pagination=pagination, mytask=mytask)
@@ -311,6 +312,7 @@ def copy_to_me():
 @login_required
 def newbug():
     form = StandardBug()
+
     # print form.validate_on_submit()
     # print form.errors
     # print form.product_name.data
@@ -323,6 +325,7 @@ def newbug():
     form.software_version.choices = [('-1', u'请选择产品')]
 
     # 可以使用重写validation函数来改变验证函数，检查产品版本，只要值不为-1即可
+    print form.errors
     if form.validate_on_submit():
         # if request.method == 'POST':
         print 'POST'
@@ -340,7 +343,8 @@ def newbug():
             print 'DDDDDDDDD'
             fname = UPLOAD_FOLDER + secure_filename(f.filename)
             f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
-        bug = Bugs(product_name=form.product_name.data,
+        bug = Bugs(bug_id=form.bugs_id.data,
+                   product_name=form.product_name.data,
                    product_version=form.product_version.data,
                    software_version=form.software_version.data,
                    version_features=form.version_features.data,
@@ -373,9 +377,11 @@ def newbug():
         flash(u'Bugs 提交成功.')
 
         # flash(request.files['photo'].filename)
-        return redirect(url_for('.bug_process', id=bug.id))
+        return redirect(url_for('.bug_process', id=bug.bug_id))
     # flash('Bugs 准备提交.')
     # flash(form.photo.data)
+    form.bugs_id.data = 'Bug' + datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
+    read_only(form.bugs_id)
     return render_template("standard_bug.html", form=form)
 
 
@@ -412,10 +418,11 @@ def upload():
             return redirect(url_for('main.upload'), 302)
 
 
-@main.route('/bug_process/<int:id>', methods=['GET', 'POST'])
+@main.route('/bug_process/<string:id>', methods=['GET', 'POST'])
 @login_required
 def bug_process(id):
-    bugs = Bugs.query.get_or_404(id)
+    print id
+    bugs = Bugs.query.filter_by(bug_id=id).first()
 
     form = BugsProcess()
     testleadedit = TestLeadEdit()
@@ -466,7 +473,7 @@ def bug_process(id):
             # flash(process_list.timestamp)
             flash('The TestLeader has been updated.')
 
-            return redirect(url_for('.bug_process', id=bugs.id))
+            return redirect(url_for('.bug_process', id=bugs.bug_id))
 
     if developedit.validate_on_submit() and current_user == bugs.bug_owner \
             and bugs.bug_status == Bug_Now_Status.DEVELOPMENT:
@@ -492,7 +499,7 @@ def bug_process(id):
         db.session.commit()
         flash('The Developer has been updated.')
 
-        return redirect(url_for('.bug_process', id=bugs.id))
+        return redirect(url_for('.bug_process', id=bugs.bug_id))
 
     if testleadedit2.validate_on_submit() and current_user == bugs.bug_owner \
             and bugs.bug_status == Bug_Now_Status.TESTLEADER_REGESSION:
@@ -514,7 +521,7 @@ def bug_process(id):
         db.session.commit()
         flash('The TestLeader2 has been updated.')
 
-        return redirect(url_for('.bug_process', id=bugs.id))
+        return redirect(url_for('.bug_process', id=bugs.bug_id))
 
     if bugclose.validate_on_submit() and current_user == bugs.bug_owner \
             and bugs.bug_status == Bug_Now_Status.REGRESSION_TESTING:
@@ -534,7 +541,7 @@ def bug_process(id):
         db.session.add(bugs)
         db.session.commit()
         flash('The Tester has been updated.')
-        return redirect(url_for('.bug_process', id=bugs.id))
+        return redirect(url_for('.bug_process', id=bugs.bug_id))
 
     # 处理日志
     process_log = bugs.process.order_by(Process.timestamp.asc())

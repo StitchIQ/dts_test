@@ -22,7 +22,7 @@
               <tr>
                 <td><input type="checkbox"></input></td>
                 <td>{{ loop.index }}</td>
-                <td><a href="{{ url_for('main.bug_process', id=bugs.id) }}" target="_blank">{{ bugs.id }}</a></td>
+                <td><a href="{{ url_for('main.bug_process', id=bugs.bug_id) }}" target="_blank">{{ bugs.bug_id }}</a></td>
                 <td>{{ bugs.product_name }}</td>
                 <td>{{ bugs.product_version }}</td>
                 <td>{{ bugs.software_version }}</td>

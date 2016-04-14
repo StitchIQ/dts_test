@@ -19,15 +19,6 @@ class Permission:
     ADMINISTER = 0x80
 
 
-class Bug_Now_Status:
-    CREATED = 1
-    TESTLEADER_AUDIT = 2
-    DEVELOPMENT = 3
-    TESTLEADER_REGESSION = 4
-    REGRESSION_TESTING = 5
-    CLOSED = 6
-
-
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -129,7 +120,7 @@ class Process(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     operator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    bugs_id = db.Column(db.Integer, db.ForeignKey('bugs.id'))
+    bugs_id = db.Column(db.String(64), db.ForeignKey('bugs.bug_id'))
     old_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
     new_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
     opinion = db.Column(db.Text)
@@ -151,6 +142,7 @@ db.event.listen(Process, 'after_insert', Process.after_insert)
 class Bugs(db.Model):
     __tablename__ = 'bugs'
     id = db.Column(db.Integer, primary_key=True)
+    bug_id = db.Column(db.String(64), unique=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     product_name = db.Column(db.String(64))
     product_version = db.Column(db.String(64))
@@ -209,6 +201,13 @@ class Bugs(db.Model):
 
 db.event.listen(Bugs.bug_descrit, 'set', Bugs.on_changed_bug_descrit)
 
+class Bug_Now_Status:
+    CREATED = 1
+    TESTLEADER_AUDIT = 2
+    DEVELOPMENT = 3
+    TESTLEADER_REGESSION = 4
+    REGRESSION_TESTING = 5
+    CLOSED = 6
 
 class BugStatus(db.Model):
     __tablename__ = 'bugstatus'
@@ -221,6 +220,16 @@ class BugStatus(db.Model):
                                  backref='new', lazy='dynamic')
     bug_now_status = db.relationship('Bugs', foreign_keys=[Bugs.bug_status],
                                      backref='now_status', lazy='dynamic')
+
+    @staticmethod
+    def insert_bug_status():
+        status = [(1,u"新建"),(2,u"测试经理审核"),(3,u"开发人员定位"),(4,u"测试经理组织回归测试"),(5,u"回归测试"),(6,u"问题关闭")]
+        for r in status:
+            s = BugStatus()
+            s.bug_status = r[0]
+            s.bug_status_descrit = r[1]
+            db.session.add(s)
+        db.session.commit()
 
 
 class User(UserMixin, db.Model):
