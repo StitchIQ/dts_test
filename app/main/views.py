@@ -1,22 +1,23 @@
 # coding=utf-8
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+from datetime import datetime
+
 from flask import render_template, redirect, request, url_for, flash, \
     current_app, jsonify, abort
-from flask.ext.login import login_required, \
-    current_user
+from flask.ext.login import login_required, current_user
 from wtforms_components import read_only
 from werkzeug import secure_filename
-from .. import db
+
 from . import main
+from .countrol_func import Bug_Num_Generate
 from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
     TestLeadEdit2, BugClose
 from ..email import send_email
 from ..models import Bugs, User, Process, BugStatus, Permission, \
     Bug_Now_Status, ProductInfo, VersionInfo
-from datetime import datetime
-import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
+from .. import db
 
 @main.route('/')
 @login_required
@@ -25,13 +26,23 @@ def index():
 
     page = request.args.get('page', 1, type=int)
     # sts=BugStatus.query.filter_by(id=6).first()
+    # Bugs.bug_status not in [Bug_Now_Status.CREATED, Bug_Now_Status.CLOSED]
+    # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
+    a = Bugs.query.filter(Bugs.bug_owner == current_user , Bugs.bug_status < Bug_Now_Status.CLOSED).filter(Bugs.bug_status > Bug_Now_Status.CREATED)
+    print a.all()
+    print str(a)
+    b = Bugs.query.filter(Bugs.author == current_user , Bugs.bug_status == Bug_Now_Status.CREATED)
+    print b.all()
 
+    pagination1 = a.union(b).order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+    '''
     pagination1 = Bugs.query.filter(
-            Bugs.bug_owner == current_user,
-            Bugs.bug_status < Bug_Now_Status.CLOSED).order_by(
+            (Bugs.bug_owner == current_user and (Bug_Now_Status.CREATED < Bugs.bug_status and Bugs.bug_status< Bug_Now_Status.CLOSED)),
+            (Bugs.author == current_user and Bugs.status_equal(Bug_Now_Status.CREATED))).order_by(
             Bugs.timestamp.desc()).paginate(
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
+    '''
 
     posts = pagination1.items
     return render_template('index.html',
@@ -379,7 +390,7 @@ def newbug():
         return redirect(url_for('.bug_process', id=bug.bug_id))
     # flash('Bugs 准备提交.')
     # flash(form.photo.data)
-    form.bugs_id.data = 'Bug' + datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
+    form.bugs_id.data = Bug_Num_Generate.bug_num()
     read_only(form.bugs_id)
     return render_template("standard_bug.html", form=form)
 
@@ -421,7 +432,9 @@ def upload():
 @login_required
 def bug_process(id):
     print id
-    bugs = Bugs.query.filter_by(bug_id=id).first()
+    bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
+    # if bugs is None and bugs.status_equal(Bug_Now_Status.CREATED):
+    #    return render_template('404.html'), 404
 
     form = BugsProcess()
     testleadedit = TestLeadEdit()
@@ -620,17 +633,16 @@ def bug_process(id):
 def bug_edit(id):
     print id
     # bugs = Bugs.query.get_or_404(id)
-    bugs = Bugs.query.filter_by(bug_id=id).first()
+    bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
     # print bugs.now_status.id
-    if current_user != bugs.bug_owner or \
-            bugs.now_status.id != Bug_Now_Status.CREATED and \
+    if current_user != bugs.author and \
+            bugs.status_equal(Bug_Now_Status.CREATED) and \
             not current_user.can(Permission.ADMINISTER):
-        abort(403)
+        return render_template('404.html'), 404
 
     process_log = bugs.process.order_by(Process.timestamp.asc())
 
     form = StandardBug()
-
 
 
     print form.errors

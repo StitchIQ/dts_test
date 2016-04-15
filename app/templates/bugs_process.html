@@ -28,14 +28,11 @@
                             <img src={{ request.url_root }}{{ bugs.bug_photos }} width="50%"/>
                             <p>current user {{ current_user }}</p>
                           {% endif %}
-                          <!-- 调试使用，后续删除 -->
-                          <p>current user {{ current_user }}</p>
-                          <p>bugs bugowner user {{ bugs.bug_owner }}</p>
                           <br>
                       </div>
 
                         <div class="bugs-footer">
-                            {% if current_user == bugs.bug_owner and bugs.now_status.id==1 %}
+                            {% if current_user == bugs.author and bugs.status_equal(Bug_Now_Status.CREATED) %}
                                 <a href="{{ url_for('.bug_edit', id=bugs.bug_id) }}">
                                     <span class="label label-primary">Edit</span>
                                 </a>

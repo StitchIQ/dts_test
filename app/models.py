@@ -190,6 +190,9 @@ class Bugs(db.Model):
         self.bug_last_update = datetime.utcnow()
         db.session.add(self)
 
+    def status_equal(self, status):
+        return self.bug_status is not None and self.bug_status == status
+
     @staticmethod
     def on_changed_bug_descrit(target, value, oldvalue, initiator):
         allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
@@ -214,6 +217,7 @@ class BugStatus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     bug_status = db.Column(db.Integer, index=True)
     bug_status_descrit = db.Column(db.String(64))
+
     old_status = db.relationship('Process', foreign_keys=[Process.old_status],
                                  backref='old', lazy='dynamic')
     new_status = db.relationship('Process', foreign_keys=[Process.new_status],
