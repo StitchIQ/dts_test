@@ -28,11 +28,11 @@ def index():
     # sts=BugStatus.query.filter_by(id=6).first()
     # Bugs.bug_status not in [Bug_Now_Status.CREATED, Bug_Now_Status.CLOSED]
     # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
-    a = Bugs.query.filter(Bugs.bug_owner == current_user , Bugs.bug_status < Bug_Now_Status.CLOSED).filter(Bugs.bug_status > Bug_Now_Status.CREATED)
-    print a.all()
-    print str(a)
-    b = Bugs.query.filter(Bugs.author == current_user , Bugs.bug_status == Bug_Now_Status.CREATED)
-    print b.all()
+    a = Bugs.query.filter(Bugs.bug_owner == current_user ,
+                          Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
+                          Bugs.bug_status > Bug_Now_Status.CREATED)
+    b = Bugs.query.filter(Bugs.author == current_user ,
+                          Bugs.bug_status == Bug_Now_Status.CREATED)
 
     pagination1 = a.union(b).order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
     '''
@@ -321,6 +321,7 @@ def copy_to_me():
 @main.route('/newbugs', methods=['GET', 'POST'])
 @login_required
 def newbug():
+    #TODO bugview需要美化
     form = StandardBug()
 
     # print form.validate_on_submit()
@@ -537,15 +538,25 @@ def bug_process(id):
 
     if bugclose.validate_on_submit() and current_user == bugs.bug_owner \
             and bugs.bug_status == Bug_Now_Status.REGRESSION_TESTING:
-        # TODO 返回测试经理的责任人不正确
-        # bugs.bug_owner_id = User.query.filter_by(
-        #    email=bugclose.bug_owner_id.data).first().id
-        process = Process(operator=current_user._get_current_object(),
-                          author=None,
-                          bugs=bugs,
-                          old_status=bugs.bug_status,
-                          new_status=bugclose.bug_status.data,
-                          opinion=bugclose.process_opinion.data)
+        if str(bugclose.bug_status.data) == str(Bug_Now_Status.TESTLEADER_REGESSION):
+            bugs.bug_owner_id = User.query.filter_by(
+                email=bugclose.bug_owner_id.data).first().id
+            process = Process(operator=current_user._get_current_object(),
+                              author=User.query.filter_by(
+                              email=testleadedit2.bug_owner_id.data).first(),
+                              bugs=bugs,
+                              old_status=bugs.bug_status,
+                              new_status=bugclose.bug_status.data,
+                              opinion=bugclose.process_opinion.data)
+
+        else:
+            bugs.bug_owner_id = None
+            process = Process(operator=current_user._get_current_object(),
+                              author=None,
+                              bugs=bugs,
+                              old_status=bugs.bug_status,
+                              new_status=bugclose.bug_status.data,
+                              opinion=bugclose.process_opinion.data)
         db.session.add(process)
 
         bugs.bug_status = bugclose.bug_status.data
@@ -588,6 +599,8 @@ def bug_process(id):
     bugclose.regression_test_version.choices =  \
         [('-1', u'--请选择 软件版本--')] + software_version.software_to_turple()
     bugclose.regression_test_version.data = bugs.resolve_version
+    bugclose.bug_owner_id.data = process_log[-1].operator.email
+    #flash(process_log[-1].author.email)
 
     # form.id.data = bugs.id
     form.product_name.data = bugs.product_name
@@ -617,6 +630,7 @@ def bug_process(id):
     if bugs.bug_photos is not None:
         print 'ssss'
         flash(bugs.bug_photos)
+
     return render_template('bugs_process.html',
                            form=form, bugs=bugs,
                            testleadedit=testleadedit, developedit=developedit,

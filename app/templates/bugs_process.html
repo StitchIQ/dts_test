@@ -17,7 +17,7 @@
           <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="">
                   <li> <a href="#buginfo" class="nav-header collapsed" data-toggle="collapse">
                       <i class="glyphicon glyphicon-cog"></i> 问题单信息
-                      Processed By: {{ bugs.author.username }}--Time at :{{ bugs.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                      Processed By: {{ bugs.author.username }}--Time at :{{ moment(bugs.timestamp).format('YYYY-MM-D HH:mm:ss') }}
                       <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
                       <ul id="buginfo" class="nav nav-list secondmenu collapse">
                       <div class="col-md-4">
@@ -67,7 +67,7 @@
                <tbody>
                     {% for logs in process_log %}
                         <tr>
-                             <td>{{ logs.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                             <td>{{ moment(logs.timestamp).format('YYYY-MM-D HH:mm:ss') }}</td>
                              <td>{{ logs.operator.username }}</td>
                              <td>{{ logs.author.username }}</td>
                              <td>{{ logs.old.bug_status_descrit }}</td>
@@ -100,6 +100,15 @@
             div.style.display="none";
         });
         $("#bug_status-2").click(function () {
+            div.style.display="block";
+        });
+    });
+    var div=document.getElementById("test_leader");
+    $(document).ready(function () {
+        $("#bug_status-0").click(function () {
+            div.style.display="none";
+        });
+        $("#bug_status-1").click(function () {
             div.style.display="block";
         });
     });

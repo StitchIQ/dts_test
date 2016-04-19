@@ -2,16 +2,16 @@
         <i class="glyphicon glyphicon-globe"></i> 开发定位处理
         {% if developedit_log.first() %}
             Processed By: {{ developedit_log.first().operator.username }}
-            --Time at :{{ developedit_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+            --Time at :{{ moment(developedit_log.first().timestamp).format('YYYY-MM-D HH:mm:ss') }}
         {% endif %}
         <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
 
 <ul>
-    {% if bugs.bug_status >=3 %}
+    {% if bugs.bug_status >= Bug_Now_Status.DEVELOPMENT %}
     <ul id="deveployment" class="nav nav-list secondmenu collapse in">
 
         <ul id="myTab" class="nav nav-tabs">
-            {% if current_user == bugs.bug_owner and bugs.bug_status ==3 %}
+            {% if current_user == bugs.bug_owner and bugs.bug_status == Bug_Now_Status.DEVELOPMENT %}
                 <li class="active">
                     <a href="#development" data-toggle="tab">当前处理</a>
                 </li>
@@ -26,7 +26,7 @@
 
         <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade in active" id="development">
-                {% if current_user == bugs.bug_owner and bugs.bug_status ==3 %}
+                {% if current_user == bugs.bug_owner and bugs.bug_status == Bug_Now_Status.DEVELOPMENT %}
 
                     <form method="post" class="form" role="form">
                         {{ developedit.hidden_tag() }}
@@ -47,7 +47,7 @@
                   <div>{{ log.opinion }}</div>
                   <hr/>
                   <lable>Processed by: {{ log.operator.username }} @
-                    <i>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</i></lable>
+                    <i>{{ moment(log.timestamp).format('YYYY-MM-D HH:mm:ss') }}</i></lable>
                </div>
             {% endfor %}
         </div>

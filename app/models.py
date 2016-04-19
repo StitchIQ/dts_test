@@ -128,12 +128,15 @@ class Process(db.Model):
 
     @staticmethod
     def after_insert(mapper, connection, target):
-        print "new insert process " ,target.opinion
+        print "new insert opinion " ,target.opinion
         print "new insert process " ,target.author_id
         user = User.query.filter_by(id=target.author_id).first()
+        if str(target.old_status) == str(target.new_status):
+            print "Status not change, No Need send email notify "
+            return None
         if user:
             token = user.generate_confirmation_token()
-            send_email(user.email, 'Please Process Bugs ' + str(target.bugs_id),
+            send_email(user.email, 'Please Process Bugs: ' + str(target.bugs_id),
                        'main/email/bug_process',
                        user=user, id=target.bugs_id, target=target, token=token)
 

@@ -2,15 +2,15 @@
         <i class="glyphicon glyphicon-bold"></i> 回归测试
         {% if bugtest_log.first() %}
             Processed By: {{ bugtest_log.first().operator.username }}
-            --Time at :{{ bugtest_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+            --Time at :{{ moment(bugtest_log.first().timestamp).format('YYYY-MM-D HH:mm:ss') }}
         {% endif %}
 
         <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
             <ul>
-            {% if bugs.bug_status >=4 %}
+            {% if bugs.bug_status >= Bug_Now_Status.TESTLEADER_REGESSION %}
             <ul id="retest" class="nav nav-list secondmenu collapse in">
                 <ul id="myTab" class="nav nav-tabs">
-                    {% if current_user == bugs.bug_owner and bugs.bug_status ==4 %}
+                    {% if current_user == bugs.bug_owner and bugs.bug_status == Bug_Now_Status.TESTLEADER_REGESSION %}
                         <li class="active"><a href="#bug_test" data-toggle="tab">当前处理</a>
                         </li>
                     {% endif %}
@@ -22,7 +22,8 @@
                 </ul>
                 <div id="myTabContent" class="tab-content">
                     <div class="tab-pane fade in active" id="bug_test">
-                        {% if current_user == bugs.bug_owner and bugs.bug_status ==4 %}
+                        {% if current_user == bugs.bug_owner and bugs.bug_status ==Bug_Now_Status.TESTLEADER_REGESSION %}
+
                             {{ wtf.quick_form(testleadedit2,horizontal_columns=('lg', 2, 20)) }}
                         {% endif %}
                     </div>
@@ -32,7 +33,7 @@
                           <div>{{ log.opinion }}</div>
                           <hr/>
                           <lable>Processed by: {{ log.operator.username }} @
-                            <i>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</i></lable>
+                            <i>{{ moment(log.timestamp).format('YYYY-MM-D HH:mm:ss') }}</i></lable>
                        </div>
                     {% endfor %}
                 </div>
@@ -47,14 +48,14 @@
         <i class="glyphicon glyphicon-fire"></i> 问题关闭
         {% if retest_log.first() %}
             Processed By: {{ retest_log.first().operator.username }}
-            --Time at :{{ retest_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+            --Time at :{{ moment(retest_log.first().timestamp).format('YYYY-MM-D HH:mm:ss') }}
         {% endif %}
         <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
         <ul>
-            {% if bugs.bug_status >=5 %}
+            {% if bugs.bug_status >= Bug_Now_Status.REGRESSION_TESTING %}
             <ul id="bugclose" class="nav nav-list secondmenu collapse in">
                 <ul id="myTab" class="nav nav-tabs">
-                    {% if current_user == bugs.bug_owner and bugs.bug_status ==5 %}
+                    {% if current_user == bugs.bug_owner and bugs.bug_status == Bug_Now_Status.REGRESSION_TESTING %}
                         <li class="active">
                             <a href="#bug_close" data-toggle="tab">当前处理</a>
                         </li>
@@ -68,8 +69,17 @@
 
                 <div id="myTabContent" class="tab-content">
                     <div class="tab-pane fade in active" id="bug_close">
-                        {% if current_user == bugs.bug_owner and bugs.bug_status ==5 %}
-                            {{ wtf.quick_form(bugclose,horizontal_columns=('lg', 2, 20)) }}
+                        {% if current_user == bugs.bug_owner and bugs.bug_status == Bug_Now_Status.REGRESSION_TESTING %}
+                            <form method="post" class="form" role="form">
+                                {{ bugclose.hidden_tag() }}
+                                {{ wtf.form_field(bugclose.regression_test_version) }}
+                                {{ wtf.form_field(bugclose.process_opinion) }}
+                                <div id="test_leader" style="display:None;">
+                                    {{ wtf.form_field(bugclose.bug_owner_id) }}
+                                </div>
+                                {{ wtf.form_field(bugclose.bug_status) }}
+                                {{ wtf.form_field(bugclose.submit) }}
+                            </form>
                         {% endif %}
                     </div>
 
@@ -78,7 +88,7 @@
                           <div>{{ log.opinion }}</div>
                           <hr/>
                           <lable>Processed by: {{ log.operator.username }} @
-                            <i>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</i></lable>
+                            <i>{{ moment(log.timestamp).format('YYYY-MM-D HH:mm:ss') }}</i></lable>
                        </div>
                     {% endfor %}
                 </div>

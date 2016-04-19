@@ -111,7 +111,7 @@ class BugClose(Form):
     regression_test_version = MySelectField('回归测试版本',
                                             coerce=str, choices=[])
     process_opinion = TextAreaField('处理意见', validators=[Required()])
-    # bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
+    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     bug_status = RadioField('选择处理',
                             choices=[('6', '问题关闭'),
                                      ('4', '测试经理组织回归测试')],

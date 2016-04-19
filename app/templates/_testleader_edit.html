@@ -2,15 +2,15 @@
     <i class="glyphicon glyphicon-credit-card"></i> 测试经理审核
     {% if testmanager_log.first() %}
         Processed By: {{ testmanager_log.first().operator.username }}
-        --Time at :{{ testmanager_log.first().timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+        --Time at :{{ moment(testmanager_log.first().timestamp).format('YYYY-MM-D HH:mm:ss') }}
     {% endif %}
     <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
 
 <ul>
-    {% if bugs.bug_status >=2 %}
+    {% if bugs.bug_status >= Bug_Now_Status.TESTLEADER_AUDIT %}
         <ul id="bug_audit" class="nav nav-list collapse secondmenu in">
         <ul id="myTab" class="nav nav-tabs">
-          {% if current_user == bugs.bug_owner and bugs.bug_status ==2 %}
+          {% if current_user == bugs.bug_owner and bugs.bug_status == Bug_Now_Status.TESTLEADER_AUDIT %}
             <li class="active">
                 <a href="#testleader" data-toggle="tab">当前处理</a>
             </li>
@@ -25,7 +25,7 @@
 
         <div id="myTabContent" class="tab-content">
 
-                {% if current_user == bugs.bug_owner and bugs.bug_status ==2 %}
+                {% if current_user == bugs.bug_owner and bugs.bug_status == Bug_Now_Status.TESTLEADER_AUDIT %}
                     <div class="tab-pane fade in active" id="testleader">
                     {{ wtf.quick_form(testleadedit,horizontal_columns=('lg', 2, 20)) }}
                      </div>
@@ -37,7 +37,7 @@
                       <div>{{ log.opinion }}</div>
                       <hr/>
                       <lable>Processed by: {{ log.operator.username }} @
-                        <i>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</i></lable>
+                        <i>{{ moment(log.timestamp).format('YYYY-MM-D HH:mm:ss') }}</i></lable>
                    </div>
                 {% endfor %}
         </div>
