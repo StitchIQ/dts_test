@@ -24,8 +24,13 @@
                           {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
 
                           <!-- 显示问题单的图片 -->
-                         {% if bugs.bug_photos !=None %}
-                            <img src={{ request.url_root }}{{ bugs.bug_photos }} width="50%"/>
+                         {% if bugs.bug_attachments %}
+                            {% for attach in attachments %}
+                                <p>
+                                    <a href={{ request.url_root }}{{ attach.path }}>
+                                    <img src={{ request.url_root }}{{ attach.path }} width="50%" title={{ attach.filename }} /></a>
+                                </p>
+                            {% endfor%}
                             <p>current user {{ current_user }}</p>
                           {% endif %}
                           <br>

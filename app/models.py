@@ -1,10 +1,13 @@
 # coding=utf-8
+import os
+import uuid
+from random import choice
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 import bleach
 from markdown import markdown
-from flask import current_app, url_for
+from flask import current_app, url_for, request
 
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
@@ -160,6 +163,7 @@ class Bugs(db.Model):
     bug_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     bug_status = db.Column(db.Integer, db.ForeignKey('bugstatus.bug_status'))
     bug_photos = db.Column(db.Text)
+    bug_attachments = db.Column(db.Boolean, default=False)
     resolve_version = db.Column(db.String(64))
     regression_test_version = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
@@ -237,6 +241,75 @@ class BugStatus(db.Model):
             s.bug_status_descrit = r[1]
             db.session.add(s)
         db.session.commit()
+
+from string import digits, ascii_uppercase, ascii_lowercase
+RANDOM_SEQ = ascii_uppercase + ascii_lowercase + digits
+
+class Attachment(db.Model):
+    __tablename__ = 'attachment'
+    id = db.Column(db.Integer, primary_key = True)
+    bug_id = db.Column(db.String(64), nullable=False)
+    filename = db.Column(db.String(5000), nullable=False)
+    filehash = db.Column(db.String(128), nullable=False)
+    uploadTime = db.Column(db.DateTime(), default=datetime.utcnow)
+    mimetype = db.Column(db.String(256), nullable=False)
+    symlink = db.Column(db.String(64), nullable=False, unique = True)
+    size = db.Column(db.Integer, nullable=False)
+    confirm = db.Column(db.Boolean, default=False)
+
+    def __init__(self, bug_id="", filename="", mimetype = "application/octet-stream", size=0, filehash=None, symlink=None):
+        self.bug_id = bug_id
+        self.mimetype = mimetype
+        self.size = int(size)
+        self.filehash = filehash if filehash else self._hash_filename(filename)
+        self.filename = filename if filename else self.filehash
+        self.symlink = symlink if symlink else self._gen_symlink()
+
+    @staticmethod
+    def _hash_filename(filename):
+        _, _, suffix = filename.rpartition('.')
+        return "%s.%s" % (uuid.uuid4().hex, suffix)
+
+    @staticmethod
+    def _gen_symlink():
+        return "".join(choice(RANDOM_SEQ) for x in range(6))
+
+    @classmethod
+    def get_by_filehash(cls, filehash):
+        return cls.query.filter_by(filehash=filehash).first()
+
+    @classmethod
+    def get_by_symlink(cls, symlink):
+        return cls.query.filter_by(symlink=symlink).first()
+
+    @classmethod
+    def create_by_uploadFile(cls, bug_id, uploadedFile):
+        # emmm. I'll fill this value later.
+        rst = cls(bug_id, uploadedFile.filename, uploadedFile.mimetype, 0)
+        uploadedFile.save(rst.save_path)
+        filestat = os.stat(rst.save_path)
+        rst.size = filestat.st_size
+        return rst
+
+    @property
+    def save_path(self):
+        return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
+        #return os.path.join('static/Uploads', self.filehash)
+
+    @property
+    def path(self):
+        # return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
+        return os.path.join('static/Uploads', self.filehash)
+
+    @property
+    def url_p(self):
+        return "http://{host}/p/{filehash}".format(
+            host=request.host, filehash=self.filehash)
+
+    @property
+    def url_s(self):
+        return "http://{host}/s/{symlink}".format(
+            host=request.host, symlink=self.symlink)
 
 
 class User(UserMixin, db.Model):

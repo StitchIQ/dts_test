@@ -16,7 +16,7 @@ from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
     TestLeadEdit2, BugClose
 from ..email import send_email
 from ..models import Bugs, User, Process, BugStatus, Permission, \
-    Bug_Now_Status, ProductInfo, VersionInfo
+    Bug_Now_Status, ProductInfo, VersionInfo, Attachment
 from .. import db
 
 @main.route('/')
@@ -337,6 +337,7 @@ def newbug():
 
     # 可以使用重写validation函数来改变验证函数，检查产品版本，只要值不为-1即可
     print form.errors
+    print form.validate_on_submit()
     if form.validate_on_submit():
         # if request.method == 'POST':
         print 'POST'
@@ -346,14 +347,19 @@ def newbug():
         if len(form.errors) != 0:
             return render_template("standard_bug.html", form=form)
 
+        print 'errror'
         UPLOAD_FOLDER = 'static/Uploads/'
         app_dir = 'app/'
-        f = request.files['photo']
+        f = request.files['attachment']
         fname = None
+        print 'eeee'
+        is_has_attach_files = False
         if f.filename != '':
             print 'DDDDDDDDD'
-            fname = UPLOAD_FOLDER + secure_filename(f.filename)
-            f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
+            # fname = UPLOAD_FOLDER + secure_filename(f.filename)
+            # f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
+            is_has_attach_files = True
+
         bug = Bugs(bug_id=form.bugs_id.data,
                    product_name=form.product_name.data,
                    product_version=form.product_version.data,
@@ -368,13 +374,19 @@ def newbug():
                                         email=form.bug_owner_id.data).first(),
                    author=current_user._get_current_object(),
                    bug_status=form.bug_status.data,
-                   bug_photos=fname)
+                   bug_photos=fname,
+                   bug_attachments=is_has_attach_files)
 
         db.session.add(bug)
 
         # bug_owner_id=form.bug_owner_id.data,
         # bug.timestamp = db.Column(db.DateTime, index=True,
         # default=datetime.utcnow)
+        attachments = Attachment.query.filter_by(bug_id=bug.bug_id).all()
+        for a in attachments:
+            a.confirm = True
+        # attachments.confirm = True
+        map(db.session.add, attachments)
         process = Process(operator=current_user._get_current_object(),
                           author=User.query.filter_by(
                           email=form.bug_owner_id.data).first(),
@@ -405,35 +417,66 @@ def upload():
     from werkzeug.utils import secure_filename
     UPLOAD_FOLDER = 'static/Uploads/'
     app_dir = 'app/'
-    ALLOWED_MIMETYPES = {'image/JPG', 'image/jpeg', 'image/png', 'image/gif',
+    ALLOWED_MIMETYPES = {'image/jpg', 'image/jpeg', 'image/png', 'image/gif',
                          'image/pjpeg', 'image/x-png'}
 
     if request.method == 'GET':
         return render_template('upload.html', img='')
-    elif request.method == 'POST':
-        f = request.files['file']
-        print 'ffff   :::::', f.filename
-        if f.filename == '':
-            flash('No select file')
-            return redirect(url_for('main.upload'), 302)
-        # fname = mktemp(suffix='_', prefix='u', dir=UPLOAD_FOLDER) +
-        # secure_filename(f.filename)
-        fname = UPLOAD_FOLDER + secure_filename(f.filename)
-        f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
-        if mimetypes.guess_type(fname)[0] in ALLOWED_MIMETYPES:
-            flash(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
-            return render_template('upload.html', img=fname)
-        else:
-            os.remove(app_dir + fname)
-            flash(mimetypes.guess_type(fname)[0])
-            return redirect(url_for('main.upload'), 302)
 
+    print 'CCCCCCCCCC' ,request.method
+    print 'bugs_id  ' ,request.form.get('bugs_id')
+    print 'file1 ', request.form.get('system_view')
+    print 'file ', request.files['attachment']
+    # TODO 关联附件和bug，并显示在页面上
+    if request.method == 'POST':
+        uploadedFile = request.files['attachment']
+        print uploadedFile
+        # bug_id = request.args.get('bugs_id')
+
+        # text file treat as binary file.
+        # if user wanna post a text file, they would use pastebin / gist.
+        if not uploadedFile:
+            return abort(400)
+
+        pasteFile = Attachment.create_by_uploadFile(request.form.get('bugs_id'),uploadedFile)
+        db.session.add(pasteFile)
+        db.session.commit()
+        print [pasteFile.url_s , pasteFile.symlink]
+        # TODO 返回json优化
+        return jsonify({
+                "url":pasteFile.url_s ,
+                "symlink":pasteFile.symlink,
+                "filename":pasteFile.filename})
+
+
+@main.route('/s/<symlink>')
+@login_required
+def s(symlink):
+    pasteFile = Attachment.get_by_symlink(symlink)
+
+    if not pasteFile:
+        return abort(404)
+
+    return redirect(pasteFile.url_p)
+
+@main.route('/p/<filehash>')
+@login_required
+def p(filehash):
+    pasteFile = Attachment.get_by_filehash(filehash)
+
+    if not pasteFile:
+        return abort(404)
+
+    return url_for('static', filename='Uploads/'+pasteFile.filehash)
 
 @main.route('/bug_process/<string:id>', methods=['GET', 'POST'])
 @login_required
 def bug_process(id):
     print id
     bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
+    attachments = None
+    if bugs.bug_attachments:
+        attachments = Attachment.query.filter_by(bug_id=id).all()
     # if bugs is None and bugs.status_equal(Bug_Now_Status.CREATED):
     #    return render_template('404.html'), 404
 
@@ -632,7 +675,7 @@ def bug_process(id):
         flash(bugs.bug_photos)
 
     return render_template('bugs_process.html',
-                           form=form, bugs=bugs,
+                           form=form, bugs=bugs, attachments=attachments,
                            testleadedit=testleadedit, developedit=developedit,
                            testleadedit2=testleadedit2, bugclose=bugclose,
                            testmanager_log=testmanager_log,
@@ -647,7 +690,11 @@ def bug_process(id):
 def bug_edit(id):
     print id
     # bugs = Bugs.query.get_or_404(id)
+    # TODO 此处的文件上传未实现
     bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
+    attachments = None
+    if bugs.bug_attachments:
+        attachments = Attachment.query.filter_by(bug_id=id).all()
     # print bugs.now_status.id
     if current_user != bugs.author and \
             bugs.status_equal(Bug_Now_Status.CREATED) and \
@@ -665,11 +712,13 @@ def bug_edit(id):
         # if request.method == 'POST':
         UPLOAD_FOLDER = 'static/Uploads/'
         app_dir = 'app/'
-        f = request.files['photo']
+        f = request.files['attachment']
         fname = None
+        print 'ddd'
         if f.filename != '':
-            fname = UPLOAD_FOLDER + secure_filename(f.filename)
-            f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
+            pass
+            #fname = UPLOAD_FOLDER + secure_filename(f.filename)
+            #f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
         bugs.product_name = form.product_name.data
         bugs.product_version = form.product_version.data
         bugs.software_version = form.software_version.data
@@ -746,7 +795,7 @@ def bug_edit(id):
     form.bug_owner_id.data = bugs.bug_owner.email
     # form.photo.data = bugs.bug_photos
     # flash(process_list.first().opinion)
-    return render_template('bug_edit.html', form=form,
+    return render_template('bug_edit.html', form=form, attachments=attachments,
                            bugs=bugs, process_log=process_log)
 
 

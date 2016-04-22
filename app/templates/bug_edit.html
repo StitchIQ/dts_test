@@ -36,12 +36,21 @@
                                 {{ wtf.form_field(form.bug_descrit) }}
                                 {{ wtf.form_field(form.bug_owner_id) }}
                                 {{ wtf.form_field(form.bug_status) }}
-                                {{ wtf.form_field(form.photo)  }}
+                                {{ wtf.form_field(form.attachment)  }}
                                 {{ wtf.form_field(form.submit)  }}
                             </form>
                             <br>
                           {% if bugs.bug_photos !=None %}
                             <img src={{ request.url_root }}{{ bugs.bug_photos }} width="50%"/>
+                          {% endif %}
+                          {% if bugs.bug_attachments %}
+                            {% for attach in attachments %}
+                                <p>
+                                    <a href={{ request.url_root }}{{ attach.path }}>
+                                    <img src={{ request.url_root }}{{ attach.path }} width="50%" title={{ attach.filename }} /></a>
+                                </p>
+                            {% endfor%}
+                            <p>current user {{ current_user }}</p>
                           {% endif %}
                           <br>
                       </div>

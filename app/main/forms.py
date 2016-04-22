@@ -43,7 +43,7 @@ class StandardBug(Form):
                             choices=[('1', u'新建'),
                                      ('2', u'测试经理审核')], default='2')
     # save = SubmitField('保存')
-    photo = FileField('DTS phote')
+    attachment = FileField('附件')
     submit = SubmitField(u'提交')
 
     '''
