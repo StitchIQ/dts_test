@@ -88,7 +88,7 @@ class DevelopEdit(Form):
     dresolve_version = MySelectField('解决版本',  coerce=str, choices=[])
     dversion_features = MySelectField('软件特性', coerce=str, choices=[])
     deve_process_opinion = TextAreaField('处理意见', validators=[Required()])
-    dbug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
+    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
     bug_status = RadioField('选择处理',
                             choices=[('2', '返回测试经理'),
                                      ('3', '转交其他开发人员处理'),

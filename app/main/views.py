@@ -5,7 +5,7 @@ sys.setdefaultencoding("utf-8")
 from datetime import datetime
 
 from flask import render_template, redirect, request, url_for, flash, \
-    current_app, jsonify, abort
+    current_app, jsonify, abort, send_from_directory
 from flask.ext.login import login_required, current_user
 from wtforms_components import read_only
 from werkzeug import secure_filename
@@ -338,6 +338,7 @@ def newbug():
     # 可以使用重写validation函数来改变验证函数，检查产品版本，只要值不为-1即可
     print form.errors
     print form.validate_on_submit()
+    # print request.values
     if form.validate_on_submit():
         # if request.method == 'POST':
         print 'POST'
@@ -438,7 +439,7 @@ def upload():
         if not uploadedFile:
             return abort(400)
 
-        pasteFile = Attachment.create_by_uploadFile(request.form.get('bugs_id'),uploadedFile)
+        pasteFile = Attachment.create_by_uploadFile(request.form.get('bugs_id'), uploadedFile)
         db.session.add(pasteFile)
         db.session.commit()
         print [pasteFile.url_s , pasteFile.symlink]
@@ -467,7 +468,21 @@ def p(filehash):
     if not pasteFile:
         return abort(404)
 
-    return url_for('static', filename='Uploads/'+pasteFile.filehash)
+    return url_for('static', filename='Uploads/' + pasteFile.filehash)
+
+@main.route('/uploads/<filehash>')
+@login_required
+def uploaded_file(filehash):
+    pasteFile = Attachment.get_by_filehash(filehash)
+
+    if not pasteFile:
+        return abort(404)
+    # current_app.config['UPLOAD_FOLDER'] 在app中显示的是带有app前缀的路径
+    import os
+    print os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
+    print current_app.config['UPLOAD_FOLDER']
+    # return send_from_directory(current_app.config["UPLOAD_FOLDER"], pasteFile.filehash)
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
 
 @main.route('/bug_process/<string:id>', methods=['GET', 'POST'])
 @login_required
@@ -536,10 +551,10 @@ def bug_process(id):
         print 'developedit'
         print testleadedit.bug_owner_id.data
         bugs.bug_owner_id = User.query.filter_by(
-            email=developedit.dbug_owner_id.data).first().id
+            email=developedit.bug_owner_id.data).first().id
         process = Process(operator=current_user._get_current_object(),
                           author=User.query.filter_by(
-                          email=developedit.dbug_owner_id.data).first(),
+                          email=developedit.bug_owner_id.data).first(),
                           bugs=bugs,
                           old_status=bugs.bug_status,
                           new_status=developedit.bug_status.data,
@@ -961,3 +976,21 @@ def authordatas():
         'data': [s.total for s in daily_bugs],
         'status': [s.status for s in daily_bugs]
         })
+
+
+@main.route('/test')
+@login_required
+def test2():
+    print 'test2'
+    print request.args.get('search')
+    return render_template('autocomplate.html')
+
+
+@main.route('/autocomplete', methods=['GET'])
+@login_required
+def autocom():
+    search = request.args.get('query', 0, type=str)
+
+    q = User.query.filter(User.email.like(search+'%')).all()
+    return jsonify({
+            "suggestions":[u.email for u in q]})

@@ -40,6 +40,22 @@
 
 <script src="static/check_user.js" type="text/javascript"></script>
 <script src="static/standard_bug1.js" type="text/javascript"></script>
+
+<script src="//cdn.bootcss.com/jquery.devbridge-autocomplete/1.2.24/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+    $('#bug_owner_id').autocomplete({
+    serviceUrl: '/autocomplete',
+    dataType: 'json',
+    deferRequestBy:300,
+    minChars: 2,
+    lookupLimit:10,
+    autoSelectFirst:true,
+    onSelect: function (suggestion) {
+        //alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
+    }
+});
+</script>
+
 <script>
 $('#attachment').change(function(){
     //var form_data = new FormData($('#form1')[0]);

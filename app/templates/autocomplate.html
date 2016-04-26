@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}D T S{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='autocomplete.css')}}">
+{% endblock %}
+
+{% block page_content %}
+
+    <input type="text" name="country" id="autocomplete"/>
+
+    <input type="text" name="country" id="website"/>
+
+
+</div>
+{% endblock %}
+
+
+
+{% block scripts %}
+{{ super() }}
+
+<script src="//cdn.bootcss.com/jquery.devbridge-autocomplete/1.2.24/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+    $('#autocomplete').autocomplete({
+    serviceUrl: '/autocomplete',
+    dataType: 'json',
+    deferRequestBy:300,
+    minChars: 2,
+    lookupLimit:10,
+    autoSelectFirst:true,
+    onSelect: function (suggestion) {
+        //alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
+    }
+});
+</script>
+
+{% endblock %}

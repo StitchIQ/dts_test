@@ -35,6 +35,7 @@ $(document).ready(function () {
             //要请求的二级下拉JSON获取页面
             //将选中的一级下拉列表项的id传过去
             $.getJSON("/get_software", { product:$("#product_name :selected").text() },function (data) {
+
             //对请求返回的JSON格式进行分解加载
             //alert(data.soft_info[0].software);
             temp = data;

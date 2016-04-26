@@ -27,8 +27,11 @@
                          {% if bugs.bug_attachments %}
                             {% for attach in attachments %}
                                 <p>
-                                    <a href={{ request.url_root }}{{ attach.path }}>
-                                    <img src={{ request.url_root }}{{ attach.path }} width="50%" title={{ attach.filename }} /></a>
+                                    <a href="{{ request.url_root }}uploads/{{ attach.filehash }}" target="_blank">
+                                    <img src="{{ request.url_root }}uploads/{{ attach.filehash }}" width="50%" title={{ attach.filename }} /></a>
+                                    <!-- 显示问题单的图片
+                                    <img src="{{ url_for('main.uploaded_file', filehash= attach.filehash  ) }}" width="30%" title={{ attach.filename }} />
+                                    -->
                                 </p>
                             {% endfor%}
                             <p>current user {{ current_user }}</p>
@@ -95,6 +98,8 @@
 {% block scripts %}
 {{ super() }}
 {{ pagedown.include_pagedown() }}
+
+
 <script type="text/javascript">
     var div=document.getElementById("test");
     $(document).ready(function () {
@@ -118,4 +123,8 @@
         });
     });
 </script>
+
+<script src="//cdn.bootcss.com/jquery.devbridge-autocomplete/1.2.24/jquery.autocomplete.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='autocomplete.css')}}">
+<script src="{{ url_for('static', filename='autocomplete.js')}}" type="text/javascript"></script>
 {% endblock %}

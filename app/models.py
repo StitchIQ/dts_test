@@ -293,13 +293,14 @@ class Attachment(db.Model):
 
     @property
     def save_path(self):
+        print 'save_path ', current_app.config["UPLOAD_FOLDER"]
         return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
         #return os.path.join('static/Uploads', self.filehash)
 
     @property
     def path(self):
         # return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
-        return os.path.join('static/Uploads', self.filehash)
+        return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
 
     @property
     def url_p(self):
@@ -398,6 +399,13 @@ class User(UserMixin, db.Model):
     def ping(self):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
+
+    def user_to_json(self):
+        json_post = self.email
+            #'username': self.username,
+
+
+        return json_post
 
     def __repr__(self):
         return '<User %r>' % self.username
