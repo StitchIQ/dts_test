@@ -17,7 +17,7 @@ class MySelectField(SelectField):
     # 重写验证函数，只要值不为-1，就通过
     def pre_validate(self, form):
         if str(self.data) == '-1':
-            raise ValueError(self.gettext('Not a valid choice'))
+            raise ValueError(self.gettext('请选择'))
 
 
 class StandardBug(Form):

@@ -431,7 +431,6 @@ def upload():
     # TODO 关联附件和bug，并显示在页面上
     if request.method == 'POST':
         uploadedFile = request.files['attachment']
-        print uploadedFile
         # bug_id = request.args.get('bugs_id')
 
         # text file treat as binary file.
@@ -988,9 +987,10 @@ def test2():
 
 @main.route('/autocomplete', methods=['GET'])
 @login_required
-def autocom():
+def autocomplete():
     search = request.args.get('query', 0, type=str)
-
-    q = User.query.filter(User.email.like(search+'%')).all()
-    return jsonify({
-            "suggestions":[u.email for u in q]})
+    print search.isalnum()
+    if not search.isalnum():
+        return 'Not Found', 200
+    user = User.query.filter(User.email.like(search + '%')).all()
+    return jsonify({"suggestions":[u.email for u in user]})

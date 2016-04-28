@@ -400,13 +400,6 @@ class User(UserMixin, db.Model):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
 
-    def user_to_json(self):
-        json_post = self.email
-            #'username': self.username,
-
-
-        return json_post
-
     def __repr__(self):
         return '<User %r>' % self.username
 

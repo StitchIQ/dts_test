@@ -1,4 +1,3 @@
-<script>
 $('#bug_owner_id').autocomplete({
     serviceUrl: '/autocomplete',
     dataType: 'json',
@@ -10,4 +9,3 @@ $('#bug_owner_id').autocomplete({
         //alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
     }
 });
-</script>

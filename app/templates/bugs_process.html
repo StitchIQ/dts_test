@@ -23,7 +23,7 @@
                       <div class="col-md-4">
                           {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
 
-                          <!-- 显示问题单的图片 -->
+                         <!-- 显示问题单的图片 -->
                          {% if bugs.bug_attachments %}
                             {% for attach in attachments %}
                                 <p>
@@ -34,7 +34,6 @@
                                     -->
                                 </p>
                             {% endfor%}
-                            <p>current user {{ current_user }}</p>
                           {% endif %}
                           <br>
                       </div>
@@ -124,7 +123,10 @@
     });
 </script>
 
+
 <script src="//cdn.bootcss.com/jquery.devbridge-autocomplete/1.2.24/jquery.autocomplete.js"></script>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='autocomplete.css')}}">
-<script src="{{ url_for('static', filename='autocomplete.js')}}" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='autocomplete/autocomplete.css')}}">
+<script src="{{ url_for('static', filename='autocomplete/autocomplete.js')}}" type="text/javascript"></script>
+
+<script src="{{ url_for('static', filename='check_user.js')}}" type="text/javascript"></script>
 {% endblock %}
