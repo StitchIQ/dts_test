@@ -5,7 +5,7 @@ sys.setdefaultencoding("utf-8")
 from datetime import datetime
 
 from flask import render_template, redirect, request, url_for, flash, \
-    current_app, jsonify, abort, send_from_directory
+    current_app, jsonify, abort, send_from_directory, make_response
 from flask.ext.login import login_required, current_user
 from wtforms_components import read_only
 from werkzeug import secure_filename
@@ -425,9 +425,12 @@ def upload():
         return render_template('upload.html', img='')
 
     print 'CCCCCCCCCC' ,request.method
-    print 'bugs_id  ' ,request.form.get('bugs_id')
-    print 'file1 ', request.form.get('system_view')
-    print 'file ', request.files['attachment']
+
+    try:
+        print 'bugs_id  ' ,request.form.get('bugs_id')
+        print 'file ', request.files['attachment']
+    except:
+        return abort(400)
     # TODO 关联附件和bug，并显示在页面上
     if request.method == 'POST':
         uploadedFile = request.files['attachment']
@@ -444,9 +447,10 @@ def upload():
         print [pasteFile.url_s , pasteFile.symlink]
         # TODO 返回json优化
         return jsonify({
-                "url":pasteFile.url_s ,
-                "symlink":pasteFile.symlink,
-                "filename":pasteFile.filename})
+                "url": pasteFile.url_s ,
+                "symlink": pasteFile.symlink,
+                "filename": pasteFile.filename,
+                "filehash": pasteFile.filehash})
 
 
 @main.route('/s/<symlink>')
@@ -469,6 +473,7 @@ def p(filehash):
 
     return url_for('static', filename='Uploads/' + pasteFile.filehash)
 
+
 @main.route('/uploads/<filehash>')
 @login_required
 def uploaded_file(filehash):
@@ -482,6 +487,62 @@ def uploaded_file(filehash):
     print current_app.config['UPLOAD_FOLDER']
     # return send_from_directory(current_app.config["UPLOAD_FOLDER"], pasteFile.filehash)
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
+
+@main.route('/delete/<filehash>')
+@login_required
+def delete_file(filehash):
+    print filehash
+    # TODO ajax删除文件存在问题，无法多次调用
+    pasteFile = Attachment.get_by_filehash(filehash)
+
+    if not pasteFile:
+        return abort(404)
+
+    db.session.delete(pasteFile)
+    db.session.commit()
+    import os
+    os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash))
+    return jsonify({
+                "delete": 'OK' ,
+                "id": pasteFile.filehash})
+
+
+@main.route('/download/<filehash>')
+@login_required
+def download_file(filehash):
+    downloadFile = Attachment.get_by_filehash(filehash)
+
+    if not downloadFile:
+        return abort(404)
+
+    response = make_response(send_from_directory(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
+    #response = make_response(os.path.join(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
+
+    # response.headers['X-Accel-Redirect'] = redirect(url_for('.download_file', filehash=downloadFile.filehash))
+    # response.headers['Content-Type'] = "application/octet-stream"
+    # response.headers['Content-Type'] = downloadFile.mimetype
+    response.headers['Content-Disposition'] = "attachment; filename={}".format(downloadFile.filename)
+
+    return response, 200
+
+@main.route('/down/<symlink>')
+@login_required
+def download(symlink):
+    downloadFile = Attachment.get_by_symlink(symlink)
+
+    if not downloadFile:
+        return abort(404)
+    import os
+
+    response = make_response(send_from_directory(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
+    #response = make_response(os.path.join(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
+    # 使用X-Accel-Redirect可以隐藏文件下载地址
+    response.headers['X-Accel-Redirect'] = redirect(url_for('.download_file', filehash=downloadFile.filehash))
+    # response.headers['Content-Type'] = "application/octet-stream"
+    # response.headers['Content-Type'] = downloadFile.mimetype
+    response.headers['Content-Disposition'] = "attachment; filename={}".format(downloadFile.filename)
+
+    return response
 
 @main.route('/bug_process/<string:id>', methods=['GET', 'POST'])
 @login_required
@@ -796,7 +857,7 @@ def bug_edit(id):
         software_version.features_to_turple()
     # form.version_features.selected = bugs.version_features
 
-    # form.id.data = bugs.id
+    form.bugs_id.data = bugs.bug_id
     form.product_name.data = bugs.product_name
     form.product_version.data = bugs.product_version
     form.software_version.data = bugs.software_version
@@ -809,6 +870,7 @@ def bug_edit(id):
     form.bug_owner_id.data = bugs.bug_owner.email
     # form.photo.data = bugs.bug_photos
     # flash(process_list.first().opinion)
+    read_only(form.bugs_id)
     return render_template('bug_edit.html', form=form, attachments=attachments,
                            bugs=bugs, process_log=process_log)
 

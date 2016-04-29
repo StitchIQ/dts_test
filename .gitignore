@@ -1,6 +1,8 @@
 # define by self
 *.jpg
 *.jpeg
+*.png
+*.pptx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -24,6 +26,7 @@ lib64/
 parts/
 sdist/
 var/
+app/attachments_files/
 *.egg-info/
 .installed.cfg
 *.egg
