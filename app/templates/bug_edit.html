@@ -38,22 +38,41 @@
                                 {{ wtf.form_field(form.bug_owner_id) }}
                                 {{ wtf.form_field(form.bug_status) }}
                                 {{ wtf.form_field(form.attachment) }}
-                                <div id="attachmentdiv"></div>
                                 {{ wtf.form_field(form.submit)  }}
                             </form>
                             <br>
                           <!-- 显示问题单的图片 -->
-                         {% if bugs.bug_attachments %}
+                          <div id="attachmentdiv">
+                           {% if bugs.bug_attachments %}
+                              {% for attach in attachments %}
+                                  {% if attach.mimetype.find('image')==0 %}
+                                      <p>
+                                      <span class="delattach" rel={{ attach.filehash }}>
+
+                                          <a href="{{ request.url_root }}uploads/{{ attach.filehash }}" target="_blank">
+                                          <img src="{{ request.url_root }}uploads/{{ attach.filehash }}" width="50%" title={{ attach.filename }} /></a>
+                                          <!-- 显示问题单的图片
+                                          <img src="{{ url_for('main.uploaded_file', filehash= attach.filehash  ) }}" width="30%" title={{ attach.filename }} />
+                                          -->
+                                          <a href="#{{ attach.filehash }}" name={{ attach.filehash }}>删除</a>
+
+                                      </span></p>
+                                  {% endif %}
+                              {% endfor%}
+
                             {% for attach in attachments %}
-                                <p>
-                                    <a href="{{ request.url_root }}uploads/{{ attach.filehash }}" target="_blank">
-                                    <img src="{{ request.url_root }}uploads/{{ attach.filehash }}" width="50%" title={{ attach.filename }} /></a>
-                                    <!-- 显示问题单的图片
-                                    <img src="{{ url_for('main.uploaded_file', filehash= attach.filehash  ) }}" width="30%" title={{ attach.filename }} />
-                                    -->
-                                </p>
+                                {% if attach.mimetype.find('image')!=0 %}
+                                    <p><span class="delattach" rel={{ attach.filehash }}>
+
+                                        <a href="{{ request.url_root }}download/{{ attach.filehash }}">{{ attach.filename }}</a>
+                                        <a href="#{{ attach.filehash }}" name={{ attach.filehash }}>删除</a>
+
+                                    </span></p>
+                                {% endif %}
                             {% endfor%}
-                          {% endif %}
+
+                            {% endif %}
+                           </div>
                           <br>
                       </div>
                       </ul>

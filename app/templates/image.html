@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<style type="text/css">
+  .btnbox{
+  z-index:999;
+  position:relative;
+  left:400px;
+  top:-350px;
+}
+</style>
+
+<script src="jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+  function show(thisObj)
+  {
+	$(thisObj).children("div").css("display","block");
+  }
+
+  function hide(thisObj)
+  {
+	$(thisObj).children("div").css("display","none");
+  }
+
+  function aa(obj){
+        $(obj).parent().parent().remove();
+  }
+</script>
+
+</head>
+<body>
+    <div id="content">
+       <div  onmouseover="show(this)" onmouseout="hide(this)"  style="float:left">
+         <img src="http://127.0.0.1:5000/uploads/edb7c66d2b10490ca6dc47021d74da27.jpg" width="50%"/>
+
+         <div class="btnbox" style="width:170px; height:20px;" >
+          <input type="button" value="testbtn1"  onclick="aa(this)"/>
+         </div>
+
+       </div>
+
+       <div  onmouseover="show(this)" onmouseout="hide(this)"   style="float:left">
+         <img src="http://127.0.0.1:5000/uploads/edb7c66d2b10490ca6dc47021d74da27.jpg" width="50%"/>
+
+         <div class="btnbox" style="width:170px; height:20px;" >
+          <input type="button" value="testbtn2"  onclick="aa(this)"/>
+         </div>
+
+       <div>
+    </div>
+</body>
+</html>
+{% endblock %}

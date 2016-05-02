@@ -15,7 +15,7 @@ $("#attachment").change(function(){
         contentType: false,
         processData: false,
         success: function(fileinfo){
-            ss = '<p><span id=' + fileinfo.symlink + '>' +
+            ss = '<p><span class="delattach" rel=' + fileinfo.filehash + '>' +
                  '<input type="text" class="form-control" name=' +
                  fileinfo.filename + ' value='+fileinfo.filename +
                  ' readonly="readonly">' +
@@ -31,9 +31,10 @@ $("#attachment").change(function(){
     });
 });
 
+/*
 $("#attachmentdiv").delegate("a","click",function(){
     //$("p").append('click');
-    alert($(this).attr('name'));
+    //alert($(this).attr('name'));
     $.ajax({
         url: '/delete/'+$(this).attr('name'),
         type: 'get',
@@ -41,10 +42,17 @@ $("#attachmentdiv").delegate("a","click",function(){
         contentType: false,
         processData: false,
         success: function(){
-            alert('rmmmmmm');
-
+            //alert('rmmmmmm');
         },
     });
     $(this).parent().remove();
 
+});
+*/
+$("#attachmentdiv").on("click", ".delattach", function(){
+    //获取当前点击的元素
+    var pic = $(this);
+    $.post("/delete/"+ pic.attr("rel") ,
+        function(){pic.parent().remove()}
+    ).error(function() { alert("error"); });
 });

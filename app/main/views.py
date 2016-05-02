@@ -488,7 +488,7 @@ def uploaded_file(filehash):
     # return send_from_directory(current_app.config["UPLOAD_FOLDER"], pasteFile.filehash)
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
 
-@main.route('/delete/<filehash>')
+@main.route('/delete/<filehash>', methods=['GET', 'POST'])
 @login_required
 def delete_file(filehash):
     print filehash
@@ -1056,3 +1056,11 @@ def autocomplete():
         return 'Not Found', 200
     user = User.query.filter(User.email.like(search + '%')).all()
     return jsonify({"suggestions":[u.email for u in user]})
+
+
+@main.route('/image')
+@login_required
+def image():
+    print 'test2'
+    print request.args.get('search')
+    return render_template('image.html')
