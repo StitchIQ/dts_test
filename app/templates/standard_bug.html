@@ -4,18 +4,23 @@
 {% block title %}D T S-New Bug{% endblock %}
 
 {% block page_content %}
-<div class="col-md-4">
+<div class="col-md-8">
 
     <form action="newbugs" method="post" enctype="multipart/form-data" id='form1'>
         {{ form.hidden_tag() }}
+        <div class="col-md-4">
         {{ wtf.form_field(form.bugs_id) }}
+        {{ wtf.form_field(form.bug_level) }}
+        {{ wtf.form_field(form.bug_show_times) }}
+        {{ wtf.form_field(form.system_view) }}
+        </div>
+        <div class="col-md-4">
         {{ wtf.form_field(form.product_name) }}
         {{ wtf.form_field(form.product_version) }}
         {{ wtf.form_field(form.software_version) }}
         {{ wtf.form_field(form.version_features) }}
-        {{ wtf.form_field(form.bug_level) }}
-        {{ wtf.form_field(form.system_view) }}
-        {{ wtf.form_field(form.bug_show_times) }}
+        </div>
+        <div class="col-md-8">
         {{ wtf.form_field(form.bug_title) }}
         {{ wtf.form_field(form.bug_descrit) }}
         {{ wtf.form_field(form.bug_owner_id) }}
@@ -23,6 +28,7 @@
         {{ wtf.form_field(form.attachment)  }}
         <div id="attachmentdiv"></div>
         {{ wtf.form_field(form.submit)  }}
+        </div>
     <br>
 
 </form>
