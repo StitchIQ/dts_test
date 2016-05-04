@@ -52,8 +52,8 @@ def index():
 @main.route('/check_user')
 @login_required
 def check_user():
-    a = request.args.get('username', 0, type=str)
-    status = User.query.filter_by(email=a).first()
+    email = request.args.get('username', 0, type=str)
+    status = User.get_by_email(email)
     if status:
         return status.username
     else:
@@ -425,33 +425,24 @@ def upload():
     if request.method == 'GET':
         return render_template('upload.html', img='')
 
-    print 'CCCCCCCCCC' ,request.method
-
+    bug_id = None
+    uploadedFile = None
     try:
-        print 'bugs_id  ' ,request.form.get('bugs_id')
-        print 'file ', request.files['attachment']
+        bug_id = request.form.get('bugs_id')
+        uploadedFile = request.files['attachment']
+        if not uploadedFile or not bug_id:
+            return abort(400)
     except:
         return abort(400)
+
     # TODO 关联附件和bug，并显示在页面上
     if request.method == 'POST':
-        uploadedFile = request.files['attachment']
-        # bug_id = request.args.get('bugs_id')
-
-        # text file treat as binary file.
-        # if user wanna post a text file, they would use pastebin / gist.
-        if not uploadedFile:
-            return abort(400)
-
-        pasteFile = Attachment.create_by_uploadFile(request.form.get('bugs_id'), uploadedFile)
+        pasteFile = Attachment.create_by_uploadFile(bug_id, uploadedFile)
         db.session.add(pasteFile)
         db.session.commit()
-        # print [pasteFile.url_s , pasteFile.symlink]
-        # TODO 返回json优化
         return jsonify({
-                "url": pasteFile.url_s ,
                 "symlink": pasteFile.symlink,
-                "filename": pasteFile.filename,
-                "filehash": pasteFile.filehash})
+                "filename": pasteFile.filename})
 
 
 @main.route('/s/<symlink>')
@@ -506,7 +497,7 @@ def delete_file(symlink):
                 bugs.status_equal(Bug_Now_Status.CREATED)) and \
                 not current_user.can(Permission.ADMINISTER):
             print 'fss'
-            return render_template('404.html'), 404
+            return abort(404)
 
 
     db.session.delete(pasteFile)
@@ -534,7 +525,7 @@ def download_file(filehash):
     # response.headers['Content-Type'] = downloadFile.mimetype
     response.headers['Content-Disposition'] = "attachment; filename={}".format(downloadFile.filename)
 
-    return response
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash)
 
 @main.route('/down/<symlink>')
 @login_required
@@ -558,7 +549,7 @@ def download(symlink):
 @login_required
 def bug_process(id):
     print id
-    bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
+    bugs = Bugs.get_by_bug_id(id)
     attachments = None
     if bugs.bug_attachments:
         attachments = Attachment.query.filter_by(bug_id=id).all()
@@ -771,7 +762,8 @@ def bug_edit(id):
     print id
     # bugs = Bugs.query.get_or_404(id)
     # TODO bug编辑的权限审核未实现
-    bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
+    #bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
+    bugs = Bugs.get_by_bug_id(id)
     if not (current_user == bugs.author and \
             bugs.status_equal(Bug_Now_Status.CREATED)) and \
             not current_user.can(Permission.ADMINISTER):

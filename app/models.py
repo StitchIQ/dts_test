@@ -176,6 +176,10 @@ class Bugs(db.Model):
         return '<User %r>' % self.id
 
     #TODO 优化bugs查询，增加classmethod方法，查询方便
+    @classmethod
+    def get_by_bug_id(cls, bug_id):
+        return cls.query.filter_by(bug_id=bug_id).first_or_404()
+
 
     def to_json(self):
         json_post = {
@@ -286,7 +290,6 @@ class Attachment(db.Model):
 
     @classmethod
     def create_by_uploadFile(cls, bug_id, uploadedFile):
-        # emmm. I'll fill this value later.
         rst = cls(bug_id, uploadedFile.filename, uploadedFile.mimetype, 0)
         uploadedFile.save(rst.save_path)
         filestat = os.stat(rst.save_path)
@@ -346,6 +349,11 @@ class User(UserMixin, db.Model):
                 self.role = Role.query.filter_by(permissions=0xff).first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
+
+    @classmethod
+    def get_by_email(cls, email):
+        return cls.query.filter_by(email=email).first_or_404()
+
 
     @property
     def password(self):
