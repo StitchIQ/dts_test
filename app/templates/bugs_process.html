@@ -20,30 +20,39 @@
                       Processed By: {{ bugs.author.username }}--Time at :{{ moment(bugs.timestamp).format('YYYY-MM-D HH:mm:ss') }}
                       <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
                       <ul id="buginfo" class="nav nav-list secondmenu collapse">
-                      <div class="col-md-4">
-                          {{ wtf.quick_form(form,horizontal_columns=('lg', 2, 20)) }}
+                      <div class="col-md-6">
+                          <div class="table-responsive">
+                            <table class="table table-condensed">
+                               <tbody>
+                                <tr>
+                                    <td>{{ wtf.form_field(form.bugs_id) }}</td>
+                                    <td>{{ wtf.form_field(form.product_name) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ wtf.form_field(form.product_version) }}</td>
+                                    <td>{{ wtf.form_field(form.software_version) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ wtf.form_field(form.version_features) }}</td>
+                                    <td>{{ wtf.form_field(form.bug_level) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ wtf.form_field(form.bug_show_times) }}</td>
+                                    <td>{{ wtf.form_field(form.system_view) }}</td>
+                                </tr>
+                               </tbody>
+                            </table>
 
-                         <!-- 显示问题单的图片 -->
-                       <div id="attachmentdiv">
-                        {% if bugs.bug_attachments %}
-                           {% for attach in attachments %}
-                               {% if attach.mimetype.find('image')==0 %}
-                                   <p><span class="delattach" rel={{ attach.filehash }}>
-                                       <a href="{{ request.url_root }}uploads/{{ attach.filehash }}" target="_blank">
-                                       <img src="{{ request.url_root }}uploads/{{ attach.filehash }}" width="50%" title={{ attach.filename }} /></a>
-                                   </span></p>
-                               {% endif %}
-                           {% endfor%}
+                            <table class="table table-condensed">
+                                <tbody>
+                                    <tr><td>{{ wtf.form_field(form.bug_title) }}</td></tr>
+                                    <tr><td><div class="post-body">{{ bug_descrit_html | safe }} </div> </td></tr>
 
-                         {% for attach in attachments %}
-                             {% if attach.mimetype.find('image')!=0 %}
-                                 <p><span class="delattach" rel={{ attach.filehash }}>
-                                     <a href="{{ request.url_root }}download/{{ attach.filehash }}">{{ attach.filename }}</a>
-                                 </span></p>
-                             {% endif %}
-                         {% endfor%}
-                         {% endif %}
+                                </tbody>
+                            </table>
                         </div>
+                         <!-- 显示问题单的图片和附件 -->
+                         {% include '_attachments.html' %}
 
                           <br>
                       </div>

@@ -63,6 +63,7 @@ class StandardBug(Form):
 
 
 class BugsProcess(Form):
+    bugs_id = StringField(u'问题单号')
     product_name = StringField('产品名称')
     product_version = StringField('产品版本号')
     software_version = StringField('软件版本号')

@@ -171,3 +171,7 @@ tfoot input {
         padding: 3px;
         box-sizing: border-box;
     }
+
+textarea.form-control {
+height: 300px;
+}

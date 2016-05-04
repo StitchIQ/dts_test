@@ -1,0 +1,20 @@
+<div id="attachmentdiv">
+    {% if bugs.bug_attachments %}
+        {% for attach in attachments %}
+           {% if attach.mimetype.find('image')==0 %}
+               <p><span class="delattach" rel={{ attach.filehash }}>
+                   <a href="{{ request.url_root }}s/{{ attach.symlink }}" target="_blank">
+                   <img src="{{ request.url_root }}s/{{ attach.symlink }}" width="50%" title={{ attach.filename }} /></a>
+               </span></p>
+           {% endif %}
+        {% endfor%}
+
+        {% for attach in attachments %}
+         {% if attach.mimetype.find('image')!=0 %}
+             <p><span class="delattach" rel={{ attach.filehash }}>
+                 <a href="{{ request.url_root }}down/{{ attach.symlink }}">{{ attach.filename }}</a>
+             </span></p>
+         {% endif %}
+        {% endfor%}
+    {% endif %}
+</div>

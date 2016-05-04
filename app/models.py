@@ -175,6 +175,8 @@ class Bugs(db.Model):
     def __repr__(self):
         return '<User %r>' % self.id
 
+    #TODO 优化bugs查询，增加classmethod方法，查询方便
+
     def to_json(self):
         json_post = {
             'url': url_for('main.bug_process', id=self.id, _external=True),
@@ -293,7 +295,6 @@ class Attachment(db.Model):
 
     @property
     def save_path(self):
-        print 'save_path ', current_app.config["UPLOAD_FOLDER"]
         return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
         #return os.path.join('static/Uploads', self.filehash)
 

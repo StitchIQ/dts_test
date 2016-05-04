@@ -4,34 +4,49 @@
 {% block title %}D T S-New Bug{% endblock %}
 
 {% block page_content %}
-<div class="col-md-8">
+<div class="col-md-6">
 
     <form action="newbugs" method="post" enctype="multipart/form-data" id='form1'>
-        {{ form.hidden_tag() }}
-        <div class="col-md-4">
-        {{ wtf.form_field(form.bugs_id) }}
-        {{ wtf.form_field(form.bug_level) }}
-        {{ wtf.form_field(form.bug_show_times) }}
-        {{ wtf.form_field(form.system_view) }}
-        </div>
-        <div class="col-md-4">
-        {{ wtf.form_field(form.product_name) }}
-        {{ wtf.form_field(form.product_version) }}
-        {{ wtf.form_field(form.software_version) }}
-        {{ wtf.form_field(form.version_features) }}
-        </div>
-        <div class="col-md-8">
-        {{ wtf.form_field(form.bug_title) }}
-        {{ wtf.form_field(form.bug_descrit) }}
-        {{ wtf.form_field(form.bug_owner_id) }}
-        {{ wtf.form_field(form.bug_status) }}
-        {{ wtf.form_field(form.attachment)  }}
-        <div id="attachmentdiv"></div>
-        {{ wtf.form_field(form.submit)  }}
-        </div>
-    <br>
+    {{ form.hidden_tag() }}
+    <div class="table-responsive">
+        <table class="table table-condensed">
+           <tbody>
+            <tr>
+                <td>{{ wtf.form_field(form.bugs_id) }}</td>
+                <td>{{ wtf.form_field(form.product_name) }}</td>
+            </tr>
+            <tr>
+                <td>{{ wtf.form_field(form.product_version) }}</td>
+                <td>{{ wtf.form_field(form.software_version) }}</td>
+            </tr>
+            <tr>
+                <td>{{ wtf.form_field(form.version_features) }}</td>
+                <td>{{ wtf.form_field(form.bug_level) }}</td>
+            </tr>
+            <tr>
+                <td>{{ wtf.form_field(form.bug_show_times) }}</td>
+                <td>{{ wtf.form_field(form.system_view) }}</td>
+            </tr>
+           </tbody>
+        </table>
 
-</form>
+        <table class="table table-condensed">
+            <tbody>
+                <tr><td>{{ wtf.form_field(form.bug_title) }}</td></tr>
+                <tr><td>{{ wtf.form_field(form.bug_descrit) }}</td></tr>
+                <tr><td>{{ wtf.form_field(form.attachment)  }}
+                    <form class="form-horizontal">
+                    <div id="attachmentdiv">附件列表</div></td></form>
+                </tr>
+                <tr><td>{{ wtf.form_field(form.bug_status) }}</td></tr>
+                <tr><td>{{ wtf.form_field(form.bug_owner_id) }}</td></tr>
+                <tr><td>{{ wtf.form_field(form.submit, button_map={'submit': 'primary'})  }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    </form>
+
 </div>
 </div>
 </div>

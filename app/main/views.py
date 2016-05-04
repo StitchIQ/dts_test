@@ -321,7 +321,7 @@ def copy_to_me():
 @main.route('/newbugs', methods=['GET', 'POST'])
 @login_required
 def newbug():
-    #TODO bugview需要美化
+
     form = StandardBug()
 
     # print form.validate_on_submit()
@@ -332,8 +332,9 @@ def newbug():
     # print [post.product_name_turple() for post in product_info]
     form.product_name.choices = [('-1', u'请选择产品')] + [
         post.product_name_turple() for post in product_info]
-    form.product_version.choices = [('-1', u'请选择产品')]
-    form.software_version.choices = [('-1', u'请选择产品')]
+    form.product_version.choices = [('-1', u'请选择版本')]
+    form.software_version.choices = [('-1', u'请选择子版本')]
+    form.version_features.choices = [('-1', u'请选择特性')]
 
     # 可以使用重写validation函数来改变验证函数，检查产品版本，只要值不为-1即可
     print form.errors
@@ -444,7 +445,7 @@ def upload():
         pasteFile = Attachment.create_by_uploadFile(request.form.get('bugs_id'), uploadedFile)
         db.session.add(pasteFile)
         db.session.commit()
-        print [pasteFile.url_s , pasteFile.symlink]
+        # print [pasteFile.url_s , pasteFile.symlink]
         # TODO 返回json优化
         return jsonify({
                 "url": pasteFile.url_s ,
@@ -461,7 +462,8 @@ def s(symlink):
     if not pasteFile:
         return abort(404)
 
-    return redirect(pasteFile.url_p)
+    #return redirect(pasteFile.url_p)
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
 
 @main.route('/p/<filehash>')
 @login_required
@@ -482,21 +484,30 @@ def uploaded_file(filehash):
     if not pasteFile:
         return abort(404)
     # current_app.config['UPLOAD_FOLDER'] 在app中显示的是带有app前缀的路径
-    import os
-    print os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
-    print current_app.config['UPLOAD_FOLDER']
-    # return send_from_directory(current_app.config["UPLOAD_FOLDER"], pasteFile.filehash)
+    # import os
+    # print os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
+    # print current_app.config['UPLOAD_FOLDER']
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
 
-@main.route('/delete/<filehash>', methods=['GET', 'POST'])
-@login_required
-def delete_file(filehash):
-    print filehash
-    # TODO ajax删除文件存在问题，无法多次调用
-    pasteFile = Attachment.get_by_filehash(filehash)
 
+@main.route('/delete/<symlink>', methods=['GET', 'POST'])
+@login_required
+def delete_file(symlink):
+    print symlink
+    # TODO 附件删除的权限审核未实现，要确保用户具有操作此bug的权限
+    #      可以加入bug的编辑权限控制，和bug状态判断
+    pasteFile = Attachment.get_by_symlink(symlink)
     if not pasteFile:
         return abort(404)
+
+    bugs = Bugs.query.filter_by(bug_id=pasteFile.bug_id).first()
+    if bugs:
+        if not (current_user == bugs.author and \
+                bugs.status_equal(Bug_Now_Status.CREATED)) and \
+                not current_user.can(Permission.ADMINISTER):
+            print 'fss'
+            return render_template('404.html'), 404
+
 
     db.session.delete(pasteFile)
     db.session.commit()
@@ -504,7 +515,7 @@ def delete_file(filehash):
     os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash))
     return jsonify({
                 "delete": 'OK' ,
-                "id": pasteFile.filehash})
+                "id": pasteFile.symlink})
 
 
 @main.route('/download/<filehash>')
@@ -523,7 +534,7 @@ def download_file(filehash):
     # response.headers['Content-Type'] = downloadFile.mimetype
     response.headers['Content-Disposition'] = "attachment; filename={}".format(downloadFile.filename)
 
-    return response, 200
+    return response
 
 @main.route('/down/<symlink>')
 @login_required
@@ -532,7 +543,6 @@ def download(symlink):
 
     if not downloadFile:
         return abort(404)
-    import os
 
     response = make_response(send_from_directory(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
     #response = make_response(os.path.join(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
@@ -720,7 +730,7 @@ def bug_process(id):
     bugclose.bug_owner_id.data = process_log[-1].operator.email
     #flash(process_log[-1].author.email)
 
-    # form.id.data = bugs.id
+    form.bugs_id.data = bugs.bug_id
     form.product_name.data = bugs.product_name
     form.product_version.data = bugs.product_version
     form.software_version.data = bugs.software_version
@@ -728,9 +738,10 @@ def bug_process(id):
     form.bug_level.data = bugs.bug_level
     form.system_view.data = bugs.system_view
     form.bug_show_times.data = bugs.bug_show_times
-    form.bug_descrit.data = bugs.bug_descrit
+    bug_descrit_html = bugs.bug_descrit_html
     form.bug_title.data = bugs.bug_title
 
+    read_only(form.bugs_id)
     read_only(form.bug_title)
     read_only(form.product_name)
     read_only(form.product_version)
@@ -742,12 +753,6 @@ def bug_process(id):
     read_only(form.bug_descrit)
 
     # flash(process_list.first().opinion)
-    if bugs.bug_photos is None:
-        print 'dddd'
-        print 'photo :', bugs.bug_photos
-    if bugs.bug_photos is not None:
-        print 'ssss'
-        flash(bugs.bug_photos)
 
     return render_template('bugs_process.html',
                            form=form, bugs=bugs, attachments=attachments,
@@ -757,7 +762,7 @@ def bug_process(id):
                            process_log=process_log,
                            developedit_log=developedit_log,
                            bugtest_log=bugtest_log,
-                           retest_log=retest_log)
+                           retest_log=retest_log, bug_descrit_html=bug_descrit_html)
 
 
 @main.route('/bug_edit/<string:id>', methods=['GET', 'POST'])
@@ -765,16 +770,18 @@ def bug_process(id):
 def bug_edit(id):
     print id
     # bugs = Bugs.query.get_or_404(id)
-    # TODO 此处的文件上传未实现
+    # TODO bug编辑的权限审核未实现
     bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
+    if not (current_user == bugs.author and \
+            bugs.status_equal(Bug_Now_Status.CREATED)) and \
+            not current_user.can(Permission.ADMINISTER):
+        return render_template('404.html'), 404
+
     attachments = None
     if bugs.bug_attachments:
         attachments = Attachment.query.filter_by(bug_id=id).all()
     # print bugs.now_status.id
-    if current_user != bugs.author and \
-            bugs.status_equal(Bug_Now_Status.CREATED) and \
-            not current_user.can(Permission.ADMINISTER):
-        return render_template('404.html'), 404
+
 
     process_log = bugs.process.order_by(Process.timestamp.asc())
 
