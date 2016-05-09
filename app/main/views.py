@@ -321,7 +321,7 @@ def copy_to_me():
 @main.route('/newbugs', methods=['GET', 'POST'])
 @login_required
 def newbug():
-
+    # TODO 此处有bug，当提及失败时，bug_id会变化，导致添加的附件无法关联到bug
     form = StandardBug()
 
     # print form.validate_on_submit()
@@ -410,7 +410,7 @@ def newbug():
     return render_template("standard_bug.html", form=form)
 
 
-@main.route('/upload', methods=['GET', 'POST'])
+@main.route('/upload', methods=['POST'])
 @login_required
 def upload():
     import mimetypes
@@ -436,13 +436,13 @@ def upload():
         return abort(400)
 
     # TODO 关联附件和bug，并显示在页面上
-    if request.method == 'POST':
-        pasteFile = Attachment.create_by_uploadFile(bug_id, uploadedFile)
-        db.session.add(pasteFile)
-        db.session.commit()
-        return jsonify({
-                "symlink": pasteFile.symlink,
-                "filename": pasteFile.filename})
+    pasteFile = Attachment.create_by_uploadFile(bug_id, uploadedFile)
+    db.session.add(pasteFile)
+    db.session.commit()
+    return jsonify({
+            "symlink": pasteFile.symlink,
+            "filename": pasteFile.filename,
+            "size": pasteFile.size})
 
 
 @main.route('/s/<symlink>')

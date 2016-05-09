@@ -172,6 +172,6 @@ tfoot input {
         box-sizing: border-box;
     }
 
-textarea.form-control {
+textarea#flask-pagedown-bug_descrit {
 height: 300px;
 }

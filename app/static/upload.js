@@ -15,12 +15,11 @@ $("#attachment").change(function(){
         contentType: false,
         processData: false,
         success: function(fileinfo){
-            ss = '<div class="form-group "><input class="form-control" type="text" ' +
-                ' value=" ' + (fileinfo.filename) + ' " readonly="readonly">'+
-                '<a href=#' + fileinfo.symlink + ' name='+ fileinfo.symlink +
-                    '>删除 '+ fileinfo.filename +'</a></span>' +
-                '</div>';
-            $('#attachmentdiv').append(ss);
+            table = '<tr class="trattach">' +
+                    '<td> <div class="form-group "><span class="label label-info">'+ fileinfo.filename +'</span></div></td>' +
+                    '<td> <div class="form-group "><button class="btn btn-warning" type="button" name="'+ fileinfo.symlink +'" >删除</button></div></td></tr>';
+            $('#listattach').append(table);
+            //$('#attachmentdiv').append(ss);
         },
         error: function(){
             alert("该文件无法上传。文件大小超过 16M！");
@@ -28,12 +27,24 @@ $("#attachment").change(function(){
     });
 });
 
-$("div[id^='attachmentdiv']").on("click", "a", function(){
-    //给div元素，所有以attachment开头的添加事件
+$("#attachmentdiv2").on("click", "button", function(){
+    //"div[id^='attachmentdiv']" 给div元素，所有以attachment开头的添加事件
+
+    //删除bug edit时的附件
     //获取当前点击的元素
     var pic = $(this);
     $.post("/delete/"+ pic.attr("name"),
         function(){ pic.parent().remove()}
+    ).error(function() { alert("删除失败 ！！"); });
+});
+
+$("#listattach").on("click", "button", function(){
+    //给tbody元素，所有tr添加事件
+    //删除bug新增加的附件
+    //获取当前点击的元素
+    var pic = $(this);
+    $.post("/delete/"+ pic.attr("name"),
+        function(){ pic.parents("tr.trattach").remove()}
     ).error(function() { alert("删除失败！"); });
 });
 

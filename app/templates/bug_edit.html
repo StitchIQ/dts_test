@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+
 
 {% block title %}D T S-Bug-Edit{% endblock %}
 
@@ -23,45 +23,9 @@
                       <div class="col-md-6">
 
                           <form  method="post" enctype="multipart/form-data">
-                                {{ form.hidden_tag() }}
-                                <div class="table-responsive">
-                                    <table class="table table-condensed">
-                                       <tbody>
-                                        <tr>
-                                            <td>{{ wtf.form_field(form.bugs_id) }}</td>
-                                            <td>{{ wtf.form_field(form.product_name) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{ wtf.form_field(form.product_version) }}</td>
-                                            <td>{{ wtf.form_field(form.software_version) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{ wtf.form_field(form.version_features) }}</td>
-                                            <td>{{ wtf.form_field(form.bug_level) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{ wtf.form_field(form.bug_show_times) }}</td>
-                                            <td>{{ wtf.form_field(form.system_view) }}</td>
-                                        </tr>
-                                       </tbody>
-                                    </table>
-
-                                    <table class="table table-condensed">
-                                        <tbody>
-                                            <tr><td>{{ wtf.form_field(form.bug_title) }}</td></tr>
-                                            <tr><td>{{ wtf.form_field(form.bug_descrit) }}</td></tr>
-                                            <tr><td>{{ wtf.form_field(form.attachment)  }}
-                                                <form class="form-horizontal">
-                                                <div id="attachmentdiv">附件列表</div></td></form>
-                                            </tr>
-                                            <tr><td>{{ wtf.form_field(form.bug_status) }}</td></tr>
-                                            <tr><td>{{ wtf.form_field(form.bug_owner_id) }}</td></tr>
-                                            <tr><td>{{ wtf.form_field(form.submit, button_map={'submit': 'primary'})  }}</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
 
 
+                        {% include '_bugtable.html' %}
                           <!-- 显示问题单的图片 -->
                           <div id="attachmentdiv2">
                            {% if bugs.bug_attachments %}
@@ -70,21 +34,23 @@
                                       <p><span class="delattach" rel={{ attach.filehash }}>
                                           <a href="{{ request.url_root }}s/{{ attach.symlink }}" target="_blank">
                                           <img src="{{ request.url_root }}s/{{ attach.symlink }}" width="50%" title={{ attach.filename }} /></a>
-                                          <a href="#{{ attach.filehash }}" name={{ attach.symlink }}>删除 {{ attach.filename }}</a>
+                                          <span class="label label-info">{{ attach.filename }}</span>
+                                          <button class="btn btn-warning" type="button" name= {{ attach.symlink }} >删除</button>
                                       </span></p>
                                   {% endif %}
                               {% endfor%}
 
-                            {% for attach in attachments %}
+                              {% for attach in attachments %}
                                 {% if attach.mimetype.find('image')!=0 %}
                                     <div class="form-group ">
                                         <p><span class="delattach" rel={{ attach.filehash }}>
                                             <a href="{{ request.url_root }}download/{{ attach.filehash }}">{{ attach.filename }}</a>
-                                            <a href="#{{ attach.filehash }}" name={{ attach.symlink }}>删除 {{ attach.filename }}</a>
+                                            <span class="label label-info">{{ attach.filename }}</span>
+                                            <button class="btn btn-warning" type="button" name= {{ attach.symlink }} >删除</button>
                                         </span></p>
                                     </div>
                                 {% endif %}
-                            {% endfor%}
+                              {% endfor%}
                             {% endif %}
 
                            </div></form>
