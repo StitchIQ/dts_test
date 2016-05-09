@@ -1,5 +1,5 @@
 # coding=utf-8
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from flask.ext.login import login_required
 from wtforms_components import read_only
 from .. import db
@@ -25,13 +25,18 @@ def add_software(id):
     product = ProductInfo.query.get_or_404(id)
     software_list = VersionInfo.query.filter_by(product=product.id).all()
     software = Add_Software()
+    print software.errors
+    print request.form.get('software_version')
+    print request.form.getlist('software_version')
+    print request.form.get('version_features')
+    print request.form.getlist('version_features')
     if software.validate_on_submit():
         software_info = VersionInfo(
                             product=product.id,
                             version_name=software.version_name.data,
                             version_descrit=software.version_descrit.data,
                             software_version=software.software_version.data,
-                            version_features=add_product.version_features.data)
+                            version_features=software.version_features.data)
 
         db.session.add(software_info)
         db.session.commit()
