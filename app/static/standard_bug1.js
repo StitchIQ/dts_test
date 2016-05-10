@@ -2,7 +2,7 @@
 $(document).ready(function () {
     //要请求的一级机构JSON获取页面
     var url="/get_product";
-    $.getJSON(url,function (data) {
+    $.getJSON(url, function (data) {
         //alert(data);
         //对请求返回的JSON格式进行分解加载
         //$("#product_name").append($("<option/>").text("--请选择 产品名称--").attr("value","-1"));
@@ -41,7 +41,7 @@ $(document).ready(function () {
             temp = data;
             $(data.soft_info).each(function () {
                 //alert(this.software);
-                $("#product_version").append($("<option/>").text(this.software).attr("value",this.index));
+                $("#product_version").append($("<option/>").text(this.software).attr("value",this.software));
             });
 
             });
@@ -61,11 +61,11 @@ $(document).ready(function () {
                 if(this.software == $("#product_version :selected").text()){
                     $.each((this.version.split(";")),function (i,item) {
                         //alert(item);
-                        $("#software_version").append($("<option/>").text(item));
+                        $("#software_version").append($("<option/>").text(item).attr("value", item));
                     });
                     $.each((this.features.split(";")),function (i,item) {
                         //alert(item);
-                        $("#version_features").append($("<option/>").text(item));
+                        $("#version_features").append($("<option/>").text(item).attr("value", item));
                     });
                     //$("#software_version").append($("<option/>").text(this.software).attr("value",this.index));
                 };

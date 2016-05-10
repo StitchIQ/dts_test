@@ -64,7 +64,6 @@ def check_user():
 @login_required
 def get_product():
     product_info = ProductInfo.query.filter_by(product_status=True).all()
-
     return jsonify({
         'product_info': [post.product_name_json() for post in product_info]
         })
@@ -75,9 +74,9 @@ def get_product():
 @main.route('/get_software')
 @login_required
 def get_software():
-    a = request.args.get('product', 0, type=str)
+    # jquery传递的参数需要转码
+    a = unicode(request.args.get('product', 0, type=str))
     # software = VersionInfo.query.filter_by(product_name=a)
-    # print 'sssss:',a
     software = VersionInfo.query.join(
                ProductInfo, ProductInfo.id == VersionInfo.product).filter(
                ProductInfo.product_name == a).all()
@@ -345,7 +344,10 @@ def newbug():
         print 'POST'
         print form.validate_on_submit()
         print form.errors
-        print form.product_name.data
+        #print form.version_features.value
+        print unicode(form.version_features.data)
+        print form.bug_level.data
+        print form.bug_title.data
         if len(form.errors) != 0:
             return render_template("standard_bug.html", form=form)
 
@@ -363,10 +365,10 @@ def newbug():
             is_has_attach_files = True
 
         bug = Bugs(bug_id=form.bugs_id.data,
-                   product_name=form.product_name.data,
-                   product_version=form.product_version.data,
-                   software_version=form.software_version.data,
-                   version_features=form.version_features.data,
+                   product_name=unicode(form.product_name.data),
+                   product_version=unicode(form.product_version.data),
+                   software_version=unicode(form.software_version.data),
+                   version_features=unicode(form.version_features.data),
                    bug_level=form.bug_level.data,
                    system_view=form.system_view.data,
                    bug_show_times=form.bug_show_times.data,
