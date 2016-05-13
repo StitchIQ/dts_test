@@ -320,7 +320,7 @@ def copy_to_me():
 @main.route('/newbugs', methods=['GET', 'POST'])
 @login_required
 def newbug():
-    # TODO 此处有bug，当提及失败时，bug_id会变化，导致添加的附件无法关联到bug
+    # TODO 此处有bug，当提交失败时，bug_id会变化，导致添加的附件无法关联到bug
     form = StandardBug()
 
     # print form.validate_on_submit()
@@ -823,7 +823,6 @@ def bug_edit(id):
                           opinion='')
         db.session.add(process)
         db.session.commit()
-        flash(bugs.now_status.bug_status_descrit)
         flash('Bugs 提交成功.')
         return redirect(url_for('.bug_process', id=bugs.bug_id))
 

@@ -1,4 +1,5 @@
 # coding=utf-8
+
 from datetime import datetime
 
 class Bug_Num_Generate(object):
