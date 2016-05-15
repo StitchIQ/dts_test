@@ -63,7 +63,7 @@ def check_user():
 @main.route('/get_product')
 @login_required
 def get_product():
-    product_info = ProductInfo.query.filter_by(product_status=True).all()
+    product_info = ProductInfo.get_all_product()
     return jsonify({
         'product_info': [post.product_name_json() for post in product_info]
         })
@@ -75,11 +75,9 @@ def get_product():
 @login_required
 def get_software():
     # jquery传递的参数需要转码
-    a = unicode(request.args.get('product', 0, type=str))
+    product_name = unicode(request.args.get('product', 0, type=str))
     # software = VersionInfo.query.filter_by(product_name=a)
-    software = VersionInfo.query.join(
-               ProductInfo, ProductInfo.id == VersionInfo.product).filter(
-               ProductInfo.product_name == a).all()
+    software = VersionInfo.get_by_product(product_name)
 
     # 对于外键，在连接时还是要使用原来的值
     # print str(VersionInfo.query.join(ProductInfo,
@@ -925,7 +923,7 @@ def dailydatas():
 @login_required
 def productcharts():
     # product = ProductInfo.query.all()
-    product = ProductInfo.query.filter_by(product_status=True).all()
+    product = ProductInfo.get_all_product()
 
     return render_template('reports/productcharts.html', product=product)
 

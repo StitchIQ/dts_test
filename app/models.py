@@ -67,6 +67,13 @@ class VersionInfo(db.Model):
     create_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
+    @classmethod
+    def get_by_product(cls, product_name):
+        return cls.query.join(
+                    ProductInfo, ProductInfo.id == VersionInfo.product).filter(
+                    ProductInfo.product_name == product_name).all()
+
+
     def software_to_json(self):
         json_post = {
             'software': self.version_name,
@@ -106,6 +113,11 @@ class ProductInfo(db.Model):
     p_id = db.relationship('VersionInfo',
                            foreign_keys=[VersionInfo.product],
                            backref='software', lazy='dynamic')
+
+    @classmethod
+    def get_all_product(cls):
+        #查询所有状态为激活的产品
+        return cls.query.filter_by(product_status=True).all()
 
     def product_name_json(self):
         json_post = {
