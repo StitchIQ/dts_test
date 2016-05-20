@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+import os
+import logging
 from flask import Flask
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.mail import Mail
@@ -29,6 +32,7 @@ def create_app(config_name):
     db.init_app(app)
     login_manager.init_app(app)
     pagedown.init_app(app)
+    configure_logging(app)
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
@@ -40,3 +44,12 @@ def create_app(config_name):
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     return app
+
+
+def configure_logging(app):
+    """Configures logging."""
+
+    import logging.config
+    # 加载日志配置
+    logging.config.fileConfig('app/config/logger.conf')
+

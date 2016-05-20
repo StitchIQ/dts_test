@@ -2,6 +2,7 @@
 import os
 import uuid
 from random import choice
+import logging
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -13,6 +14,7 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
 from .email import send_email
 
+dts_log = logging.getLogger('dts')
 
 class Permission:
     FOLLOW = 0x01
@@ -69,6 +71,7 @@ class VersionInfo(db.Model):
 
     @classmethod
     def get_by_product(cls, product_name):
+        dts_log.debug('Get all product')
         return cls.query.join(
                     ProductInfo, ProductInfo.id == VersionInfo.product).filter(
                     ProductInfo.product_name == product_name).all()
@@ -143,17 +146,16 @@ class Process(db.Model):
 
     @staticmethod
     def after_insert(mapper, connection, target):
-        print "new insert opinion " ,target.opinion
-        print "new insert process " ,target.author_id
         user = User.query.filter_by(id=target.author_id).first()
         if str(target.old_status) == str(target.new_status):
-            print "Status not change, No Need send email notify "
+            dts_log.debug("Status not change, No Need send email notify ")
             return None
         if user:
             token = user.generate_confirmation_token()
             send_email(user.email, 'Please Process Bugs: ' + str(target.bugs_id),
                        'main/email/bug_process',
                        user=user, id=target.bugs_id, target=target, token=token)
+            dts_log.debug("Send mail to %s" %user.email)
 
 db.event.listen(Process, 'after_insert', Process.after_insert)
 

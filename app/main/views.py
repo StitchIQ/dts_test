@@ -3,6 +3,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 from datetime import datetime
+import logging
 
 from flask import render_template, redirect, request, url_for, flash, \
     current_app, jsonify, abort, send_from_directory, make_response
@@ -19,11 +20,18 @@ from ..models import Bugs, User, Process, BugStatus, Permission, \
     Bug_Now_Status, ProductInfo, VersionInfo, Attachment
 from .. import db
 
+
+# TODO 增加日志,
+# TODO bug导出功能,
+# TODO 增加单元测试。
+# TODO 附件的在bug中不同阶段分类
+
+dts_log = logging.getLogger('dts')
+
 @main.route('/')
 @login_required
 def index():
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
-
     page = request.args.get('page', 1, type=int)
     # sts=BugStatus.query.filter_by(id=6).first()
     # Bugs.bug_status not in [Bug_Now_Status.CREATED, Bug_Now_Status.CLOSED]
@@ -43,7 +51,6 @@ def index():
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
     '''
-
     posts = pagination1.items
     return render_template('index.html',
                            bugs_list=posts, pagination=pagination1)
@@ -321,47 +328,28 @@ def newbug():
     # TODO 此处有bug，当提交失败时，bug_id会变化，导致添加的附件无法关联到bug
     form = StandardBug()
 
-    # print form.validate_on_submit()
-    # print form.errors
-    # print form.product_name.data
-
-    product_info = ProductInfo.query.filter_by(product_status=True).all()
-    # print [post.product_name_turple() for post in product_info]
-    form.product_name.choices = [('-1', u'请选择产品')] + [
-        post.product_name_turple() for post in product_info]
-    form.product_version.choices = [('-1', u'请选择版本')]
-    form.software_version.choices = [('-1', u'请选择子版本')]
-    form.version_features.choices = [('-1', u'请选择特性')]
-
-    # 可以使用重写validation函数来改变验证函数，检查产品版本，只要值不为-1即可
-    print form.errors
-    print form.validate_on_submit()
+    dts_log.debug(form.errors)
+    dts_log.debug(form.validate_on_submit())
     # print request.values
     if form.validate_on_submit():
         # if request.method == 'POST':
-        print 'POST'
-        print form.validate_on_submit()
-        print form.errors
         #print form.version_features.value
-        print unicode(form.version_features.data)
-        print form.bug_level.data
-        print form.bug_title.data
+
         if len(form.errors) != 0:
             return render_template("standard_bug.html", form=form)
 
-        print 'errror'
         UPLOAD_FOLDER = 'static/Uploads/'
         app_dir = 'app/'
         f = request.files['attachment']
         fname = None
-        print 'eeee'
         is_has_attach_files = False
+
         if f.filename != '':
-            print 'DDDDDDDDD'
             # fname = UPLOAD_FOLDER + secure_filename(f.filename)
             # f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
             is_has_attach_files = True
 
+        dts_log.debug(unicode(form.version_features.data))
         bug = Bugs(bug_id=form.bugs_id.data,
                    product_name=unicode(form.product_name.data),
                    product_version=unicode(form.product_version.data),
@@ -496,7 +484,7 @@ def delete_file(symlink):
         if not (current_user == bugs.author and \
                 bugs.status_equal(Bug_Now_Status.CREATED)) and \
                 not current_user.can(Permission.ADMINISTER):
-            print 'fss'
+            dts_log.error(''.jion([current_user,' : ', bugs.bug_id]))
             return abort(404)
 
 
@@ -548,7 +536,6 @@ def download(symlink):
 @main.route('/bug_process/<string:id>', methods=['GET', 'POST'])
 @login_required
 def bug_process(id):
-    print id
     bugs = Bugs.get_by_bug_id(id)
     attachments = None
     if bugs.bug_attachments:
@@ -575,11 +562,11 @@ def bug_process(id):
 
     if bugs.bug_status == Bug_Now_Status.TESTLEADER_AUDIT \
             and current_user == bugs.bug_owner:
-        print 'testleaderedit test'
+        dts_log.debug('testleaderedit test')
         if testleadedit.validate_on_submit():
-            print 'testleaderedit'
-            print testleadedit.bug_status.data
-            print developedit.bug_status.data
+            dts_log.debug('testleaderedit')
+            dts_log.debug(testleadedit.bug_status.data)
+            dts_log.debug(developedit.bug_status.data)
             bugs.bug_owner_id = User.query.filter_by(
                 email=testleadedit.bug_owner_id.data).first().id
 
@@ -609,8 +596,8 @@ def bug_process(id):
 
     if developedit.validate_on_submit() and current_user == bugs.bug_owner \
             and bugs.bug_status == Bug_Now_Status.DEVELOPMENT:
-        print 'developedit'
-        print testleadedit.bug_owner_id.data
+        dts_log.debug('developedit')
+        dts_log.debug(testleadedit.bug_owner_id.data)
         bugs.bug_owner_id = User.query.filter_by(
             email=developedit.bug_owner_id.data).first().id
         process = Process(operator=current_user._get_current_object(),
@@ -635,7 +622,7 @@ def bug_process(id):
 
     if testleadedit2.validate_on_submit() and current_user == bugs.bug_owner \
             and bugs.bug_status == Bug_Now_Status.TESTLEADER_REGESSION:
-        print 'testleadedit2'
+        dts_log.debug('testleadedit2')
         bugs.bug_owner_id = User.query.filter_by(
             email=testleadedit2.bug_owner_id.data).first().id
 
@@ -779,16 +766,12 @@ def bug_edit(id):
 
     form = StandardBug()
 
-
-    print form.errors
-    print form.validate_on_submit()
     if form.validate_on_submit():
         # if request.method == 'POST':
         UPLOAD_FOLDER = 'static/Uploads/'
         app_dir = 'app/'
         f = request.files['attachment']
         fname = None
-        print 'ddd'
         if f.filename != '':
             pass
             #fname = UPLOAD_FOLDER + secure_filename(f.filename)

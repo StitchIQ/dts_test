@@ -7,6 +7,7 @@ from wtforms import ValidationError
 from flask.ext.pagedown.fields import PageDownField
 from flask_wtf.file import FileField, FileAllowed
 
+from ..models import ProductInfo
 
 class NameForm(Form):
     name = StringField('What is your name?', validators=[Required(), Email()])
@@ -46,18 +47,19 @@ class StandardBug(Form):
     attachment = FileField('附件')
     submit = SubmitField(u'提交')
 
-    '''
     def __init__(self):
-        Form.__init__(self)
-        StandardBug.bugs_num += 1
-        self.bugs_id.data = StandardBug.bugs_num
-        print 'StandardBug.bugs_id : ', StandardBug.bugs_num
-    '''
-    def validate_bugs_num(form, field):
-        print 'OOOOK'
+        super(StandardBug, self).__init__()
+        product_info = ProductInfo.get_all_product()
+        self.product_name.choices = [('-1', u'请选择产品')] + [
+                        post.product_name_turple() for post in product_info]
 
-    # 自定义的验证函数也可以生效
-    def validate_product_name(form, field):
+        self.product_version.choices  = [('-1', u'请选择产品版本')]
+        self.software_version.choices = [('-1', u'请选择软件版本')]
+        self.version_features.choices = [('-1', u'请选择软件特性')]
+
+
+    # 自定义的验证函数
+    def validate_product_name(self, field):
         if str(field.data) == '-1':
             raise ValidationError("Not a valid choice")
 
