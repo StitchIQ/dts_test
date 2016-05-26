@@ -310,6 +310,11 @@ class Attachment(db.Model):
         rst.size = filestat.st_size
         return rst
 
+    @classmethod
+    def get_all_attach_by_bug_id(cls, bug_id):
+        rst = Attachment.query.filter_by(bug_id=bug_id).all()
+        return rst
+
     @property
     def save_path(self):
         return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
@@ -362,10 +367,12 @@ class User(UserMixin, db.Model):
             if self.email == current_app.config['FLASKY_ADMIN']:
                 self.role = Role.query.filter_by(permissions=0xff).first()
             if self.role is None:
+                dts_log.debug("Query User %s " %self.username)
                 self.role = Role.query.filter_by(default=True).first()
 
     @classmethod
     def get_by_email(cls, email):
+        dts_log.debug("Get Email : %s" %email)
         return cls.query.filter_by(email=email).first_or_404()
 
 

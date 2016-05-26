@@ -105,12 +105,11 @@
 
     {% block page_content %} {% endblock %}
 
-    {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            {{ message }}
+    {% block messages %}
+        <div id="flashed-messages">
+            {% include 'flashed_messages.html' %}
         </div>
-    {% endfor %}
+    {% endblock %}
 
     </div>
    </div>

@@ -52,4 +52,25 @@ def configure_logging(app):
     import logging.config
     # 加载日志配置
     logging.config.fileConfig('app/config/logger.conf')
+    #dts_log = logging.getLogger('dts')
+    '''
+    这个方法可以在全局使用app.logger.debug记录日志，
+    logs_folder = os.path.join(app.root_path, os.pardir, "logs")
+    from logging.handlers import SMTPHandler
+    formatter = logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s '
+        '[in %(pathname)s:%(lineno)d]')
 
+    info_log = os.path.join(logs_folder, "logs")
+
+    info_file_handler = logging.handlers.RotatingFileHandler(
+        info_log,
+        maxBytes=100000,
+        backupCount=10
+    )
+    info_file_handler.setLevel(logging.INFO)
+    info_file_handler.setFormatter(formatter)
+    app.logger.addHandler(info_file_handler)
+    #app.logger.addHandler('dts')
+    app.logger.debug("init______")
+    '''

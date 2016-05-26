@@ -20,13 +20,15 @@ from ..models import Bugs, User, Process, BugStatus, Permission, \
     Bug_Now_Status, ProductInfo, VersionInfo, Attachment
 from .. import db
 
+from ..decorators import bug_edit_check2
 
-# TODO 增加日志,
+
+
+# flash :"success" "info" "danger"
 # TODO bug导出功能,
 # TODO 增加单元测试。
 # TODO 附件的在bug中不同阶段分类
-
-dts_log = logging.getLogger('dts')
+dts_log = logging.getLogger('DTS')
 
 @main.route('/')
 @login_required
@@ -51,6 +53,7 @@ def index():
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
     '''
+    dts_log.debug("index")
     posts = pagination1.items
     return render_template('index.html',
                            bugs_list=posts, pagination=pagination1)
@@ -387,7 +390,7 @@ def newbug():
         db.session.add(process)
         db.session.commit()
 
-        flash(u'Bugs 提交成功.')
+        flash(u'Bugs 提交成功.',"success")
 
         # flash(request.files['photo'].filename)
         return redirect(url_for('.bug_process', id=bug.bug_id))
@@ -423,7 +426,6 @@ def upload():
     except:
         return abort(400)
 
-    # TODO 关联附件和bug，并显示在页面上
     pasteFile = Attachment.create_by_uploadFile(bug_id, uploadedFile)
     db.session.add(pasteFile)
     db.session.commit()
@@ -567,8 +569,9 @@ def bug_process(id):
             dts_log.debug('testleaderedit')
             dts_log.debug(testleadedit.bug_status.data)
             dts_log.debug(developedit.bug_status.data)
-            bugs.bug_owner_id = User.query.filter_by(
-                email=testleadedit.bug_owner_id.data).first().id
+            dts_log.debug("Get Email 222")
+            bugs.bug_owner_id = User.get_by_email(
+                                    testleadedit.bug_owner_id.data).id
 
             process = Process(operator=current_user._get_current_object(),
                               author=User.query.filter_by(
@@ -616,7 +619,7 @@ def bug_process(id):
         print 'CCCCC: :', developedit.dresolve_version.data
         db.session.add(bugs)
         db.session.commit()
-        flash('The Developer has been updated.')
+        flash('The Developer has been updated.', "success")
 
         return redirect(url_for('.bug_process', id=bugs.bug_id))
 
@@ -743,14 +746,14 @@ def bug_process(id):
                            retest_log=retest_log, bug_descrit_html=bug_descrit_html)
 
 
-@main.route('/bug_edit/<string:id>', methods=['GET', 'POST'])
+@main.route('/bug_edit/<string:bug_id>', methods=['GET', 'POST'])
 @login_required
-def bug_edit(id):
-    print id
+def bug_edit(bug_id):
+    print bug_id
     # bugs = Bugs.query.get_or_404(id)
     # TODO bug编辑的权限审核未实现
     #bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
-    bugs = Bugs.get_by_bug_id(id)
+    bugs = Bugs.get_by_bug_id(bug_id)
     if not (current_user == bugs.author and \
             bugs.status_equal(Bug_Now_Status.CREATED)) and \
             not current_user.can(Permission.ADMINISTER):
@@ -758,7 +761,7 @@ def bug_edit(id):
 
     attachments = None
     if bugs.bug_attachments:
-        attachments = Attachment.query.filter_by(bug_id=id).all()
+        attachments = Attachment.get_all_attach_by_bug_id(bug_id)
     # print bugs.now_status.id
 
 
@@ -1025,7 +1028,8 @@ def authordatas():
 def test2():
     print 'test2'
     print request.args.get('search')
-    return render_template('autocomplate.html')
+    #return render_template('autocomplate.html')
+    return render_template('test/checkbox.html')
 
 
 @main.route('/autocomplete', methods=['GET'])
