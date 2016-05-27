@@ -6,7 +6,7 @@ from datetime import datetime
 import logging
 
 from flask import render_template, redirect, request, url_for, flash, \
-    current_app, jsonify, abort, send_from_directory, make_response
+    current_app, jsonify, abort, send_from_directory, make_response, send_file
 from flask.ext.login import login_required, current_user
 from wtforms_components import read_only
 from werkzeug import secure_filename
@@ -1049,3 +1049,71 @@ def image():
     print 'test2'
     print request.args.get('search')
     return render_template('image.html')
+
+
+@main.route('/daochu', methods=['POST'])
+@login_required
+def daochu():
+
+    print '4',request.data
+    print '6',request.get_json(force=True)
+    print '7',request.json
+    print type(request.json)
+    json_data = request.data
+    # bug_list = json_data.split(',')
+    # print bug_list
+    print type(json_data)
+
+    bug_list = request.json
+    all_bug = []
+    for l in bug_list:
+        i = Bugs.get_by_bug_id(l)
+
+        all_bug.append(i)
+
+    filename = datetime.now().strftime("%Y%m%d%H%M%S") + 'output.csv'
+    print filename
+    import csv
+    for bug in all_bug:
+        pass
+        #print bug
+
+    with open('app/output_files/' + filename, 'wb') as csvfile:
+        spamwriter = csv.writer(csvfile)
+        for res in all_bug:
+            row = (res.bug_id,
+                   res.author.username,
+                   res.bug_owner.username,
+                   res.product_name,
+                   res.product_version,
+                   res.software_version,
+                   res.version_features,
+                   res.bug_level,
+                   res.system_view,
+                   res.bug_show_times,
+                   res.bug_title,
+                   res.bug_status,
+                   res.resolve_version,
+                   res.regression_test_version)
+            # print row
+            spamwriter.writerow(row)
+
+    #return send_file(filename, attachment_filename='capsule.zip', as_attachment=True)
+    return jsonify({'filename':filename})
+
+
+@main.route('/daochu2/<filename>')
+@login_required
+def data_output(filename):
+    #filename = 'output.csv'
+    #response = make_response(send_file(filename))
+    response = make_response(send_from_directory(current_app.config['OUTPUT_FOLDER'], filename))
+
+    # response.headers['X-Accel-Redirect'] = redirect(url_for('.download_file', filehash=downloadFile.filehash))
+    # response.headers['Content-Type'] = "application/octet-stream"
+    # response.headers['Content-Type'] = downloadFile.mimetype
+    response.headers['Content-Disposition'] = "attachment; filename={}".format(filename)
+    response.headers['Cache-Control'] = "no-cache, no-store, max-age=0, must-revalidate"
+    #return send_file(filename)
+    #return send_file(filename, attachment_filename='capsule.zip', as_attachment=True)
+    return send_from_directory(current_app.config['OUTPUT_FOLDER'], filename, as_attachment=True)

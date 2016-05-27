@@ -187,7 +187,7 @@ class Bugs(db.Model):
                               backref='bugs', lazy='dynamic')
 
     def __repr__(self):
-        return '<User %r>' % self.id
+        return '<Bugs %r>' % self.bug_id
 
     #TODO 优化bugs查询，增加classmethod方法，查询方便
     @classmethod
