@@ -197,8 +197,8 @@ class Bugs(db.Model):
 
     def to_json(self):
         json_post = {
-            'url': url_for('main.bug_process', id=self.id, _external=True),
-            'id': self.id,
+            'url': url_for('main.bug_process', id=self.bug_id, _external=True),
+            'id': self.bug_id,
             'author': self.author.username,
             'product_name': self.product_name,
             'product_version': self.product_version,

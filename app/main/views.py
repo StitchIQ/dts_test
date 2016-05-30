@@ -186,6 +186,33 @@ def jsontable():
     flash(posts)
     return render_template('table_list2.html')
 
+@main.route('/bstable')
+@login_required
+def bs_table():
+    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
+    page = request.args.get('page', 1, type=int)
+    # sts=BugStatus.query.filter_by(id=6).first()
+    # Bugs.bug_status not in [Bug_Now_Status.CREATED, Bug_Now_Status.CLOSED]
+    # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
+    a = Bugs.query.filter(Bugs.bug_owner == current_user ,
+                          Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
+                          Bugs.bug_status > Bug_Now_Status.CREATED)
+    b = Bugs.query.filter(Bugs.author == current_user ,
+                          Bugs.bug_status == Bug_Now_Status.CREATED)
+
+    pagination1 = a.union(b).order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+    '''
+    pagination1 = Bugs.query.filter(
+            (Bugs.bug_owner == current_user and (Bug_Now_Status.CREATED < Bugs.bug_status and Bugs.bug_status< Bug_Now_Status.CLOSED)),
+            (Bugs.author == current_user and Bugs.status_equal(Bug_Now_Status.CREATED))).order_by(
+            Bugs.timestamp.desc()).paginate(
+            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            error_out=False)
+    '''
+    dts_log.debug("index")
+    posts = pagination1.items
+    return render_template('bstalbe.html',
+                           bugs_list=posts, pagination=pagination1)
 
 @main.route('/datatable')
 @login_required
@@ -254,6 +281,7 @@ def myjson2():
     # ('bugs_owner','bug_owner.username'),
     table = DataTable(request.args, Bugs, query, [
         "id",
+        "bug_id",
         ('user_name', 'author_id'),
         "bug_level",
         ("bug_owner_id", 'bug_owner.username'),
