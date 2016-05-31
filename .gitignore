@@ -27,6 +27,7 @@ parts/
 sdist/
 var/
 app/attachments_files/
+app/output_files/
 *.egg-info/
 .installed.cfg
 *.egg

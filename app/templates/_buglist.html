@@ -1,8 +1,21 @@
 <div class="table-responsive">
-    <table class="table table-bordered" data-toggle="table" data-pagination="true" data-search="true">
+<div id="toolbar" class="btn-group">
+    <button type="button" class="btn btn-default" id="submit" >
+        <i class="glyphicon glyphicon-plus">导出</i>
+    </button>
+</div>
+    <table id="table"
+           data-toggle="table"
+           data-search="true"
+            data-search="true"
+           data-click-to-select="true"
+           data-striped="true"
+           data-height="700"
+           data-show-columns="true"
+           data-toolbar="#toolbar">
        <thead>
           <tr>
-             <th><input type="checkbox"></input></th>
+             <th data-field="state" data-checkbox="true"><input type="checkbox"></input></th>
              <th>Num.</th>
              <th>BugsID</th>
              <th>产品名称</th>
