@@ -23,9 +23,7 @@ from .. import db
 from ..decorators import bug_edit_check2
 
 
-
 # flash :"success" "info" "danger"
-# TODO bug导出功能,
 # TODO 增加单元测试。
 # TODO 附件的在bug中不同阶段分类
 dts_log = logging.getLogger('DTS')
@@ -77,8 +75,6 @@ def get_product():
     return jsonify({
         'product_info': [post.product_name_json() for post in product_info]
         })
-    # return '''[{"name": "NVR"},{"name": "IPC"}]'''
-    # return '''[{id:"1",name:"pro001"},{id:"1",name:"pro002"}]'''
 
 
 @main.route('/get_software')
@@ -97,212 +93,6 @@ def get_software():
     return jsonify({
         'soft_info': [soft.software_to_json() for soft in software]
         })
-    # return jsonify({
-    #    'product_info': [post.product_name_json() for post in product_info]
-    #    })  [{id:"1",name:"amdin"},{id:"1",name:"amdin"}]
-    # return '''[{"name": "V100"},{"name": "V200"}]'''
-    # return '''[{id:"1",name:"soft001"},{id:"1",name:"soft002"}]'''
-
-
-@main.route('/get_version')
-@login_required
-def get_version():
-    a = request.args.get('version', 0, type=str)
-    version = VersionInfo.query.filter_by(version_name=a).all()
-    print 'DDDDD::', len(version)
-    # return jsonify({
-    #    'product_info': [post.product_name_json() for post in product_info]
-    #    })
-    # return '''['B101','B020','B030']'''
-    return '''[{"name": "B010"},{"name": "B020"}]'''
-    # return '''[{id:"1",name:"ver001"},{id:"1",name:"ver002"}]'''
-
-
-@main.route('/_add_numbers')
-@login_required
-def add_numbers():
-    a = request.args.get('a', 0, type=int)
-    b = request.args.get('b', 0, type=int)
-    return jsonify(result=a + b)
-
-
-@main.route('/add')
-@login_required
-def add_numbers2():
-    a = request.args.get('a', 0, type=int)
-    b = request.args.get('b', 0, type=int)
-    return '''[
-    {
-        "product_name": "NVR",
-        "version_list": [
-            {
-                "product_verison": "V100",
-                "soft_version": [
-                    "B101",
-                    "B102"
-                ]
-            },
-            {
-                "product_verison": "V222",
-                "soft_version": [
-                    "B201",
-                    "B202"
-                ]
-            }
-        ]
-    },
-    {
-        "product_name": "IPC",
-        "version_list": [
-            {
-                "product_verison": "V300",
-                "soft_version": [
-                    "B111",
-                    "B121"
-                ]
-            }
-        ]
-    }
-]'''
-
-
-@main.route('/jsontable')
-@login_required
-def jsontable():
-    # http://blog.csdn.net/porschev/article/details/5943579
-    # pageIndex=1&pageSize=20
-    # page = request.args.get('page', 1, type=int)
-    # sts=BugStatus.query.filter_by(id=6).first()
-    page = request.args.get('pageIndex', 1, type=int)
-    size = request.args.get('pageSize', 1, type=int)
-    pagination1 = Bugs.query.filter(
-            Bugs.bug_owner == current_user,
-            Bugs.bug_status < Bug_Now_Status.CLOSED).order_by(
-            Bugs.timestamp.desc()).paginate(
-            page, per_page=size,
-            error_out=False)
-
-    posts = pagination1.items
-    flash(posts)
-    return render_template('table_list2.html')
-
-@main.route('/bstable')
-@login_required
-def bs_table():
-    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
-    page = request.args.get('page', 1, type=int)
-    # sts=BugStatus.query.filter_by(id=6).first()
-    # Bugs.bug_status not in [Bug_Now_Status.CREATED, Bug_Now_Status.CLOSED]
-    # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
-    a = Bugs.query.filter(Bugs.bug_owner == current_user ,
-                          Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
-                          Bugs.bug_status > Bug_Now_Status.CREATED)
-    b = Bugs.query.filter(Bugs.author == current_user ,
-                          Bugs.bug_status == Bug_Now_Status.CREATED)
-
-    pagination1 = a.union(b).order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
-    '''
-    pagination1 = Bugs.query.filter(
-            (Bugs.bug_owner == current_user and (Bug_Now_Status.CREATED < Bugs.bug_status and Bugs.bug_status< Bug_Now_Status.CLOSED)),
-            (Bugs.author == current_user and Bugs.status_equal(Bug_Now_Status.CREATED))).order_by(
-            Bugs.timestamp.desc()).paginate(
-            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-            error_out=False)
-    '''
-    dts_log.debug("index")
-    posts = pagination1.items
-    return render_template('bstalbe.html',
-                           bugs_list=posts, pagination=pagination1)
-
-@main.route('/datatable')
-@login_required
-def datatable():
-
-    return render_template('datatable.html')
-
-
-@main.route('/myjson')
-@login_required
-def myjson():
-    # page = request.args.get('page', 1, type=int)
-    page = request.args.get('pageIndex', 1, type=int)
-    size = request.args.get('pageSize', 1, type=int)
-
-    pagination = Bugs.query.filter(
-            Bugs.bug_owner == current_user,
-            Bugs.bug_status < Bug_Now_Status.CLOSED).order_by(
-            Bugs.timestamp.desc()).paginate(
-            page, per_page=size,
-            error_out=False)
-    posts = pagination.items
-    prev = None
-    if pagination.has_prev:
-        prev = url_for('main.myjson', page=page-1, _external=True)
-    next = None
-    if pagination.has_next:
-        next = url_for('main.myjson', page=page+1, _external=True)
-
-    return jsonify({
-        'posts': [post.to_json() for post in posts],
-        'prev': prev,
-        'next': next,
-        'count': pagination.total,
-        'pages': pagination.pages
-        })
-
-
-@main.route('/myjson2')
-@login_required
-def myjson2():
-    page = request.args.get('page', 1, type=int)
-
-    pagination = Bugs.query.filter(
-            Bugs.bug_owner == current_user,
-            Bugs.bug_status < Bug_Now_Status.CLOSED).order_by(
-            Bugs.timestamp.desc()).paginate(
-            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-            error_out=False)
-    posts = pagination.items
-    prev = None
-    if pagination.has_prev:
-        prev = url_for('main.myjson', page=page-1, _external=True)
-    next = None
-    if pagination.has_next:
-        next = url_for('main.myjson', page=page+1, _external=True)
-
-    # query = Bugs.query
-    query = db.session.query(Bugs).filter(
-            Bugs.bug_owner == current_user,
-            Bugs.bug_status < Bug_Now_Status.CLOSED).order_by(
-            Bugs.timestamp.desc())
-    # q = query.all()
-    from datatables import DataTable
-    rq = request.args
-    # ('bugs_owner','bug_owner.username'),
-    table = DataTable(request.args, Bugs, query, [
-        "id",
-        "bug_id",
-        ('user_name', 'author_id'),
-        "bug_level",
-        ("bug_owner_id", 'bug_owner.username'),
-        "bug_show_times",
-        ('bug_status', 'now_status.bug_status_descrit'),
-        "bug_title",
-        "product_name",
-        "product_version",
-        "software_version",
-        "system_view",
-        "timestamp"
-    ])
-
-    return jsonify({
-        'data': [post.to_json() for post in posts],
-        "draw": 1,
-        "recordsFiltered": pagination.total,
-        "recordsTotal": pagination.total
-        })
-
-    # return jsonify(table.json())
 
 
 @main.route('/task/<string:mytask>')
@@ -337,6 +127,7 @@ def task(mytask):
 @main.route('/copy_to_me/')
 @login_required
 def copy_to_me():
+    # TODO 待实现抄送功能
     page = request.args.get('page', 1, type=int)
     # sts=BugStatus.query.filter_by(id=6).first()
 
@@ -503,13 +294,14 @@ def uploaded_file(filehash):
 @login_required
 def delete_file(symlink):
     print symlink
-    # TODO 附件删除的权限审核未实现，要确保用户具有操作此bug的权限
-    #      可以加入bug的编辑权限控制，和bug状态判断
+
+    #  可以加入bug的编辑权限控制，和bug状态判断
     pasteFile = Attachment.get_by_symlink(symlink)
     if not pasteFile:
         return abort(404)
 
     bugs = Bugs.query.filter_by(bug_id=pasteFile.bug_id).first()
+    # 检查是否有删除附件的权限
     if bugs:
         if not (current_user == bugs.author and \
                 bugs.status_equal(Bug_Now_Status.CREATED)) and \
@@ -779,9 +571,9 @@ def bug_process(id):
 def bug_edit(bug_id):
     print bug_id
     # bugs = Bugs.query.get_or_404(id)
-    # TODO bug编辑的权限审核未实现
     #bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
     bugs = Bugs.get_by_bug_id(bug_id)
+    # 检查是否编辑权限
     if not (current_user == bugs.author and \
             bugs.status_equal(Bug_Now_Status.CREATED)) and \
             not current_user.can(Permission.ADMINISTER):
@@ -886,21 +678,6 @@ def bug_edit(bug_id):
     return render_template('bug_edit.html', form=form, attachments=attachments,
                            bugs=bugs, process_log=process_log)
 
-
-@main.route('/charts', methods=['GET'])
-@login_required
-def charts():
-    return render_template('reports/charts.html')
-
-
-@main.route('/chartsdata', methods=['GET'])
-@login_required
-def chartsdata():
-    return '''{
-            "name":"销量",
-            "type":"line",
-            "data":[5, 20, 40, 10, 10, 20, 15, 18, 19, 25, 30]
-            }'''
 
 
 @main.route('/dailycharts', methods=['GET'])

@@ -4,6 +4,7 @@
 {% block title %}D T S-New Bug{% endblock %}
 
 {% block page_content %}
+{{ super() }}
 <div class="col-md-6">
 
     <form action="newbugs" method="post" enctype="multipart/form-data" id='form1'>
@@ -11,9 +12,7 @@
     </form>
 
 </div>
-</div>
-</div>
-</div>
+
 
 {% endblock %}
 

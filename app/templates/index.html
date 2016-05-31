@@ -4,103 +4,21 @@
 {% block title %}D T S{% endblock %}
 
 {% block page_content %}
-
 <div class="col-md-9">
 
-    <div class="btn-group btn-group-lg">
-
-    </div>
-
-    <hr>
-
-    <form >
         {% include '_buglist.html' %}
-         <input type="button" id="all"  value="全选"/>
-        <input type="button" id="no"  value="全不选"/>
-        <input type="button" id="other"  value="反选"/>
-        <input type="button" id="submit"  value="提交"/>
-    </form>
-    {% if pagination %}
+        {% if pagination %}
         <div class="pagination">
         {{ macros.pagination_widget(pagination, '.index') }}
         </div>
     {% endif %}
-
-
 {% endblock %}
 
 
 {% block scripts %}
 {{ super() }}
-<script src="//cdn.bootcss.com/bootstrap-table/1.10.1/bootstrap-table.js"></script>
-<link href="//cdn.bootcss.com/bootstrap-table/1.10.1/bootstrap-table.css" rel="stylesheet">
-
-
-<script type="text/javascript">
-    var  arr  = [];
-    $(function(){
-        $('tbody>tr').click(function(){
-            if($(this).hasClass('selected')){
-            $(this).removeClass('selected').find(':checkbox').prop('checked',false);
-            }else{
-            $(this).addClass('selected').find(':checkbox').prop('checked',true);
-            }
-        })
-        $('thead>tr').click(function(){
-            arr = [];
-            $("tbody tr").each(function(){
-                if($(this).hasClass('selected')){
-                    $(this).removeClass('selected').find(':checkbox').prop('checked',false);
-                }else{
-                    $(this).addClass('selected').find(':checkbox').prop('checked',true);
-                }
-                console.log($(this));
-                var text = $(this).children("td:nth-child(3)").text();
-                //console.log(text);
-                arr.push(text);
-            })
-             //console.log(arr);
-        })
-    })
-
-    $(function(){
-    $("#all").click(function(){
-        $('[name=items]:checkbox').attr("checked",true);
-    })
-    $("#no").click(function(){
-        $('[name=items]:checkbox').attr("checked",false);
-    })
-    $("#other").click(function(){
-        $('[name=items]:checkbox').each(function(){
-        this.checked=!this.checked;
-        });
-    })
-    $("#submit").click(function(){
-        arr = [];
-        $("tbody tr").each(function(){
-            if($(this).hasClass('selected')){
-                var text = $(this).children("td:nth-child(3)").text();
-                arr.push(text);
-            }
-        })
-
-        //console.log(JSON.stringify(arr));
-        $.ajax({
-            url: '/daochu',
-            type: 'POST',
-            data: JSON.stringify(arr),
-            contentType: 'application/json',
-            dataType: 'json',
-            processData: false,
-            success: function(fileinfo){
-                //alert(fileinfo.filename);
-                window.open("daochu2/"+fileinfo.filename,"_blank");
-            },
-            error: function(){
-                alert("该文件大小超过 16M！");
-            },
-        });
-    })
-})
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.css" rel="stylesheet">
+<script src="{{ url_for('static', filename='bootstrap_table.js')}}" type="text/javascript"></script>
 {% endblock %}
+

@@ -22,16 +22,12 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="{{ url_for('main.index') }}">DTS</a>
-            <a class="navbar-brand" href="{{ url_for('main.bs_table') }}">BSTable</a>
             <a class="navbar-brand" href="{{ url_for('main.newbug') }}">NewBug</a>
-            <a class="navbar-brand" href="{{ url_for('main.jsontable') }}">JsonTable</a>
-            <a class="navbar-brand" href="{{ url_for('main.upload') }}">Upload</a>
-            <a class="navbar-brand" href="{{ url_for('main.datatable') }}">Datatable</a>
             <a class="navbar-brand" href="{{ url_for('mang.add_product') }}">Add-Product</a>
-            <a class="navbar-brand" href="{{ url_for('main.charts') }}">Charts</a>
         </div>
-        <div class="navbar-collapse collapse">
 
+
+        <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
                 <li class="dropdown">
@@ -78,7 +74,6 @@
       <li> <a href="#configSetting" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-credit-card"></i> 问题单浏览 <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
            <ul id="configSetting" class="nav nav-list collapse secondmenu">
-            <li class="active"><a href="{{ url_for('main.charts') }}"><i class="glyphicon glyphicon-globe"></i>&nbsp;问题单报表</a></li>
             <li><a href="{{ url_for('main.dailycharts') }}"><i class="glyphicon glyphicon-star-empty"></i>&nbsp;每日问题单报表</a></li>
             <li><a href="{{ url_for('main.productcharts') }}"><i class="glyphicon glyphicon-star"></i>&nbsp;版本问题单报表</a></li>
             <li><a href="#"><i class="glyphicon glyphicon-text-width"></i>&nbsp;问题分析报表</a></li>
@@ -104,7 +99,18 @@
 
 
     {% block page_content %} {% endblock %}
-
+        <div class="row">
+       <form class="bs-example bs-example-form" role="form">
+        <div class="input-group">
+           <input type="text" class="form-control">
+           <span class="input-group-btn">
+              <button class="btn btn-default" type="button">
+                 Go!
+              </button>
+           </span>
+        </div><!-- /input-group -->
+       </form><!-- bs-example -->
+    </div>
     {% block messages %}
         <div id="flashed-messages">
             {% include 'flashed_messages.html' %}
