@@ -49,7 +49,14 @@ require(
                     type : 'value'
                 }
             ],
-            series : [{name:'',type:'bar',data:[]}]
+            series : [{name:'',type:'bar',data:[],
+            itemStyle: {
+                        normal: {
+                            label: {
+                                show: true,//是否展示
+                                //position:'inside'
+                            }
+                        }},}]
         };
 
         $(function() {

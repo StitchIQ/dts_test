@@ -175,3 +175,8 @@ tfoot input {
 textarea#flask-pagedown-bug_descrit {
 height: 300px;
 }
+
+
+#toolbar > div {
+margin-top: 0;
+}

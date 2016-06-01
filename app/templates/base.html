@@ -23,7 +23,15 @@
             </button>
             <a class="navbar-brand" href="{{ url_for('main.index') }}">DTS</a>
             <a class="navbar-brand" href="{{ url_for('main.newbug') }}">NewBug</a>
+            <a class="navbar-brand" href="{{ url_for('main.productcharts') }}">问题单报表</a>
             <a class="navbar-brand" href="{{ url_for('mang.add_product') }}">Add-Product</a>
+            <a class="navbar-brand" >
+                <div class="input-append">
+                    <input class="span2" id="appendedInputButton" type="text">
+                    <button class="btn" type="button">Go!</button>
+                </div>
+            </a>
+
         </div>
 
 
@@ -99,18 +107,7 @@
 
 
     {% block page_content %} {% endblock %}
-        <div class="row">
-       <form class="bs-example bs-example-form" role="form">
-        <div class="input-group">
-           <input type="text" class="form-control">
-           <span class="input-group-btn">
-              <button class="btn btn-default" type="button">
-                 Go!
-              </button>
-           </span>
-        </div><!-- /input-group -->
-       </form><!-- bs-example -->
-    </div>
+
     {% block messages %}
         <div id="flashed-messages">
             {% include 'flashed_messages.html' %}

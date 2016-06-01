@@ -40,7 +40,16 @@ require(
              xAxis : [
                 {
                     type : 'category',
-                    data : []
+                    data : [],
+                    axisLabel:{
+                        interval:0,
+                        rotate:45,//倾斜度 -90 至 90 默认为0
+                        margin:2,
+                        textStyle:{
+                            fontWeight:"bolder",
+                            color:"#000000"
+                        }
+                    },
                 }
             ],
             yAxis : [
@@ -48,7 +57,15 @@ require(
                     type : 'value'
                 }
             ],
-            series : [{name:'',type:'bar',data:[]}]
+            series : [{name:'',type:'bar',data:[],
+            itemStyle: {
+                        normal: {
+                            label: {
+                                show: true,//是否展示
+                                //position:'inside'
+                            }
+                        }},
+            }]
         };
 
         $(function() {
@@ -64,7 +81,7 @@ require(
                  option.title.text='问题单每日报表';
                  myChart.clear();//清空绘画内容，清空后实例可用
                  myChart.hideLoading();//清除无数据时动画显示
-                 myChart.setOption(option);
+                 myChart.setOption(option,true);
                  //myChart.setSeries(data.data);
                 });
             });
