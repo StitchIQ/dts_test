@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Bug-Charts{% endblock %}
+{% block title %}DTS-每日问题单报表{% endblock %}
 
 {% block page_content %}
 <div class="col-md-9">
@@ -60,7 +60,7 @@
                     series : []
                 };
                 // 为echarts对象加载数据
-                $.getJSON("/dailydatas", function(data) {
+                $.getJSON("/bugdailydatas", function(data) {
                  option.xAxis[0].data = data.date;
                  option.series[0] = data;
                  myChart.setOption(option);

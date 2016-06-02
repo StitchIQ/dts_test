@@ -28,9 +28,13 @@ from ..decorators import bug_edit_check2
 # TODO 附件的在bug中不同阶段分类
 dts_log = logging.getLogger('DTS')
 
+
 @main.route('/')
+@main.route('/<string:product>')
+@main.route('/<string:product>/<string:version>')
+@main.route('/<string:product>/<string:version>/<string:software>')
 @login_required
-def index():
+def index(product=None,version=None,software=None):
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
     page = request.args.get('page', 1, type=int)
     # sts=BugStatus.query.filter_by(id=6).first()
@@ -42,7 +46,17 @@ def index():
     b = Bugs.query.filter(Bugs.author == current_user ,
                           Bugs.bug_status == Bug_Now_Status.CREATED)
 
-    pagination1 = a.union(b).order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+    a = a.union(b)
+    if product:
+        a = a.filter(Bugs.product_name == product)
+
+    if version:
+        a = a.filter(Bugs.product_version == version)
+
+    if software:
+        a = a.filter(Bugs.software_version == software)
+
+    pagination1 = a.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
     '''
     pagination1 = Bugs.query.filter(
             (Bugs.bug_owner == current_user and (Bug_Now_Status.CREATED < Bugs.bug_status and Bugs.bug_status< Bug_Now_Status.CLOSED)),
@@ -55,6 +69,7 @@ def index():
     posts = pagination1.items
     return render_template('index.html',
                            bugs_list=posts, pagination=pagination1)
+
 
 
 @main.route('/check_user')
@@ -686,6 +701,16 @@ def dailycharts():
     return render_template('reports/dailycharts.html')
 
 
+@main.route('/bugsversioncharts', methods=['GET'])
+@login_required
+def bugsversioncharts():
+    product = ProductInfo.get_all_product()
+    version = VersionInfo.query.all()
+
+    return render_template('reports/versionreports.html', product=product,
+                            version=version)
+
+
 @main.route('/dailydatas', methods=['GET'])
 @login_required
 def dailydatas():
@@ -696,7 +721,7 @@ def dailydatas():
 
     daily_bugs = db.session.query(
                     db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
-                    db.func.count(Bugs.id).label('total')).group_by(
+                    db.func.count(Bugs.bug_id).label('total')).group_by(
                     db.func.strftime('%Y.%m.%d', Bugs.timestamp)).all()
     # ss = db.session.execute("select strftime('%Y.%m.%d',timestamp)
     # as date,count(id) as total from bugs GROUP BY
@@ -726,7 +751,7 @@ def productdatas():
     # print prd
     daily_bugs = Bugs.query.with_entities(
         db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
-        db.func.count(Bugs.id).label('total')).filter(
+        db.func.count(Bugs.bug_id).label('total')).filter(
         Bugs.product_name == prd).group_by(
         db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date')).all()
 
@@ -738,13 +763,171 @@ def productdatas():
         })
 
 
+@main.route('/versiondatas', methods=['GET'])
+@login_required
+def versiondatas():
+    version = request.args.get('product')
+    # print prd
+    daily_bugs = Bugs.query.with_entities(
+        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
+        db.func.count(Bugs.bug_id).label('total')).filter(
+        Bugs.product_version == version).group_by(
+        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date')).all()
+
+    return jsonify({
+        'name': "Bugs",
+        'type': "bar",
+        'data': [s.total for s in daily_bugs],
+        'date': [s.date for s in daily_bugs]
+        })
+
+
+@main.route('/bugtodaydatas', methods=['GET'])
+@login_required
+def bugtodaydatas():
+    # daily_bugs2 = Bugs.query.with_entities(db.func.strftime(
+    #        '%Y.%m.%d',Bugs.timestamp).label('date'),
+    # db.func.count(Bugs.id).label('total')).group_by(db.func.strftime(
+    #       '%Y.%m.%d',Bugs.timestamp).label('date')).all()
+    version = request.args.get('product')
+    # 查询当天新增的问题单
+    daily_bugs = db.session.query(
+                    db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
+                    db.func.count(Bugs.bug_id).label('total')).filter(
+                    db.func.date(Bugs.timestamp)==db.func.date('now','localtime')).filter(
+                    Bugs.product_version == version).group_by(
+                    db.func.strftime('%Y.%m.%d', Bugs.timestamp)).all()
+    # ss = db.session.execute("select strftime('%Y.%m.%d',timestamp)
+    # as date,count(id) as total from bugs GROUP BY
+    # strftime('%Y.%m.%d',timestamp)")
+
+    return jsonify({
+        'name': "Bugs数",
+        'type': "bar",
+        'data': [s.total for s in daily_bugs],
+        'date': [s.date for s in daily_bugs]
+        })
+
+@main.route('/bugdailydatas', methods=['GET'])
+@login_required
+def bugdailydatas():
+    version = request.args.get('product')
+    # print prd
+    daily_bugs = Bugs.query.with_entities(
+        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
+        db.func.count(Bugs.bug_id).label('total')).filter(
+        Bugs.product_version == version).group_by(
+        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date')).all()
+
+    return jsonify({
+        'name': "Bugs",
+        'type': "bar",
+        'dataY': [s.total for s in daily_bugs],
+        'dataX': [s.date for s in daily_bugs]
+        })
+
+@main.route('/softwarebugdatas', methods=['GET'])
+@login_required
+def softwarebugdatas():
+    version = request.args.get('product')
+    # print prd
+    daily_bugs = Bugs.query.with_entities(
+        Bugs.software_version.label('software'),
+        db.func.count(Bugs.bug_id).label('total')).filter(
+        Bugs.product_version == version).group_by(
+        Bugs.software_version.label('software')).all()
+
+    return jsonify({
+        'name': "Bugs",
+        'type': "bar",
+        'dataY': [s.total for s in daily_bugs],
+        'dataX': [s.software for s in daily_bugs]
+        })
+
+
+@main.route('/featuresbugdatas', methods=['GET'])
+@login_required
+def featuresbugdatas():
+    version = request.args.get('product')
+    # print prd
+    daily_bugs = Bugs.query.with_entities(
+        Bugs.version_features.label('features'),
+        db.func.count(Bugs.bug_id).label('total')).filter(
+        Bugs.product_version == version).group_by(
+        Bugs.version_features.label('features')).all()
+
+    print [s.features for s in daily_bugs]
+    return jsonify({
+        'name': "Bugs",
+        'type': "bar",
+        'dataY': [s.total for s in daily_bugs],
+        'dataX': [s.features for s in daily_bugs]
+        })
+
+@main.route('/seriousbugdatas', methods=['GET'])
+@login_required
+def seriousbugdatas():
+    version = request.args.get('product')
+    # print prd
+    daily_bugs = Bugs.query.with_entities(
+        Bugs.bug_level.label('level'),
+        db.func.count(Bugs.bug_id).label('total')).filter(
+        Bugs.product_version == version).group_by(
+        Bugs.bug_level.label('level')).all()
+
+    return jsonify({
+        'name': "Bugs",
+        'type': "bar",
+        'dataY': [s.total for s in daily_bugs],
+        'dataX': [s.level for s in daily_bugs]
+        })
+
+@main.route('/statusbugdatas', methods=['GET'])
+@login_required
+def statusbugdatas():
+    version = request.args.get('product')
+    # print prd
+    daily_bugs = db.session.query(
+                db.func.count(Bugs.bug_id).label('total'),
+                BugStatus.bug_status_descrit.label('status')).filter(
+                Bugs.product_version == version).filter(
+                Bugs.bug_status == BugStatus.bug_status).group_by(
+                Bugs.bug_status).all()
+
+    return jsonify({
+        'name': "Bugs",
+        'type': "bar",
+        'dataY': [s.total for s in daily_bugs],
+        'dataX': [s.status for s in daily_bugs]
+        })
+
+
+@main.route('/authorbugsdatas', methods=['GET'])
+@login_required
+def authorbugsdatas():
+    version = request.args.get('product')
+
+    daily_bugs = db.session.query(db.func.count(Bugs.id).label('total'),
+                                  User.username.label('status')).filter(
+                                  Bugs.product_version == version).filter(
+                                  Bugs.author_id == User.id).group_by(
+                                  Bugs.author_id).all()
+
+    return jsonify({
+        'name': "Bugs",
+        'type': "bar",
+        'dataY': [s.total for s in daily_bugs],
+        'dataX': [s.status for s in daily_bugs]
+        })
+
+
 @main.route('/seriousdatas', methods=['GET'])
 @login_required
 def seriousdatas():
     prd = request.args.get('product')
     daily_bugs = Bugs.query.with_entities(
                     Bugs.bug_level.label('level'),
-                    db.func.count(Bugs.id).label('total')).filter(
+                    db.func.count(Bugs.bug_id).label('total')).filter(
                     Bugs.product_name == prd).group_by(
                     Bugs.bug_level.label('level')).all()
 
@@ -762,7 +945,7 @@ def seriousdataspie():
     prd = request.args.get('product')
     daily_bugs = Bugs.query.with_entities(
                     Bugs.bug_level.label('level'),
-                    db.func.count(Bugs.id).label('total')).filter(
+                    db.func.count(Bugs.bug_id).label('total')).filter(
                     Bugs.product_name == prd).group_by(
                     Bugs.bug_level.label('level')).all()
 
@@ -786,7 +969,7 @@ def statusdatas():
     # ss = dd.join(BugStatus, BugStatus.bug_status==Bugs.bug_status).filter(
     # Bugs.product_name==prd).group_by(Bugs.bug_status).all()
     daily_bugs = db.session.query(
-                db.func.count(Bugs.id).label('total'),
+                db.func.count(Bugs.bug_id).label('total'),
                 BugStatus.bug_status_descrit.label('status')).filter(
                 Bugs.product_name == prd).filter(
                 Bugs.bug_status == BugStatus.bug_status).group_by(
@@ -846,14 +1029,6 @@ def autocomplete():
         return 'Not Found', 200
     user = User.query.filter(User.email.like(search + '%')).all()
     return jsonify({"suggestions":[u.email for u in user]})
-
-
-@main.route('/image')
-@login_required
-def image():
-    print 'test2'
-    print request.args.get('search')
-    return render_template('image.html')
 
 
 @main.route('/daochu', methods=['POST'])

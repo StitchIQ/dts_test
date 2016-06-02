@@ -68,8 +68,10 @@ require(
                     itemStyle: {
                         normal: {
                             label: {
-                                show: true,//是否展示
-                                //position:'inside'
+                                position:'inner',
+                                formatter : function (params) {
+                                  return (params.percent - 0).toFixed(0) + '%'
+                                }
                             }
                         }},
                 }
@@ -86,7 +88,7 @@ require(
                  option.legend.data = data.level;
                  option.series[0].name = data.name;
                  option.series[0].data = data.data;
-                 option.title.text='问题单严重程度报表';
+                 option.title.text='问题单严重程度报表pie';
                  myChart.clear();//清空绘画内容，清空后实例可用
                  myChart.hideLoading();//清除无数据时动画显示
                  myChart.setOption(option);

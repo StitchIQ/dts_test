@@ -22,8 +22,9 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="{{ url_for('main.index') }}">DTS</a>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">首页</a>
             <a class="navbar-brand" href="{{ url_for('main.newbug') }}">NewBug</a>
-            <a class="navbar-brand" href="{{ url_for('main.productcharts') }}">问题单报表</a>
+            <a class="navbar-brand" href="{{ url_for('main.bugsversioncharts') }}">问题单报表</a>
             <a class="navbar-brand" href="{{ url_for('mang.add_product') }}">Add-Product</a>
             <a class="navbar-brand" >
                 <div class="input-append">
@@ -83,8 +84,8 @@
         <i class="glyphicon glyphicon-credit-card"></i> 问题单浏览 <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
            <ul id="configSetting" class="nav nav-list collapse secondmenu">
             <li><a href="{{ url_for('main.dailycharts') }}"><i class="glyphicon glyphicon-star-empty"></i>&nbsp;每日问题单报表</a></li>
-            <li><a href="{{ url_for('main.productcharts') }}"><i class="glyphicon glyphicon-star"></i>&nbsp;版本问题单报表</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-text-width"></i>&nbsp;问题分析报表</a></li>
+            <li><a href="{{ url_for('main.productcharts') }}"><i class="glyphicon glyphicon-star"></i>&nbsp;产品问题单报表</a></li>
+            <li><a href="{{ url_for('main.bugsversioncharts') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;版本问题单分析报表</a></li>
             <li><a href="#"><i class="glyphicon glyphicon-ok-circle"></i>&nbsp;测试报告报表</a></li>
            </ul>
       </li>

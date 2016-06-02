@@ -69,10 +69,11 @@ require(
         };
 
         $(function() {
-            $('tr td a').bind('click', function() {
+            $('tr td a').on('click', function() {
                 //alert($(this).closest('tr').find('td:eq(1)').text());
+                var para = $(this).text();
               $.getJSON("/productdatas", {
-                    product: $(this).closest('tr').find('td:eq(1)').text(),
+                    product: para,
                 },function(data) {
                  //alert(data.date);
                  option.xAxis[0].data = data.date;
