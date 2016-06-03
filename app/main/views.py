@@ -30,13 +30,14 @@ dts_log = logging.getLogger('DTS')
 
 
 @main.route('/')
-@main.route('/<string:product>')
-@main.route('/<string:product>/<string:version>')
-@main.route('/<string:product>/<string:version>/<string:software>')
 @login_required
-def index(product=None,version=None,software=None):
+def index():
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
     page = request.args.get('page', 1, type=int)
+    product = request.args.get('product')
+    version = request.args.get('version')
+    software = request.args.get('software')
+    dts_log.debug(request.url)
     # sts=BugStatus.query.filter_by(id=6).first()
     # Bugs.bug_status not in [Bug_Now_Status.CREATED, Bug_Now_Status.CLOSED]
     # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
