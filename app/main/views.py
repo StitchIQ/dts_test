@@ -857,7 +857,6 @@ def featuresbugdatas():
         Bugs.product_version == version).group_by(
         Bugs.version_features.label('features')).all()
 
-    print [s.features for s in daily_bugs]
     return jsonify({
         'name': "Bugs",
         'type': "bar",
