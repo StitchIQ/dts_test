@@ -1,16 +1,15 @@
-Dear {{ user.username }},
+{{ user.username }}, 你好
 
-Welcome to DTS!
+欢迎使用 DTS!
 
-Please process this case:
-Please process this case: <a href="{{ url_for('main.bug_process', id=id, token=token, _external=True) }}">click here</a>.
+请尽快处理此问题单：{{ bug_id }}
+
+问题单链接为: <a href="{{ url_for('main.bug_process', id=bug_id, token=token, _external=True) }}">点击这里</a>.
+
+问题单处理意见为：{{target.opinion}}
+
+如果链接无法打开，请把复制下面的地址，把地址粘贴到浏览器的地址栏中:
+{{ url_for('main.bug_process', id=bug_id, token=token, _external=True) }}
 
 
-Alternatively, you can paste the following link in your browser's address bar:
-{{ url_for('main.bug_process', id=id, token=token, _external=True) }}
-
-Sincerely,
-
-The Flasky Team
-
-Note: replies to this email address are not monitored.
+提示: 此邮件为自动发送，请勿回复此邮件。

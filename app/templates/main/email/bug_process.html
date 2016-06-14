@@ -1,11 +1,13 @@
-<p>Dear {{ user.username }},</p>
-<p>Welcome to <b>DTS</b>!</p>
-<p>Please process this case: <a href="{{ url_for('main.bug_process', id=id, token=token, _external=True) }}">click here</a>.</p>
+<p>{{ user.username }}, 你好</p>
+<p>欢迎使用 <b>DTS</b>!</p>
 
-<p>{{target.opinion}}</p>
+<p>请尽快处理问题单: {{ bug_id }}.</p>
 
-<p>Alternatively, you can paste the following link in your browser's address bar:</p>
-<p>{{ url_for('main.bug_process', id=id, token=token, _external=True) }}</p>
-<p>Sincerely,</p>
-<p>The DTS Team</p>
-<p><small>Note: replies to this email address are not monitored.</small></p>
+<p>问题单链接: <a href="{{ url_for('main.bug_process', id=bug_id, token=token, _external=True) }}">点击这里</a>.</p>
+
+<p>问题单处理意见为：<b>{{target.opinion}}</b></p>
+
+<p>如果无法打开，请把下面的地址贴到浏览器的地址栏中:</p>
+<p>{{ url_for('main.bug_process', id=bug_id, token=token, _external=True) }}</p>
+
+<p><small>提示: 此邮件为自动发送，请勿回复此邮件.</small></p>

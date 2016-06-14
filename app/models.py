@@ -152,9 +152,9 @@ class Process(db.Model):
             return None
         if user:
             token = user.generate_confirmation_token()
-            send_email(user.email, 'Please Process Bugs: ' + str(target.bugs_id),
+            send_email(user.email, u'请处理此问题单: ' + str(target.bugs_id),
                        'main/email/bug_process',
-                       user=user, id=target.bugs_id, target=target, token=token)
+                       user=user, bug_id=target.bugs_id, target=target, token=token)
             dts_log.debug("Send mail to %s" %user.email)
 
 db.event.listen(Process, 'after_insert', Process.after_insert)

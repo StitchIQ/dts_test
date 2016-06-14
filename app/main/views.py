@@ -155,7 +155,6 @@ def copy_to_me():
             error_out=False)
 
     posts = pagination1.items
-    flash(posts)
     return render_template('index.html', bugs_list=posts,
                            pagination=pagination1)
 
@@ -210,11 +209,11 @@ def newbug():
         # bug_owner_id=form.bug_owner_id.data,
         # bug.timestamp = db.Column(db.DateTime, index=True,
         # default=datetime.utcnow)
-        attachments = Attachment.query.filter_by(bug_id=bug.bug_id).all()
-        for a in attachments:
-            a.confirm = True
+        #attachments = Attachment.query.filter_by(bug_id=bug.bug_id).all()
+        #for a in attachments:
+        #    a.confirm = True
         # attachments.confirm = True
-        map(db.session.add, attachments)
+        # map(db.session.add, attachments)
         process = Process(operator=current_user._get_current_object(),
                           author=User.query.filter_by(
                           email=form.bug_owner_id.data).first(),
@@ -225,7 +224,7 @@ def newbug():
         db.session.add(process)
         db.session.commit()
 
-        flash(u'Bugs 提交成功.',"success")
+        flash(u'Bugs 提交成功.', "success")
 
         # flash(request.files['photo'].filename)
         return redirect(url_for('.bug_process', id=bug.bug_id))
@@ -429,7 +428,7 @@ def bug_process(id):
             process.opinion = testleadedit.process_opinion'''
 
             # flash(process_list.timestamp)
-            flash('The TestLeader has been updated.')
+            flash('测试经理更新成功.', "success")
 
             return redirect(url_for('.bug_process', id=bugs.bug_id))
 
@@ -452,10 +451,9 @@ def bug_process(id):
         bugs.bug_status = developedit.bug_status.data
         bugs.resolve_version = developedit.dresolve_version.data
         bugs.version_features = developedit.dversion_features.data
-        print 'CCCCC: :', developedit.dresolve_version.data
         db.session.add(bugs)
         db.session.commit()
-        flash('The Developer has been updated.', "success")
+        flash('开发人员更新成功.', "success")
 
         return redirect(url_for('.bug_process', id=bugs.bug_id))
 
@@ -477,7 +475,7 @@ def bug_process(id):
         bugs.bug_status = testleadedit2.bug_status.data
         db.session.add(bugs)
         db.session.commit()
-        flash('The TestLeader2 has been updated.')
+        flash('测试经理更新成功.', "success")
 
         return redirect(url_for('.bug_process', id=bugs.bug_id))
 
@@ -508,7 +506,7 @@ def bug_process(id):
         bugs.regression_test_version = bugclose.regression_test_version.data
         db.session.add(bugs)
         db.session.commit()
-        flash('The Tester has been updated.')
+        flash('测试人员更新成功.', "success")
         return redirect(url_for('.bug_process', id=bugs.bug_id))
 
     # 处理日志
@@ -643,7 +641,7 @@ def bug_edit(bug_id):
                           opinion='')
         db.session.add(process)
         db.session.commit()
-        flash('Bugs 提交成功.')
+        flash('Bugs 提交成功.', "success")
         return redirect(url_for('.bug_process', id=bugs.bug_id))
 
 
