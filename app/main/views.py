@@ -718,10 +718,11 @@ def dailydatas():
     # db.func.count(Bugs.id).label('total')).group_by(db.func.strftime(
     #       '%Y.%m.%d',Bugs.timestamp).label('date')).all()
 
-    daily_bugs = db.session.query(
-                    db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
+    daily_bugs = Bugs.query.with_entities(
+                    db.func.date(Bugs.timestamp).label('date'),
                     db.func.count(Bugs.bug_id).label('total')).group_by(
-                    db.func.strftime('%Y.%m.%d', Bugs.timestamp)).all()
+                    db.func.date(Bugs.timestamp).label('date')).all()
+
     # ss = db.session.execute("select strftime('%Y.%m.%d',timestamp)
     # as date,count(id) as total from bugs GROUP BY
     # strftime('%Y.%m.%d',timestamp)")
@@ -730,7 +731,7 @@ def dailydatas():
         'name': "Bugs数",
         'type': "bar",
         'data': [s.total for s in daily_bugs],
-        'date': [s.date for s in daily_bugs]
+        'date': [str(s.date) for s in daily_bugs]
         })
 
 
@@ -749,16 +750,16 @@ def productdatas():
     prd = request.args.get('product')
     # print prd
     daily_bugs = Bugs.query.with_entities(
-        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
+        db.func.date(Bugs.timestamp).label('date'),
         db.func.count(Bugs.bug_id).label('total')).filter(
         Bugs.product_name == prd).group_by(
-        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date')).all()
+        db.func.date(Bugs.timestamp).label('date')).all()
 
     return jsonify({
         'name': "Bugs2",
         'type': "bar",
         'data': [s.total for s in daily_bugs],
-        'date': [s.date for s in daily_bugs]
+        'date': [str(s.date) for s in daily_bugs]
         })
 
 
@@ -768,22 +769,23 @@ def versiondatas():
     version = request.args.get('product')
     # print prd
     daily_bugs = Bugs.query.with_entities(
-        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
+        db.func.date(Bugs.timestamp).label('date'),
         db.func.count(Bugs.bug_id).label('total')).filter(
         Bugs.product_version == version).group_by(
-        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date')).all()
+        db.func.date(Bugs.timestamp).label('date')).all()
 
     return jsonify({
         'name': "Bugs",
         'type': "bar",
         'data': [s.total for s in daily_bugs],
-        'date': [s.date for s in daily_bugs]
+        'date': [str(s.date) for s in daily_bugs]
         })
 
 
 @main.route('/bugtodaydatas', methods=['GET'])
 @login_required
 def bugtodaydatas():
+    # TODO 今日新增问题
     # daily_bugs2 = Bugs.query.with_entities(db.func.strftime(
     #        '%Y.%m.%d',Bugs.timestamp).label('date'),
     # db.func.count(Bugs.id).label('total')).group_by(db.func.strftime(
@@ -791,11 +793,11 @@ def bugtodaydatas():
     version = request.args.get('product')
     # 查询当天新增的问题单
     daily_bugs = db.session.query(
-                    db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
+                    db.func.date(Bugs.timestamp).label('date'),
                     db.func.count(Bugs.bug_id).label('total')).filter(
                     db.func.date(Bugs.timestamp)==db.func.date('now','localtime')).filter(
                     Bugs.product_version == version).group_by(
-                    db.func.strftime('%Y.%m.%d', Bugs.timestamp)).all()
+                    db.func.date(Bugs.timestamp)).all()
     # ss = db.session.execute("select strftime('%Y.%m.%d',timestamp)
     # as date,count(id) as total from bugs GROUP BY
     # strftime('%Y.%m.%d',timestamp)")
@@ -813,16 +815,18 @@ def bugdailydatas():
     version = request.args.get('product')
     # print prd
     daily_bugs = Bugs.query.with_entities(
-        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date'),
+        db.func.date(Bugs.timestamp).label('date'),
         db.func.count(Bugs.bug_id).label('total')).filter(
         Bugs.product_version == version).group_by(
-        db.func.strftime('%Y.%m.%d', Bugs.timestamp).label('date')).all()
+        db.func.date(Bugs.timestamp)).all()
+
+    #daily = db.session.execute("select count(bug_id) as total , DATE_FORMAT(timestamp,'%y-%m-%d') as dd from bugs group by dd;").fetchall()
 
     return jsonify({
         'name': "Bugs",
         'type': "bar",
         'dataY': [s.total for s in daily_bugs],
-        'dataX': [s.date for s in daily_bugs]
+        'dataX': [str(s.date) for s in daily_bugs],
         })
 
 @main.route('/softwarebugdatas', methods=['GET'])
