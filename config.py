@@ -2,43 +2,22 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-'''
-class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
-    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    MAIL_SERVER = 'smtp.qq.com'
-    MAIL_PORT = 25
-    MAIL_USE_TLS = True
-    MAIL_USERNAME = '147457787@qq.com'
-    MAIL_PASSWORD = 'enuihxcpvyibbjeb'
-    FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
-    FLASKY_MAIL_SENDER = 'Flasky Admin <147457787@qq.com>'
-    FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
-    FLASKY_POSTS_PER_PAGE = 25
-    FLASKY_FOLLOWERS_PER_PAGE = 50
-    FLASKY_COMMENTS_PER_PAGE = 30
-
-
-    @staticmethod
-    def init_app(app):
-        pass
-'''
-
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    MAIL_SERVER = 'smtp.kedacom.com'
+    MAIL_SERVER = 'smtp.com.com'
     MAIL_PORT = 25
     MAIL_USE_TLS = False
-    MAIL_USERNAME = 'sqlmail@kedacom.com'
+    MAIL_USERNAME = 'username'
     MAIL_PASSWORD = 'password'
     FLASKY_MAIL_SUBJECT_PREFIX = '[DTS]'
-    FLASKY_MAIL_SENDER = 'DTS Admin <sqlmail@kedacom.com>'
+    FLASKY_MAIL_SENDER = 'DTS Admin <username@com.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     FLASKY_POSTS_PER_PAGE = 25
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 30
+    UPLOAD_FOLDER = os.path.join(basedir, 'app/attachment_files')
 
     @staticmethod
     def init_app(app):
@@ -68,5 +47,5 @@ config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
 
-    'default': ProductionConfig
+    'default': DevelopmentConfig
 }
