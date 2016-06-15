@@ -5,9 +5,9 @@
 {% block head %}
 {{ super() }}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css')}}">
+<link rel="shortcut icon" href="static/favicon.ico" type="image/x-icon">
+<link rel="icon" href="static/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="/static/styles.css">
 {% endblock %}
 
 
@@ -118,14 +118,15 @@
 <!-- ...... -->
         <div class="col-md-12">
             <hr />
-            <p class="text-muted">Copyright .. 2015 Lixing0303@163.com All Rights Reserved.</p>
+            <p class="text-muted">Copyright ..  All Rights Reserved.</p>
         </div>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
 {{ moment.include_moment() }}
-<!-- ......
-{{ moment.lang("zh-CN") }}
+{{ moment.lang("zh-cn") }}
+<!-- ...... {{ moment.include_moment() }}
+{{ moment.lang("zh-CN") }}{{ super() }}
 <!-- ...... -->
 {% endblock %}

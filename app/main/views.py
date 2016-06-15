@@ -164,9 +164,15 @@ def copy_to_me():
 def newbug():
     # TODO 此处有bug，当提交失败时，bug_id会变化，导致添加的附件无法关联到bug
     form = StandardBug()
+    if request.method == 'GET':
+        form.bugs_id.data = Bug_Num_Generate.bug_num()
+
+    read_only(form.bugs_id)
+
 
     dts_log.debug(form.errors)
     dts_log.debug(form.validate_on_submit())
+
     # print request.values
     if form.validate_on_submit():
         # if request.method == 'POST':
@@ -230,8 +236,17 @@ def newbug():
         return redirect(url_for('.bug_process', id=bug.bug_id))
     # flash('Bugs 准备提交.')
     # flash(form.photo.data)
-    form.bugs_id.data = Bug_Num_Generate.bug_num()
-    read_only(form.bugs_id)
+
+    '''
+    if request.method == 'POST':
+        dts_log.debug(form.errors)
+        read_only(form.bugs_id)
+        dts_log.debug(form.product_version.data)
+        form.product_version.choices = [(form.product_version.data, form.product_version.data)]
+        form.software_version.choices = [(form.software_version.data, form.software_version.data)]
+        form.version_features.choices = [(form.version_features.data, form.version_features.data)]
+        return render_template("standard_bug.html", form=form)
+    '''
     return render_template("standard_bug.html", form=form)
 
 
