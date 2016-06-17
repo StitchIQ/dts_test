@@ -21,7 +21,7 @@ $("#submit").click(function(){
         processData: false,
         success: function(fileinfo){
             //alert(fileinfo.filename);
-            window.open("daochu2/"+fileinfo.filename,"_blank");
+            window.open("/daochu2/"+fileinfo.filename,"_blank");
         },
         error: function(){
             alert("该文件大小超过 16M！");

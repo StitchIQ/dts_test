@@ -1052,35 +1052,28 @@ def autocomplete():
 @login_required
 def daochu():
 
-    print '4',request.data
-    print '6',request.get_json(force=True)
-    print '7',request.json
-    print type(request.json)
+    # print '4',request.data
+    # print '6',request.get_json(force=True)
+    # print '7',request.json
+    # print type(request.json)
     json_data = request.data
     # bug_list = json_data.split(',')
     # print bug_list
-    print type(json_data)
+    # print type(json_data)
 
     bug_list = request.json
-    all_bug = []
-    for l in bug_list:
-        i = Bugs.get_by_bug_id(l)
-
-        all_bug.append(i)
 
     filename = datetime.now().strftime("%Y%m%d%H%M%S") + 'output.csv'
-    print filename
+    # print filename
     import csv
-    for bug in all_bug:
-        pass
-        #print bug
 
     with open('app/output_files/' + filename, 'wb') as csvfile:
         spamwriter = csv.writer(csvfile)
-        for res in all_bug:
+        for l in bug_list:
+            res = Bugs.get_by_bug_id(l)
             row = (res.bug_id,
                    res.author.username,
-                   res.bug_owner.username,
+                   res.bug_owner.username if res.bug_owner else None,
                    res.product_name,
                    res.product_version,
                    res.software_version,
@@ -1088,8 +1081,8 @@ def daochu():
                    res.bug_level,
                    res.system_view,
                    res.bug_show_times,
-                   res.bug_title,
-                   res.bug_status,
+                   "'"+res.bug_title+"'",
+                   res.now_status.bug_status_descrit,
                    res.resolve_version,
                    res.regression_test_version)
             # print row
