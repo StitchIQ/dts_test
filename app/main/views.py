@@ -154,6 +154,7 @@ def copy_to_me():
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
 
+
     posts = pagination1.items
     return render_template('index.html', bugs_list=posts,
                            pagination=pagination1)
