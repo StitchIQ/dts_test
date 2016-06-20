@@ -40,6 +40,14 @@ class Config:
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 30
 
+
+    # 附件存放目录和附件大小控制
+    UPLOAD_FOLDER = basedir + '/app/attachments_files/'
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+
+    # 临时存放数据导出文件
+    OUTPUT_FOLDER = basedir + '/app/output_files/'
+
     @staticmethod
     def init_app(app):
         pass
@@ -58,9 +66,9 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-    #SQLALCHEMY_DATABASE_URI = "mysql://dts:password@127.0.0.1:3306/dts"
+    #SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+    #    'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    SQLALCHEMY_DATABASE_URI = "mysql://dts:140327@172.16.110.1:3306/dts"
     #SQLALCHEMY_ECHO = True
 
 config = {
