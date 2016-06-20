@@ -20,8 +20,15 @@
 
 {% block scripts %}
 {{ super() }}
+<<<<<<< HEAD
 <script src="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.css">
+=======
+<script src="{{ url_for('static', filename='libs/bootstrap-table1.10.1/bootstrap-table.min.js')}}" type="text/javascript"></script>
+
+<link href="{{ url_for('static', filename='libs/bootstrap-table1.10.1/bootstrap-table.min.css')}}" rel="stylesheet">
+
+>>>>>>> 45906c2a5f0bbc47a7e86c73050b61686159ee0d
 <script src="{{ url_for('static', filename='bootstrap_table.js')}}" type="text/javascript"></script>
 
 <script src="{{ url_for('static', filename='libs/bootstrap-table1.10.1/bootstrap-table.min.js')}}" type="text/javascript"></script>
