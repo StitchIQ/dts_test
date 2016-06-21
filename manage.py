@@ -2,7 +2,7 @@
 # coding=utf-8
 import os
 from app import create_app, db
-from app.models import User, Role, Bugs, BugStatus, Process, ProductInfo
+from app.models import User, Role, Bugs, BugStatus, Process, ProductInfo, Bug_Now_Status
 from flask.ext.script import Manager, Shell
 from flask.ext.migrate import Migrate, MigrateCommand
 import sys
@@ -16,7 +16,7 @@ migrate = Migrate(app, db)
 
 def make_shell_context():
     return dict(app=app, db=db, User=User, Role=Role, Bugs=Bugs,
-                BugStatus=BugStatus, Process=Process)
+                BugStatus=BugStatus, Process=Process, Bug_Now_Status=Bug_Now_Status)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
 
@@ -30,5 +30,5 @@ def test():
 
 
 if __name__ == '__main__':
-    manager.run()
-    #app.run(host="0.0.0.0", port=8080)
+    #manager.run()
+    app.run(host="0.0.0.0", port=8080)

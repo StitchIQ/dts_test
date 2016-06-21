@@ -124,9 +124,9 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='libs/moment2.13.0/moment-with-locales.min.js')}}" type="text/javascript"></script>
 
-{{ moment.include_moment() }}
+<!-- 使用参数，加载本地js文件 -->
+{{ moment.include_moment("2.13.0","/static/libs/moment2.13.0/moment-with-locales.min.js") }}
 {{ moment.lang("zh-cn") }}
 <!-- ...... {{ moment.include_moment() }}
 {{ moment.lang("zh-CN") }}{{ super() }}

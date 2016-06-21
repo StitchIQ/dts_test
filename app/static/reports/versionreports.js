@@ -149,4 +149,17 @@
                      //myChart.setSeries(data.data);
                 });
         });
+
+
     });
+    $(function(){
+        var ecConfig = echarts.config;
+        function eConsole2(param) {
+            console.log(param);
+            console.log(param.name);
+            //window.open("http://172.16.124.10","_blank");
+        };
+        dailycharts.on('click', eConsole2);
+    });
+
+
