@@ -438,7 +438,7 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
+'''
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
         return False
@@ -447,3 +447,4 @@ class AnonymousUser(AnonymousUserMixin):
         return False
 
 login_manager.anonymous_user = AnonymousUser
+'''

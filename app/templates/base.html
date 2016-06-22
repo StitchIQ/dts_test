@@ -28,8 +28,13 @@
             <a class="navbar-brand" href="{{ url_for('mang.add_product') }}">添加产品和版本</a>
             <a class="navbar-brand" >
                 <div class="input-append">
-                    <input class="span2" id="appendedInputButton" type="text">
-                    <button class="btn" type="button">Go!</button>
+                    <input class="span2" id="appendedInputButton" type="text" size="30">
+                    <button class="btn" type="button" onclick="open2()">Go!</button>
+                    <script language=javascript>
+                        function open2(){
+                            window.location.href="/bug_process/"+document.getElementById('appendedInputButton').value;
+                        }
+                    </script>
                 </div>
             </a>
 
