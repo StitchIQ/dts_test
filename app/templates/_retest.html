@@ -24,7 +24,7 @@
                     <div class="tab-pane fade in active" id="bug_test">
                         {% if current_user == bugs.bug_owner and bugs.bug_status ==Bug_Now_Status.TESTLEADER_REGESSION %}
 
-                            {{ wtf.quick_form(testleadedit2,horizontal_columns=('lg', 2, 20)) }}
+                            {{ wtf.quick_form(testleadedit2,horizontal_columns=('lg', 2, 20),button_map={'submit': 'primary'}) }}
                         {% endif %}
                     </div>
 
@@ -78,7 +78,7 @@
                                     {{ wtf.form_field(bugclose.bug_owner_id) }}
                                 </div>
                                 {{ wtf.form_field(bugclose.bug_status) }}
-                                {{ wtf.form_field(bugclose.submit) }}
+                                {{ wtf.form_field(bugclose.submit, button_map={'submit': 'primary'}) }}
                             </form>
                         {% endif %}
                     </div>

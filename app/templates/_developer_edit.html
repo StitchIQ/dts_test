@@ -37,7 +37,7 @@
                         {{ wtf.form_field(developedit.deve_process_opinion) }}
                         {{ wtf.form_field(developedit.bug_owner_id) }}
                         {{ wtf.form_field(developedit.bug_status) }}
-                        {{ wtf.form_field(developedit.submit) }}
+                        {{ wtf.form_field(developedit.submit, button_map={'submit': 'primary'}) }}
                     </form>
                 {% endif %}
             </div>

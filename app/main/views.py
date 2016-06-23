@@ -170,12 +170,16 @@ def newbug():
 
     read_only(form.bugs_id)
 
-
     dts_log.debug(form.errors)
     dts_log.debug(form.validate_on_submit())
 
     # print request.values
     if form.validate_on_submit():
+        if request.form.get('submit'):
+            form.bug_status.data = '2'
+
+        if request.form.get('save_crft'):
+            form.bug_status.data = '1'
         # if request.method == 'POST':
         #print form.version_features.value
 
@@ -248,6 +252,27 @@ def newbug():
         form.version_features.choices = [(form.version_features.data, form.version_features.data)]
         return render_template("standard_bug.html", form=form)
     '''
+    form.bug_descrit.data = u'''
+支持MarkDown语法，帮助查看
+
+问题单填写规范：
+### 环境信息
+*详细描述测试时的环境信息*
+
+### 操作步骤
+
+1. 打开页面
+2. 输入参数
+
+### 预期结果
+
+1. 看到视频
+2. 参数显示
+
+### 实际结果
+
+1. 看到乱码
+'''
     return render_template("standard_bug.html", form=form)
 
 
@@ -620,6 +645,12 @@ def bug_edit(bug_id):
     form = StandardBug()
 
     if form.validate_on_submit():
+        # 判断是提交还是保存草稿
+        if request.form.get('submit'):
+            form.bug_status.data = '2'
+        if request.form.get('save_crft'):
+            form.bug_status.data = bugs.bug_status
+
         # if request.method == 'POST':
         UPLOAD_FOLDER = 'static/Uploads/'
         app_dir = 'app/'

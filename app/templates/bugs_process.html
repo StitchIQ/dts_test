@@ -13,69 +13,76 @@
     </ul>
     <div id="myTabContent" class="tab-content">
        <div class="tab-pane fade in active" id="bug">
-
           <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="">
-                  <li> <a href="#buginfo" class="nav-header collapsed" data-toggle="collapse">
-                      <i class="glyphicon glyphicon-cog"></i> 问题单信息
-                      Processed By: {{ bugs.author.username }}--Time at :{{ moment(bugs.timestamp).format('YYYY-MM-D HH:mm:ss') }}
-                      <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-                      <ul id="buginfo" class="nav nav-list secondmenu collapse">
-                      <div class="col-md-6">
-                          <div class="table-responsive">
-                            <table class="table table-condensed">
-                               <tbody>
-                                <tr>
-                                    <td>{{ wtf.form_field(form.bugs_id) }}</td>
-                                    <td>{{ wtf.form_field(form.product_name) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>{{ wtf.form_field(form.product_version) }}</td>
-                                    <td>{{ wtf.form_field(form.software_version) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>{{ wtf.form_field(form.version_features) }}</td>
-                                    <td>{{ wtf.form_field(form.bug_level) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>{{ wtf.form_field(form.bug_show_times) }}</td>
-                                    <td>{{ wtf.form_field(form.system_view) }}</td>
-                                </tr>
-                               </tbody>
-                            </table>
+              <li> <a href="#buginfo" class="nav-header collapsed" data-toggle="collapse">
+                  <i class="glyphicon glyphicon-cog"></i> 问题单信息
+                  Processed By: {{ bugs.author.username }}--Time at :{{ moment(bugs.timestamp).format('YYYY-MM-D HH:mm:ss') }}
+                  <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
+                  <ul id="buginfo" class="nav nav-list secondmenu collapse">
+                  <div class="col-md-6" id="bug2">
+                      <div class="table-responsive">
+                        <table class="table table-condensed">
+                           <tbody>
+                            <tr>
+                                <td>{{ wtf.form_field(form.bugs_id) }}</td>
+                                <td>{{ wtf.form_field(form.product_name) }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ wtf.form_field(form.product_version) }}</td>
+                                <td>{{ wtf.form_field(form.software_version) }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ wtf.form_field(form.version_features) }}</td>
+                                <td>{{ wtf.form_field(form.bug_level) }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ wtf.form_field(form.bug_show_times) }}</td>
+                                <td>{{ wtf.form_field(form.system_view) }}</td>
+                            </tr>
+                           </tbody>
+                        </table>
 
-                            <table class="table table-condensed">
-                                <tbody>
-                                    <tr><td>{{ wtf.form_field(form.bug_title) }}</td></tr>
-                                    <tr><td><div class="post-body">{{ bug_descrit_html | safe }} </div> </td></tr>
+                        <table class="table table-condensed">
+                            <tbody>
+                                <tr><td>{{ wtf.form_field(form.bug_title) }}</td></tr>
+                                <tr><td><div class="post-body">{{ bug_descrit_html | safe }} </div> </td></tr>
 
-                                </tbody>
-                            </table>
-                        </div>
-                        <hr/>
-                         <!-- 显示问题单的图片和附件 -->
-                         {% include '_attachments.html' %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr/>
+                     <!-- 显示问题单的图片和附件 -->
+                     {% include '_attachments.html' %}
+                      <br>
+                        {% if current_user == bugs.author and bugs.status_equal(Bug_Now_Status.CREATED) %}
+                            <a href="{{ url_for('.bug_edit', bug_id=bugs.bug_id) }}">
+                                <button type="button" class="btn btn-primary">编辑</button>
+                            </a>
+                        {% elif current_user.is_administrator() %}
+                            <a href="{{ url_for('.bug_edit', bug_id=bugs.bug_id) }}">
+                                <button type="button" class="btn btn-warning">编辑[管理员]</button>
+                            </a>
+                        {% endif %}
+                  </div>
 
-                          <br>
-                      </div>
+                    <div class="bug2-footer">
+                        {% if current_user == bugs.author and bugs.status_equal(Bug_Now_Status.CREATED) %}
+                            <a href="{{ url_for('.bug_edit', bug_id=bugs.bug_id) }}">
+                                <button type="button" class="btn btn-primary">编辑</button>
+                            </a>
+                        {% elif current_user.is_administrator() %}
+                            <a href="{{ url_for('.bug_edit', bug_id=bugs.bug_id) }}">
+                                <button type="button" class="btn btn-warning">编辑[管理员]</button>
+                            </a>
+                        {% endif %}
+                    </div>
 
-                        <div class="bugs-footer">
-                            {% if current_user == bugs.author and bugs.status_equal(Bug_Now_Status.CREATED) %}
-                                <a href="{{ url_for('.bug_edit', bug_id=bugs.bug_id) }}">
-                                    <span class="label label-primary">Edit</span>
-                                </a>
-                            {% elif current_user.is_administrator() %}
-                                <a href="{{ url_for('.bug_edit', bug_id=bugs.bug_id) }}">
-                                    <span class="label label-danger">Edit [Admin]</span>
-                                </a>
-                            {% endif %}
-                        </div>
-
-                      </ul>
-                  </li>
-                  {% include '_testleader_edit.html' %}
-                  {% include '_developer_edit.html' %}
-                  {% include '_retest.html' %}
-               </ul>
+                  </ul>
+              </li>
+              {% include '_testleader_edit.html' %}
+              {% include '_developer_edit.html' %}
+              {% include '_retest.html' %}
+           </ul>
        </div>
 
        <div class="tab-pane fade" id="log">

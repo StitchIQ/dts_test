@@ -1,7 +1,9 @@
 <p>{{ user.username }}, 你好</p>
 <p>欢迎使用 <b>DTS</b>!</p>
 
-<p>请尽快处理问题单: {{ bug_id }}.</p>
+<p>请尽快处理问题单: {{ bug_id }}</p>
+
+<p>问题单标题: {{ target.bugs.bug_title }}</p>
 
 <p>问题单链接: <a href="{{ url_for('main.bug_process', id=bug_id, token=token, _external=True) }}">点击这里</a>.</p>
 

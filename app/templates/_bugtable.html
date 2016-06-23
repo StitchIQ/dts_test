@@ -35,9 +35,11 @@
                     </table></tbody>
                 </div></td></form>
             </tr>
-            <tr><td>{{ wtf.form_field(form.bug_status) }}</td></tr>
+
             <tr><td>{{ wtf.form_field(form.bug_owner_id) }}</td></tr>
-            <tr><td>{{ wtf.form_field(form.submit, button_map={'submit': 'primary'})  }}</td></tr>
+            <tr><td>
+                {{ wtf.form_field(form.save_crft, button_map={'save_crft': 'info'})  }}
+                {{ wtf.form_field(form.submit, button_map={'submit': 'primary'})  }}</td></tr>
         </tbody>
     </table>
 </div>

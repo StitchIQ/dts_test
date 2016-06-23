@@ -4,6 +4,8 @@
 
 请尽快处理此问题单：{{ bug_id }}
 
+问题单标题: {{ target.bugs.bug_title }}
+
 问题单链接为: <a href="{{ url_for('main.bug_process', id=bug_id, token=token, _external=True) }}">点击这里</a>.
 
 问题单处理意见为：{{target.opinion}}

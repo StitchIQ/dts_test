@@ -38,13 +38,14 @@ class StandardBug(Form):
                                           (u'较难重现', u'较难重现'),
                                           (u'无法重现', u'无法重现')])
     bug_title = StringField(u'问题标题', validators=[Required(), Length(1, 64)])
-    bug_descrit = PageDownField(u'问题描述', validators=[Required()])
+    bug_descrit = PageDownField(u'问题描述', validators=[Required()], render_kw={"placeholder": "支持MarkDown语法，帮助查看：http://www.jianshu.com/p/1e402922ee32/"})
     bug_owner_id = StringField(u'问题处理人', validators=[Required(), Email()])
     bug_status = RadioField(u'选择处理',
                             choices=[('1', u'新建'),
                                      ('2', u'测试经理审核')], default='2')
     # save = SubmitField('保存')
     attachment = FileField('附件')
+    save_crft = SubmitField(u'保存草稿')
     submit = SubmitField(u'提交')
 
     def __init__(self):
@@ -58,6 +59,7 @@ class StandardBug(Form):
         self.version_features.choices = [('-1', u'请选择软件特性')]
 
 
+
     # 自定义的验证函数
     def validate_product_name(self, field):
         if str(field.data) == '-1':
@@ -66,25 +68,26 @@ class StandardBug(Form):
 
 class BugsProcess(Form):
     bugs_id = StringField(u'问题单号')
-    product_name = StringField('产品名称')
-    product_version = StringField('产品版本号')
-    software_version = StringField('软件版本号')
-    version_features = StringField('软件特性')
-    bug_level = StringField('严重程度')
-    system_view = StringField('系统表现')
-    bug_show_times = StringField('出现频率')
-    bug_title = StringField('问题标题')
-    bug_descrit = TextAreaField('问题描述')
+    product_name = StringField(u'产品名称')
+    product_version = StringField(u'产品版本号')
+    software_version = StringField(u'软件版本号')
+    version_features = StringField(u'软件特性')
+    bug_level = StringField(u'严重程度')
+    system_view = StringField(u'系统表现')
+    bug_show_times = StringField(u'出现频率')
+    bug_title = StringField(u'问题标题')
+    bug_descrit = TextAreaField(u'问题描述')
     # bug_owner_id = StringField('问题处理人')
 
 
 class TestLeadEdit(Form):
-    test_process_opinion = TextAreaField('处理意见', validators=[Required()])
-    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
-    bug_status = RadioField('选择处理',
-                            choices=[('1', '返回修改'), ('3', '开发人员修改')],
+    test_process_opinion = TextAreaField(u'处理意见', validators=[Required()])
+    bug_owner_id = StringField(u'问题单处理人', validators=[Required(), Email()])
+    bug_status = RadioField(u'选择处理',
+                            choices=[('1', u'返回修改'), ('3', u'开发人员修改')],
                             default='3')
-    submit = SubmitField('提交')
+    submit = SubmitField(u'提交')
+
 
 
 class DevelopEdit(Form):
