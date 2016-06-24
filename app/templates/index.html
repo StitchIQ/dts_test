@@ -9,7 +9,7 @@
     {% include '_buglist.html' %}
     {% if pagination %}
         <div class="pagination">
-        {{ macros.pagination_widget(pagination, '.index') }}
+        {{ macros.pagination_widget(pagination, request.base_url) }}
         </div>
     {% endif %}
 

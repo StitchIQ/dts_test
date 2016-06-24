@@ -38,6 +38,8 @@ def index():
     version = request.args.get('version')
     software = request.args.get('software')
     dts_log.debug(request.url)
+    dts_log.debug(request.url_root)
+    dts_log.debug(request.base_url)
     # sts=BugStatus.query.filter_by(id=6).first()
     # Bugs.bug_status not in [Bug_Now_Status.CREATED, Bug_Now_Status.CLOSED]
     # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
@@ -114,24 +116,37 @@ def get_software():
 @main.route('/task/<string:mytask>')
 @login_required
 def task(mytask):
-    if mytask == 'created':
-        page = request.args.get('page', 1, type=int)
+    dts_log.debug(request.url)
+    dts_log.debug(request.url_root)
+    dts_log.debug(request.base_url)
+    page = request.args.get('page', 1, type=int)
+    product = request.args.get('product')
+    version = request.args.get('version')
+    software = request.args.get('software')
 
-        pagination = Bugs.query.filter_by(author=current_user).paginate(
-                page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-                error_out=False)
+    if mytask == 'created':
+
+        pagination = Bugs.query.filter_by(author=current_user)
         # posts = pagination2.items
 
     if mytask == 'processed':
-        page = request.args.get('page', 1, type=int)
 
         # 查询的思路是表连接,要去重复值
         pagination = Bugs.query.join(
                     Process,
                     Process.bugs_id == Bugs.bug_id).distinct().filter(
-                    Process.operator == current_user).paginate(
-                    page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-                    error_out=False)
+                    Process.operator == current_user)
+
+    if product:
+        pagination = pagination.filter(Bugs.product_name == product)
+
+    if version:
+        pagination = pagination.filter(Bugs.product_version == version)
+
+    if software:
+        pagination = pagination.filter(Bugs.software_version == software)
+
+    pagination = pagination.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
 
     posts = pagination.items
     # flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.bug_id).filter(
@@ -139,6 +154,42 @@ def task(mytask):
     return render_template('main.html', bugs_list=posts,
                            pagination=pagination, mytask=mytask)
 
+@main.route('/index2/<string:product>')
+@main.route('/index2/<string:product>/<string:version>')
+@main.route('/index2/<string:product>/<string:version>/<string:software>')
+@login_required
+def index2(product=None, version=None, software=None):
+    dts_log.debug(product)
+    dts_log.debug(request.url)
+    dts_log.debug(request.url_root)
+    dts_log.debug(request.base_url)
+    page = request.args.get('page', 1, type=int)
+
+    dts_log.debug(product)
+    a = Bugs.query.filter(Bugs.bug_owner == current_user ,
+                          Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
+                          Bugs.bug_status > Bug_Now_Status.CREATED)
+    b = Bugs.query.filter(Bugs.author == current_user ,
+                          Bugs.bug_status == Bug_Now_Status.CREATED)
+
+    pagination = a.union(b)
+    dts_log.debug(product)
+    if product:
+        pagination = pagination.filter(Bugs.product_name == product)
+    dts_log.debug(product)
+    if version:
+        pagination = pagination.filter(Bugs.product_version == version)
+    dts_log.debug(product)
+    if software:
+        pagination = pagination.filter(Bugs.software_version == software)
+    dts_log.debug(product)
+    pagination = pagination.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+
+    posts = pagination.items
+    # flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.bug_id).filter(
+    #        Process.operator == current_user)))
+    return render_template('main.html', bugs_list=posts,
+                           pagination=pagination)
 
 @main.route('/copy_to_me/')
 @login_required
