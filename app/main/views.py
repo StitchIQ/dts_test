@@ -30,13 +30,14 @@ dts_log = logging.getLogger('DTS')
 
 
 @main.route('/')
+@main.route('/<string:product>')
+@main.route('/<string:product>/<string:version>')
+@main.route('/<string:product>/<string:version>/<string:software>')
 @login_required
-def index():
+def index(product=None, version=None, software=None):
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
     page = request.args.get('page', 1, type=int)
-    product = request.args.get('product')
-    version = request.args.get('version')
-    software = request.args.get('software')
+
     dts_log.debug(request.url)
     dts_log.debug(request.url_root)
     dts_log.debug(request.base_url)
@@ -113,16 +114,29 @@ def get_software():
         })
 
 
+@main.route('/task')
 @main.route('/task/<string:mytask>')
+@main.route('/task/<string:mytask>/<string:product>')
+@main.route('/task/<string:mytask>/<string:product>/<string:version>')
+@main.route('/task/<string:mytask>/<string:product>/<string:version>/<string:software>')
 @login_required
-def task(mytask):
+def task(mytask='process', product=None, version=None, software=None):
     dts_log.debug(request.url)
     dts_log.debug(request.url_root)
     dts_log.debug(request.base_url)
+    dts_log.debug(request.endpoint)
+    dts_log.debug(request.view_args.copy())
     page = request.args.get('page', 1, type=int)
-    product = request.args.get('product')
-    version = request.args.get('version')
-    software = request.args.get('software')
+
+    if mytask == 'process':
+        a = Bugs.query.filter(Bugs.bug_owner == current_user ,
+                              Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
+                              Bugs.bug_status > Bug_Now_Status.CREATED)
+        b = Bugs.query.filter(Bugs.author == current_user ,
+                              Bugs.bug_status == Bug_Now_Status.CREATED)
+
+        pagination = a.union(b)
+
 
     if mytask == 'created':
 
@@ -154,42 +168,7 @@ def task(mytask):
     return render_template('main.html', bugs_list=posts,
                            pagination=pagination, mytask=mytask)
 
-@main.route('/index2/<string:product>')
-@main.route('/index2/<string:product>/<string:version>')
-@main.route('/index2/<string:product>/<string:version>/<string:software>')
-@login_required
-def index2(product=None, version=None, software=None):
-    dts_log.debug(product)
-    dts_log.debug(request.url)
-    dts_log.debug(request.url_root)
-    dts_log.debug(request.base_url)
-    page = request.args.get('page', 1, type=int)
 
-    dts_log.debug(product)
-    a = Bugs.query.filter(Bugs.bug_owner == current_user ,
-                          Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
-                          Bugs.bug_status > Bug_Now_Status.CREATED)
-    b = Bugs.query.filter(Bugs.author == current_user ,
-                          Bugs.bug_status == Bug_Now_Status.CREATED)
-
-    pagination = a.union(b)
-    dts_log.debug(product)
-    if product:
-        pagination = pagination.filter(Bugs.product_name == product)
-    dts_log.debug(product)
-    if version:
-        pagination = pagination.filter(Bugs.product_version == version)
-    dts_log.debug(product)
-    if software:
-        pagination = pagination.filter(Bugs.software_version == software)
-    dts_log.debug(product)
-    pagination = pagination.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
-
-    posts = pagination.items
-    # flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.bug_id).filter(
-    #        Process.operator == current_user)))
-    return render_template('main.html', bugs_list=posts,
-                           pagination=pagination)
 
 @main.route('/copy_to_me/')
 @login_required

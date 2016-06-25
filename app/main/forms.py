@@ -18,7 +18,7 @@ class MySelectField(SelectField):
     # 重写验证函数，只要值不为-1，就通过
     def pre_validate(self, form):
         if str(self.data) == '-1':
-            raise ValueError(self.gettext('请选择'))
+            raise ValueError(self.gettext(u'请选择'))
 
 
 class StandardBug(Form):
@@ -44,7 +44,7 @@ class StandardBug(Form):
                             choices=[('1', u'新建'),
                                      ('2', u'测试经理审核')], default='2')
     # save = SubmitField('保存')
-    attachment = FileField('附件')
+    attachment = FileField(u'附件')
     save_crft = SubmitField(u'保存草稿')
     submit = SubmitField(u'提交')
 

@@ -173,10 +173,14 @@ tfoot input {
     }
 
 textarea#flask-pagedown-bug_descrit {
-height: 200px;
+   height: 200px;
 }
 
 
 #toolbar > div {
-margin-top: 0;
+  margin-top: 0;
+}
+
+#appendedInputButton {
+	color: #000A08;
 }
