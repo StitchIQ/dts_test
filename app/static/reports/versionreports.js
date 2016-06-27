@@ -175,14 +175,63 @@
     });
     $(function(){
         var ecConfig = echarts.config;
-        function eConsole2(param) {
+        function datelist(param) {
             console.log(param);
             console.log(param.name);
             console.log(product);
             console.log(version);
-            window.open("/"+product+"/"+version, "_blank");
+            myurl = "&date="+param.name;
+            window.open("/buglist/"+product+"?version="+version+myurl, "_blank");
         };
-        dailycharts.on('click', eConsole2);
+        function softlist(param) {
+            console.log(param);
+            console.log(param.name);
+            console.log(product);
+            console.log(version);
+            myurl = "&software="+param.name;
+            window.open("/buglist/"+product+"?version="+version+myurl, "_blank");
+        };
+
+        function featureslist(param) {
+            console.log(param);
+            console.log(param.name);
+            console.log(product);
+            console.log(version);
+            myurl = "&features="+param.name;
+            window.open("/buglist/"+product+"?version="+version+myurl, "_blank");
+        };
+
+        function seriouslist(param) {
+            console.log(param);
+            console.log(param.name);
+            console.log(product);
+            console.log(version);
+            myurl = "&serious="+param.name;
+            window.open("/buglist/"+product+"?version="+version+myurl, "_blank");
+        };
+        function statuslist(param) {
+            console.log(param);
+            console.log(param.name);
+            console.log(product);
+            console.log(version);
+            myurl = "&status="+param.name;
+            window.open("/buglist/"+product+"?version="+version+myurl, "_blank");
+        };
+        function authorlist(param) {
+            console.log(param);
+            console.log(param.name);
+            console.log(product);
+            console.log(version);
+            myurl = "&author="+param.name;
+            window.open("/buglist/"+product+"?version="+version+myurl, "_blank");
+        };
+
+        dailycharts.on('click', datelist);
+        softwarecharts.on('click', softlist);
+        featurescharts.on('click', featureslist);
+        seriouscharts.on('click', seriouslist);
+        statuscharts.on('click', statuslist);
+        authorcharts.on('click', authorlist);
     });
 
 

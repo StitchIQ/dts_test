@@ -75,6 +75,54 @@ def index(product=None, version=None, software=None):
                            bugs_list=posts, pagination=pagination1)
 
 
+@main.route('/buglist/<string:product>')
+@login_required
+def buglist(product=None):
+    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
+    page     = request.args.get('page', 1, type=int)
+    version  = request.args.get('version')
+    software = request.args.get('software')
+    date     = request.args.get('date')
+    features = request.args.get('features')
+    serious  = request.args.get('serious')
+    status   = request.args.get('status')
+    author   = request.args.get('author')
+
+    dts_log.debug(product)
+    dts_log.debug(request.url)
+    dts_log.debug(request.url_root)
+    dts_log.debug(request.base_url)
+
+    bugs_list = Bugs.query.filter(Bugs.product_name == product)
+
+    if version:
+        bugs_list = bugs_list.filter(Bugs.product_version == version)
+
+    if software:
+        bugs_list = bugs_list.filter(Bugs.software_version == software)
+
+    if date:
+        bugs_list = bugs_list.filter(Bugs.software_version == software)
+
+    if features:
+        bugs_list = bugs_list.filter(Bugs.version_features == features)
+
+    if serious:
+        bugs_list = bugs_list.filter(Bugs.bug_level == serious)
+
+    if status:
+        st = BugStatus.query.filter_by(bug_status_descrit=status).first()
+        bugs_list = bugs_list.filter_by(now_status = st)
+
+    if author:
+        au = User.query.filter_by(username=author).first()
+        bugs_list = bugs_list.filter_by(author = au)
+
+    bugs_list = bugs_list.order_by(Bugs.timestamp.desc())
+
+    dts_log.debug(buglist.__name__)
+    return render_template('index.html', bugs_list=bugs_list)
+
 
 @main.route('/check_user')
 @login_required
@@ -1008,8 +1056,7 @@ def authorbugsdatas():
     if version:
         daily_bugs = daily_bugs.filter(Bugs.product_version == version)
 
-    daily_bugs = daily_bugs.filter(
-                                  Bugs.author_id == User.id).group_by(
+    daily_bugs = daily_bugs.filter(Bugs.author_id == User.id).group_by(
                                   Bugs.author_id).all()
     return jsonify({
         'name': "Bugs",
