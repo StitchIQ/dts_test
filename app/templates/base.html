@@ -28,11 +28,22 @@
             <a class="navbar-brand" href="{{ url_for('mang.add_product') }}">添加产品和版本</a>
             <a class="navbar-brand" >
                 <div class="input-append">
-                    <input class="span2" id="appendedInputButton" type="text" size="30">
+                    <input class="span2" id="appendedInputButton" type="text" size="26" maxlength="25" onkeydown="test(event);">
                     <button class="btn" type="button" onclick="open2()">Go!</button>
                     <script language=javascript>
                         function open2(){
-                            window.location.href="/bug_process/"+document.getElementById('appendedInputButton').value;
+                            //window.location.href="/bug_process/"+document.getElementById('appendedInputButton').value;
+                            if (document.getElementById('appendedInputButton').value !=''){
+                                window.open("/bug_process/"+document.getElementById('appendedInputButton').value, "_blank");
+                            }
+                        }
+                        function test(e){
+                            e = e || event;//兼容ie,chrome,FF
+                            if (e.keyCode == 13){//13 是回车
+                                if (document.getElementById('appendedInputButton').value !=''){
+                                    window.open("/bug_process/"+document.getElementById('appendedInputButton').value, "_blank");
+                                }
+                            }
                         }
                     </script>
                 </div>
