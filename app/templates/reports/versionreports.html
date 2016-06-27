@@ -18,11 +18,11 @@
                 {% for p in product %}
                   <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{ p.product_name }}</td>
+                    <td><a href="#" id="product">{{ p.product_name }}</a></td>
                     <td>
                         {% for v in version%}
                             {% if v.product == p.id %}
-                                <a href="#" id={{ v.version_name }}>{{ v.version_name }}</a>
+                                <a href="#" id="version">{{ v.version_name }}</a>
                             {% endif %}
                         {% endfor %}
                     </td>

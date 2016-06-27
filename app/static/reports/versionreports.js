@@ -59,12 +59,28 @@
         }]
     };
 
+    var product = "";
+    var version = "";
     $(function() {
         $("tr td a").on("click", function() {
-            var para = $(this).text();
-
+            //product = $(this).closest('tr').find('td:eq(1)').text();
+            //version = $(this).text();
+            product = "";
+            version = "";
+            //console.log($(this).attr("id"));
+            //console.log(this.id);
+            if ($(this).attr("id") =="product"){
+                product = $(this).closest('tr').find('td:eq(1)').text();
+            };
+            if($(this).attr("id") =="version"){
+                product = $(this).closest('tr').find('td:eq(1)').text();
+                version = $(this).text();
+            };
+            console.log(product);
+            console.log(version);
           $.getJSON("/bugdailydatas", {
-                product: para,
+                product: product,
+                version: version
             },
             function(data) {
              //alert(data.date);
@@ -79,7 +95,8 @@
             });
 
           $.getJSON("/softwarebugdatas", {
-                product: para,
+                product: product,
+                version: version
             },
             function(data) {
              //alert(data.date);
@@ -93,8 +110,9 @@
              //myChart.setSeries(data.data);
             });
 
-            $.getJSON("/featuresbugdatas",
-                { product: para, },
+            $.getJSON("/featuresbugdatas", {
+                product: product,
+                version: version },
                 function(data) {
                      //alert(data.date);
                      option.xAxis[0].data = data.dataX;
@@ -108,7 +126,8 @@
                 });
 
             $.getJSON("/seriousbugdatas",
-                { product: para, },
+                { product: product,
+                version: version },
                 function(data) {
                      //alert(data.date);
                      option.xAxis[0].data = data.dataX;
@@ -122,7 +141,8 @@
                 });
 
             $.getJSON("/statusbugdatas",
-                { product: para, },
+                { product: product,
+                version: version },
                 function(data) {
                      //alert(data.date);
                      option.xAxis[0].data = data.dataX;
@@ -136,7 +156,8 @@
                 });
 
             $.getJSON("/authorbugsdatas",
-                { product: para, },
+                { product: product,
+                version: version },
                 function(data) {
                      //alert(data.date);
                      option.xAxis[0].data = data.dataX;
@@ -157,7 +178,9 @@
         function eConsole2(param) {
             console.log(param);
             console.log(param.name);
-            //window.open("http://172.16.124.10","_blank");
+            console.log(product);
+            console.log(version);
+            window.open("/"+product+"/"+version, "_blank");
         };
         dailycharts.on('click', eConsole2);
     });
