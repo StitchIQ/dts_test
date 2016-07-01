@@ -6,7 +6,7 @@ from datetime import datetime
 import logging
 
 from flask import render_template, redirect, request, url_for, flash, \
-    current_app, jsonify, abort, send_from_directory, make_response, send_file
+    current_app, jsonify, abort, send_from_directory, make_response, send_file, Response
 from flask.ext.login import login_required, current_user
 from wtforms_components import read_only
 from werkzeug import secure_filename
@@ -18,11 +18,16 @@ from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
 from ..email import send_email
 from ..models import Bugs, User, Process, BugStatus, Permission, \
     Bug_Now_Status, ProductInfo, VersionInfo, Attachment
-from .. import db
+from .. import db , dts_mongodb
 
 from ..decorators import bug_edit_check2
 
 
+import pymongo
+import bson.binary
+from cStringIO import StringIO
+#mdb = pymongo.MongoClient('172.16.124.10',27017).test2
+mdb = dts_mongodb
 # flash :"success" "info" "danger"
 # TODO 增加单元测试。
 # TODO 附件的在bug中不同阶段分类
@@ -102,7 +107,7 @@ def buglist(product=None):
         bugs_list = bugs_list.filter(Bugs.software_version == software)
 
     if date:
-        bugs_list = bugs_list.filter(Bugs.software_version == software)
+        bugs_list = bugs_list.filter(db.func.date(Bugs.timestamp)== date)
 
     if features:
         bugs_list = bugs_list.filter(Bugs.version_features == features)
@@ -379,13 +384,100 @@ def upload():
     except:
         return abort(400)
 
-    pasteFile = Attachment.create_by_uploadFile(bug_id, uploadedFile)
-    db.session.add(pasteFile)
-    db.session.commit()
+    #mongo.save_file(uploadedFile.filename, request.files['attachment'])
+    #return redirect(url_for('main.get_upload', filename=uploadedFile.filename))
+    mongo_id = save_file(bug_id, uploadedFile)
+    #pasteFile = Attachment.create_by_uploadFile(bug_id, uploadedFile)
+    #db.session.add(pasteFile)
+    #db.session.commit()
+
     return jsonify({
-            "symlink": pasteFile.symlink,
-            "filename": pasteFile.filename,
-            "size": pasteFile.size})
+            "symlink": str(mongo_id['_id']),
+            "filename": str(mongo_id['filename'])})
+
+
+def save_file(bug_id, f):
+    content = StringIO(f.read())
+    '''
+    try:
+        mime = Image.open(content).format.lower()
+        if mime not in allow_formats:
+            raise IOError()
+    except IOError:
+        flask.abort(400)'''
+    # print len(bson.binary.Binary(content.getvalue()))
+    c = dict(bug_id=bug_id,
+            filename=f.filename,
+            content=bson.binary.Binary(content.getvalue()),
+            mime=f.mimetype
+            )
+    mdb.files.save(c)
+    return c
+
+@main.route('/viewimage/<fileid>')
+def viewimage(fileid=None):
+    try:
+        f = mdb.files.find_one(bson.objectid.ObjectId(fileid))
+        # print f
+        if f is None:
+            dts_log.error(''.join([fileid, ' 没有找到']))
+            raise bson.errors.InvalidId()
+        #response = make_response(f['content'],mimetype='image/' + f['mime'])
+        #response.headers['Content-Disposition'] = "attachment; filename={}".format("a.jpg")
+        #return response
+        response = make_response(send_file(StringIO(f['content'])))
+        response.headers['Content-Type'] = f['mime']
+        return response
+    except bson.errors.InvalidId:
+        abort(404)
+
+@main.route('/viewlargeimage/<fileid>')
+def viewlargeimage(fileid=None):
+    return render_template('imageview.html',fileid=fileid)
+
+
+@main.route('/mongodown/<fileid>')
+@login_required
+def mongo_download(fileid):
+    f = mdb.files.find_one(bson.objectid.ObjectId(fileid))
+
+    if f is None:
+        dts_log.error(''.join([fileid, ' 没有找到']))
+        return abort(404)
+
+    response = make_response(send_file(StringIO(f['content'])))
+
+    # response.headers['X-Accel-Redirect'] = redirect(url_for('.download_file', filehash=downloadFile.filehash))
+    # response.headers['Content-Type'] = "application/octet-stream"
+    # response.headers['Content-Type'] = downloadFile.mimetype
+    response.headers['Content-Disposition'] = "attachment; filename={}".format(f['filename'])
+    response.headers['Content-Type'] = "application/octet-stream"
+    return response
+
+
+@main.route('/mongodelete/<fileid>', methods=['POST'])
+@login_required
+def mongo_delete(fileid):
+    f = mdb.files.find_one(bson.objectid.ObjectId(fileid),{"_id":1,"bug_id":1})
+
+    if f is None:
+        dts_log.error(''.join([fileid, ' : ', ' 没有找到']))
+        return abort(404)
+
+    bugs = Bugs.query.filter_by(bug_id=f["bug_id"]).first()
+    # 检查是否有删除附件的权限
+    if bugs:
+        if not (current_user == bugs.author and \
+                bugs.status_equal(Bug_Now_Status.CREATED)) and \
+                not current_user.can(Permission.ADMINISTER):
+            dts_log.error(''.join([current_user.username,' : ', bugs.bug_id]))
+            return abort(403)
+
+    mdb.files.remove(bson.objectid.ObjectId(fileid))
+
+    return jsonify({
+                "delete": 'OK' ,
+                "id": str(f['_id'])})
 
 
 @main.route('/s/<symlink>')
@@ -410,24 +502,9 @@ def p(filehash):
     return url_for('static', filename='Uploads/' + pasteFile.filehash)
 
 
-@main.route('/uploads/<filehash>')
-@login_required
-def uploaded_file(filehash):
-    pasteFile = Attachment.get_by_filehash(filehash)
-
-    if not pasteFile:
-        return abort(404)
-    # current_app.config['UPLOAD_FOLDER'] 在app中显示的是带有app前缀的路径
-    # import os
-    # print os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
-    # print current_app.config['UPLOAD_FOLDER']
-    return send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
-
-
 @main.route('/delete/<symlink>', methods=['GET', 'POST'])
 @login_required
 def delete_file(symlink):
-    print symlink
 
     #  可以加入bug的编辑权限控制，和bug状态判断
     pasteFile = Attachment.get_by_symlink(symlink)
@@ -440,8 +517,8 @@ def delete_file(symlink):
         if not (current_user == bugs.author and \
                 bugs.status_equal(Bug_Now_Status.CREATED)) and \
                 not current_user.can(Permission.ADMINISTER):
-            dts_log.error(''.jion([current_user,' : ', bugs.bug_id]))
-            return abort(404)
+            dts_log.error(''.join([current_user,' : ', bugs.bug_id]))
+            return abort(403)
 
 
     db.session.delete(pasteFile)
@@ -499,6 +576,8 @@ def bug_process(id):
         attachments = Attachment.query.filter_by(bug_id=id).all()
     # if bugs is None and bugs.status_equal(Bug_Now_Status.CREATED):
     #    return render_template('404.html'), 404
+    attachlist = list(mdb.files.find({"bug_id":id},{"_id":1,"filename":1,"mime":1}))
+
 
     form = BugsProcess()
     testleadedit = TestLeadEdit()
@@ -690,7 +769,7 @@ def bug_process(id):
     # flash(process_list.first().opinion)
 
     return render_template('bugs_process.html',
-                           form=form, bugs=bugs, attachments=attachments,
+                           form=form, bugs=bugs, attachments=attachments,attachlist=attachlist,
                            testleadedit=testleadedit, developedit=developedit,
                            testleadedit2=testleadedit2, bugclose=bugclose,
                            testmanager_log=testmanager_log,
@@ -716,6 +795,7 @@ def bug_edit(bug_id):
     attachments = None
     if bugs.bug_attachments:
         attachments = Attachment.get_all_attach_by_bug_id(bug_id)
+    attachlist = list(mdb.files.find({"bug_id":bug_id},{"_id":1,"filename":1,"mime":1}))
     # print bugs.now_status.id
 
 
@@ -816,6 +896,7 @@ def bug_edit(bug_id):
     # flash(process_list.first().opinion)
     read_only(form.bugs_id)
     return render_template('bug_edit.html', form=form, attachments=attachments,
+                            attachlist=attachlist,
                            bugs=bugs, process_log=process_log)
 
 

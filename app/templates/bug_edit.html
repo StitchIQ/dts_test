@@ -51,6 +51,29 @@
                                     </div>
                                 {% endif %}
                               {% endfor%}
+
+                              {% for attach in attachlist %}
+                                  {% if attach['mime'].find('image')==0 %}
+                                      <p><span class="delattach">
+                                          <a href="{{ request.url_root }}viewlargeimage/{{ attach['_id'] }}" target="_blank">
+                                          <img src="{{ request.url_root }}viewimage/{{ attach['_id'] }}" width="50%" title={{ attach['filename'] }} /></a>
+                                          <span class="label label-info">{{ attach['filename'] }}</span>
+                                          <button class="btn btn-warning" type="button" name= {{ attach['_id'] }} >删除</button>
+                                      </span></p>
+                                  {% endif %}
+                              {% endfor%}
+                                <hr>
+                              {% for attach in attachlist %}
+                                {% if attach['mime'].find('image')!=0 %}
+                                    <div class="form-group ">
+                                        <p><span class="delattach">
+                                            <a href="{{ request.url_root }}mongodown/{{ attach['_id'] }}">{{ attach['filename'] }}</a>
+                                            <span class="label label-info">{{ attach['filename'] }}</span>
+                                            <button class="btn btn-warning" type="button" name= {{ attach['_id'] }} >删除</button>
+                                        </span></p>
+                                    </div>
+                                {% endif %}
+                              {% endfor%}
                             {% endif %}
 
                            </div></form>

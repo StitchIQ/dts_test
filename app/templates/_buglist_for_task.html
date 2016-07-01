@@ -22,6 +22,7 @@
              <th>产品名称</th>
              <th>产品版本</th>
              <th>软件版本</th>
+             <th>软件特性</th>
              <th>问题级别</th>
              <th>出现频率</th>
              <th>问题单描述</th>
@@ -41,6 +42,7 @@
                 <td><a href="{{ url_for(request.endpoint, mytask=mytask, product=bugs.product_name, version=bugs.product_version) }}">{{ bugs.product_version }}</a></td>
                 <td><a href="{{ url_for(request.endpoint, mytask=mytask, product=bugs.product_name, version=bugs.product_version, software=bugs.software_version) }}">
                     {{ bugs.software_version }}</a></td>
+                <td>{{ bugs.version_features }}</td>
                 <td>{{ bugs.bug_level }}</td>
                 <td>{{ bugs.bug_show_times }}</td>
                 <td>{{ bugs.bug_title }}</td>

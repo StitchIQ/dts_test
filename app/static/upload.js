@@ -33,7 +33,7 @@ $("#attachmentdiv2").on("click", "button", function(){
     //删除bug edit时的附件
     //获取当前点击的元素
     var pic = $(this);
-    $.post("/delete/"+ pic.attr("name"),
+    $.post("/mongodelete/"+ pic.attr("name"),
         function(){ pic.parent().remove()}
     ).error(function() { alert("删除失败 ！！"); });
 });
@@ -43,7 +43,7 @@ $("#listattach").on("click", "button", function(){
     //删除bug新增加的附件
     //获取当前点击的元素
     var pic = $(this);
-    $.post("/delete/"+ pic.attr("name"),
+    $.post("/mongodelete/"+ pic.attr("name"),
         function(){ pic.parents("tr.trattach").remove()}
     ).error(function() { alert("删除失败！"); });
 });

@@ -17,4 +17,23 @@
          {% endif %}
         {% endfor%}
     {% endif %}
+
+    {% if bugs.bug_attachments %}
+        {% for attach in attachlist %}
+           {% if attach['mime'].find('image')==0 %}
+               <p><span class="delattach">
+                   <a href="{{ request.url_root }}viewlargeimage/{{ attach['_id'] }}" target="_blank">
+                   <img src="{{ request.url_root }}viewimage/{{ attach['_id'] }}" width="50%" title={{ attach['filename'] }} /></a>
+               </span></p>
+           {% endif %}
+        {% endfor%}
+        <hr>
+        {% for attach in attachlist %}
+         {% if attach['mime'].find('image')!=0 %}
+             <p><span class="delattach">
+                 <span class="label label-info"><a href="{{ request.url_root }}mongodown/{{ attach['_id'] }}" download>{{ attach['filename'] }}</a></span>
+             </span></p>
+         {% endif %}
+        {% endfor%}
+    {% endif %}
 </div>

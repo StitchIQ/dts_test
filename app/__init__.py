@@ -9,16 +9,18 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.pagedown import PageDown
 from config import config
+from pymongo import MongoClient
 
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
 pagedown = PageDown()
-
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
+
+dts_mongodb = MongoClient('172.16.124.10',27017).test2
 
 
 def create_app(config_name):
