@@ -35,9 +35,6 @@ dts_log = logging.getLogger('DTS')
 
 
 @main.route('/')
-#@main.route('/<string:product>')
-#@main.route('/<string:product>/<string:version>')
-#@main.route('/<string:product>/<string:version>/<string:software>')
 @login_required
 def index(product=None, version=None, software=None):
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()

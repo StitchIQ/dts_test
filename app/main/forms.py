@@ -30,14 +30,14 @@ class StandardBug(Form):
     bug_level = SelectField(u'严重程度',
                             choices=[(u'致命', u'致命'), (u'严重', u'严重'),
                                      (u'一般', u'一般'), (u'提示', u'提示')])
-    system_view = StringField(u'系统表现', validators=[Required(), Length(1, 64)])
+    system_view = StringField(u'问题单知情人')
     bug_show_times = SelectField(u'出现频率',
                                  choices=[(u'必现', u'必现'),
                                           (u'频繁出现', u'频繁出现'),
                                           (u'概率出现', u'概率出现'),
                                           (u'较难重现', u'较难重现'),
                                           (u'无法重现', u'无法重现')])
-    bug_title = StringField(u'问题标题', validators=[Required(), Length(1, 64)])
+    bug_title = StringField(u'问题标题', validators=[Required(), Length(1, 100)])
     bug_descrit = PageDownField(u'问题描述', validators=[Required()], render_kw={"placeholder": "支持MarkDown语法，帮助查看：http://www.jianshu.com/p/1e402922ee32/"})
     bug_owner_id = StringField(u'问题处理人', validators=[Required(), Email()])
     bug_status = RadioField(u'选择处理',
