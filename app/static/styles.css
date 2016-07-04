@@ -21,6 +21,7 @@ body {
 	font-size: 12px;
 	font-weight: 600;
 	color: #4A515B;
+	text-align: center;
 	background: #E9E9E9;
 	background: -moz-linear-gradient(top, #FAFAFA 0%, #E9E9E9 100%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FAFAFA), color-stop(100%,#E9E9E9));
@@ -54,6 +55,7 @@ body {
 
 #main-nav.nav-tabs.nav-stacked > li.active > a, #main-nav.nav-tabs.nav-stacked > li > a:hover > span {
 	color: #FFF;
+	text-align: center;
 }
 
 .main-nav.nav-tabs.nav-stacked > li {
@@ -184,3 +186,4 @@ textarea#flask-pagedown-bug_descrit {
 #appendedInputButton {
 	color: #000A08;
 }
+

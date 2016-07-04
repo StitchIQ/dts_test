@@ -12,6 +12,15 @@
 
 
 {% block navbar %}
+<ul class="nav nav-pills">
+   <li class="active"><a href="#">Home</a></li>
+   <li><a href="#">SVN</a></li>
+   <li><a href="#">iOS</a></li>
+   <li><a href="#">VB.Net</a></li>
+   <li><a href="#">Java</a></li>
+   <li><a href="#">PHP</a></li>
+</ul>
+
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
@@ -77,9 +86,10 @@
     <div class="col-md-2">
      <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="">
       <li> <a href="/"> <i class="glyphicon glyphicon-th-large"></i> 首页 </a> </li>
-      <li> <a href="#systemSetting" class="nav-header collapsed" data-toggle="collapse"> <i class="glyphicon glyphicon-cog"></i> 我的工作台 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-       <ul id="systemSetting" class="nav nav-list collapse secondmenu" style="height: 0px;">
-        <li class="active"><a href="/">
+
+      <li> <a href="#systemSetting" class="glyphicon glyphicon-th-large" >
+            <i class="glyphicon glyphicon-cog"></i> 我的工作台</a>
+        <li><a href="/">
             <i class="glyphicon glyphicon-user"></i>&nbsp;我的待办</a></li>
 
         <li><a href="{{ url_for('main.task', mytask='processed') }}">
@@ -94,27 +104,44 @@
         <li><a href="#"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;我关注的问题</a></li>
         <li><a href="#"><i class="glyphicon glyphicon-edit"></i>&nbsp;我修改的问题</a></li>
 
-       </ul> </li>
-
+        </li>
       <li> <a href="#configSetting" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-credit-card"></i> 问题单浏览 <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
-           <ul id="configSetting" class="nav nav-list collapse secondmenu">
             <li><a href="{{ url_for('main.buglist') }}"><i class="glyphicon glyphicon-star-empty"></i>&nbsp;问题单查询</a></li>
             <li><a href="{{ url_for('reports.productcharts') }}"><i class="glyphicon glyphicon-star"></i>&nbsp;产品问题单报表</a></li>
             <li><a href="{{ url_for('reports.bugsversioncharts') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;版本问题单分析报表</a></li>
             <li><a href="#"><i class="glyphicon glyphicon-ok-circle"></i>&nbsp;测试报告报表</a></li>
-           </ul>
       </li>
 
 
       <li> <a href="#dicSetting" class="nav-header collapsed" data-toggle="collapse">
           <i class="glyphicon glyphicon-bold"></i> 系统配置 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-       <ul id="dicSetting" class="nav nav-list secondmenu collapse">
         <li><a href="{{ url_for('mang.productlist') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;产品列表</a></li>
         <li><a href="{{ url_for('mang.add_product') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;添加产品和版本</a></li>
-       </ul> </li>
+      </li>
+
       <li> <a href="#"> <i class="glyphicon glyphicon-fire"></i> 关于系统 <span class="badge pull-right">1</span> </a> </li>
      </ul>
+    <div class="row">
+          <div class="span3 bs-docs-sidebar">
+            <ul class="nav nav-list bs-docs-sidenav">
+              <li><a href="#dropdowns"><i class="icon-chevron-right"></i> 下拉菜单</a></li>
+              <li><a href="#buttonGroups"><i class="icon-chevron-right"></i> 按钮组</a></li>
+              <li><a href="#buttonDropdowns"><i class="icon-chevron-right"></i> 按钮下拉菜单</a></li>
+              <li><a href="#navs"><i class="icon-chevron-right"></i> 导航</a></li>
+              <li><a href="#navbar"><i class="icon-chevron-right"></i> 导航条</a></li>
+              <li><a href="#breadcrumbs"><i class="icon-chevron-right"></i> 面包屑</a></li>
+              <li><a href="#pagination"><i class="icon-chevron-right"></i> 分页</a></li>
+              <li><a href="#labels-badges"><i class="icon-chevron-right"></i> 标签与徽章</a></li>
+              <li><a href="#typography"><i class="icon-chevron-right"></i> 排版</a></li>
+              <li><a href="#thumbnails"><i class="icon-chevron-right"></i> 缩略图</a></li>
+              <li><a href="#alerts"><i class="icon-chevron-right"></i> 警告框</a></li>
+              <li><a href="#progress"><i class="icon-chevron-right"></i> 进度条</a></li>
+              <li><a href="#media"><i class="icon-chevron-right"></i> 媒体对象</a></li>
+              <li><a href="#misc"><i class="icon-chevron-right"></i> Misc</a></li>
+            </ul>
+        </div>
+      </div>
     </div>
 
 

@@ -9,7 +9,7 @@ from ..models import User
 
 class LoginForm(Form):
     email = StringField('邮箱地址', validators=[Required(), Length(1, 64),
-                                             Email()])
+                                             Email()],render_kw={"placeholder": u"请输入邮箱地址"})
     password = PasswordField('密码', validators=[Required()])
     remember_me = BooleanField('保持登录')
     submit = SubmitField('登录')
@@ -17,7 +17,7 @@ class LoginForm(Form):
 
 class RegistrationForm(Form):
     email = StringField('邮箱地址', validators=[Required(), Length(1, 64),
-                                             Email()])
+                                             Email()],render_kw={"placeholder": u"请输入邮箱地址"})
     username = StringField('用户名', validators=[
         Required(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                                           '用户名必须为字母')])

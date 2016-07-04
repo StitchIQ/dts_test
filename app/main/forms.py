@@ -37,9 +37,9 @@ class StandardBug(Form):
                                           (u'概率出现', u'概率出现'),
                                           (u'较难重现', u'较难重现'),
                                           (u'无法重现', u'无法重现')])
-    bug_title = StringField(u'问题标题', validators=[Required(), Length(1, 100)])
+    bug_title = StringField(u'问题标题', validators=[Required(), Length(1, 100)],render_kw={"placeholder": u"概述描述问题单情况，长度不超过100字符"})
     bug_descrit = PageDownField(u'问题描述', validators=[Required()], render_kw={"placeholder": "支持MarkDown语法，帮助查看：http://www.jianshu.com/p/1e402922ee32/"})
-    bug_owner_id = StringField(u'问题处理人', validators=[Required(), Email()])
+    bug_owner_id = StringField(u'问题处理人', validators=[Required(), Email()],render_kw={"placeholder": u"请输入处理人邮箱地址"})
     bug_status = RadioField(u'选择处理',
                             choices=[('1', u'新建'),
                                      ('2', u'测试经理审核')], default='2')
@@ -82,7 +82,7 @@ class BugsProcess(Form):
 
 class TestLeadEdit(Form):
     test_process_opinion = TextAreaField(u'处理意见', validators=[Required()])
-    bug_owner_id = StringField(u'问题单处理人', validators=[Required(), Email()])
+    bug_owner_id = StringField(u'问题单处理人', validators=[Required(), Email()],render_kw={"placeholder": u"请输入处理人邮箱地址"})
     bug_status = RadioField(u'选择处理',
                             choices=[('1', u'返回修改'), ('3', u'开发人员修改')],
                             default='3')
@@ -94,7 +94,7 @@ class DevelopEdit(Form):
     dresolve_version = MySelectField('解决版本',  coerce=str, choices=[])
     dversion_features = MySelectField('软件特性', coerce=str, choices=[])
     deve_process_opinion = TextAreaField('处理意见', validators=[Required()])
-    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()])
+    bug_owner_id = StringField('问题单处理人', validators=[Required(), Email()],render_kw={"placeholder": u"请输入处理人邮箱地址"})
     bug_status = RadioField('选择处理',
                             choices=[('2', '返回测试经理'),
                                      ('3', '转交其他开发人员处理'),
@@ -106,7 +106,7 @@ class DevelopEdit(Form):
 class TestLeadEdit2(Form):
     process_opinion = TextAreaField('处理意见', validators=[Required()])
     bug_owner_id = StringField('问题单处理人',
-                               validators=[Required(), Email()])
+                               validators=[Required(), Email()],render_kw={"placeholder": u"请输入处理人邮箱地址"})
     bug_status = RadioField('选择处理',
                             choices=[('3', '返回开发人员修改'),
                                      ('5', '测试人员回归')], default='5')
