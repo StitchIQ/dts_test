@@ -181,7 +181,7 @@ def task(mytask='process', product=None, version=None, software=None):
     dts_log.debug(request.endpoint)
     dts_log.debug(request.view_args.copy())
     page = request.args.get('page', 1, type=int)
-
+    dts_log.debug(mytask)
     if mytask == 'process':
         a = Bugs.query.filter(Bugs.bug_owner == current_user ,
                               Bugs.bug_status < Bug_Now_Status.CLOSED).filter(

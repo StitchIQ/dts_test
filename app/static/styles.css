@@ -21,7 +21,6 @@ body {
 	font-size: 12px;
 	font-weight: 600;
 	color: #4A515B;
-	text-align: center;
 	background: #E9E9E9;
 	background: -moz-linear-gradient(top, #FAFAFA 0%, #E9E9E9 100%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FAFAFA), color-stop(100%,#E9E9E9));
@@ -187,3 +186,7 @@ textarea#flask-pagedown-bug_descrit {
 	color: #000A08;
 }
 
+
+.col-md-12 > p {
+	text-align: center;
+}
