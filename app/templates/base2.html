@@ -5,13 +5,14 @@
 {% block head %}
 {{ super() }}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
-<link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="static/favicon.ico" type="image/x-icon">
+<link rel="icon" href="static/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="/static/styles.css">
 {% endblock %}
 
 
 {% block navbar %}
+
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
@@ -24,10 +25,9 @@
             <a class="navbar-brand" href="{{ url_for('main.index') }}">首页</a>
             <a class="navbar-brand" href="{{ url_for('main.newbug') }}">新建问题单</a>
             <a class="navbar-brand" href="{{ url_for('reports.bugsversioncharts') }}">问题单报表</a>
-            <a class="navbar-brand" href="{{ url_for('main.buglist') }}">问题单查询</a>
+            <a class="navbar-brand" href="{{ url_for('mang.buglist') }}">问题单查询</a>
 
         </div>
-
 
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
@@ -44,7 +44,7 @@
                 {% endif %}
             </ul>
 
-            <form class="navbar-form navbar-lift" role="form" onsubmit="return dts_search()">
+            <form class="navbar-form navbar-right" role="form" onsubmit="return dts_search()">
                 <div class="form-group">
                   <input type="text" placeholder="输入问题单号" id="appendedInputButton" class="form-control" size="26" maxlength="25" >
                 </div>
@@ -87,47 +87,65 @@
 <div class="container-fluid" style="padding-top: 20px;">
    <div class="row">
     <div class="col-md-2">
-     <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="height: 0px;">
+     <ul id="main-nav" class="main-nav nav nav-tabs nav-stacked" style="">
       <li> <a href="/"> <i class="glyphicon glyphicon-th-large"></i> 首页 </a> </li>
 
-      <li>
-        <a href="#systemSetting" class="nav-header" data-toggle="collapse" aria-expanded="true">
-            <i class="glyphicon glyphicon-cog"></i> 我的工作台
-            <span class="pull-right glyphicon glyphicon-chevron-toggle"></span>
-        </a>
-       <ul id="systemSetting" class="nav nav-list collapse secondmenu in" >
+      <li> <a href="#systemSetting" class="glyphicon glyphicon-th-large" >
+            <i class="glyphicon glyphicon-cog"></i> 我的工作台</a>
         <li><a href="/">
             <i class="glyphicon glyphicon-user"></i>&nbsp;我的待办</a></li>
+
         <li><a href="{{ url_for('main.task', mytask='processed') }}">
             <i class="glyphicon glyphicon-th-list"></i>&nbsp;处理过的问题</a></li>
+
         <li><a href="{{ url_for('main.task', mytask='created') }}">
             <i class="glyphicon glyphicon-asterisk"></i>&nbsp;我创建的问题</a></li>
-        <li class="disabled"><a href="{{ url_for('main.copy_to_me') }}">
-            <i class="glyphicon glyphicon-edit"></i>&nbsp;抄送我的问题</a></li>
-        <li class="disabled"><a href="#"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;我关注的问题</a></li>
-        <li class="disabled"><a href="#"><i class="glyphicon glyphicon-edit"></i>&nbsp;我修改的问题</a></li>
-       </ul>
-    </li>
 
-      <li> <a href="#configSetting" class="nav-header" data-toggle="collapse" aria-expanded="true">
+        <li><a href="{{ url_for('main.copy_to_me') }}">
+            <i class="glyphicon glyphicon-edit"></i>&nbsp;抄送我的问题</a></li>
+
+        <li><a href="#"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;我关注的问题</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-edit"></i>&nbsp;我修改的问题</a></li>
+        </li>
+
+      <li> <a href="#configSetting" class="nav-header collapsed" data-toggle="collapse">
         <i class="glyphicon glyphicon-credit-card"></i> 问题单浏览 <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
-           <ul id="configSetting" class="nav nav-list collapse secondmenu in">
             <li><a href="{{ url_for('main.buglist') }}"><i class="glyphicon glyphicon-star-empty"></i>&nbsp;问题单查询</a></li>
-            <li class="disabled"><a href="{{ url_for('reports.productcharts') }}"><i class="glyphicon glyphicon-star"></i>&nbsp;产品问题单报表</a></li>
+            <li><a href="{{ url_for('reports.productcharts') }}"><i class="glyphicon glyphicon-star"></i>&nbsp;产品问题单报表</a></li>
             <li><a href="{{ url_for('reports.bugsversioncharts') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;版本问题单分析报表</a></li>
-            <li class="disabled"><a href="#"><i class="glyphicon glyphicon-ok-circle"></i>&nbsp;测试报告报表</a></li>
-           </ul>
+            <li><a href="#"><i class="glyphicon glyphicon-ok-circle"></i>&nbsp;测试报告报表</a></li>
       </li>
 
 
-      <li> <a href="#dicSetting" class="nav-header" data-toggle="collapse" aria-expanded="true">
+      <li> <a href="#dicSetting" class="nav-header collapsed" data-toggle="collapse">
           <i class="glyphicon glyphicon-bold"></i> 系统配置 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
-       <ul id="dicSetting" class="nav nav-list secondmenu collapse in">
         <li><a href="{{ url_for('mang.productlist') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;产品列表</a></li>
         <li><a href="{{ url_for('mang.add_product') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;添加产品和版本</a></li>
-       </ul> </li>
+      </li>
+
       <li> <a href="#"> <i class="glyphicon glyphicon-fire"></i> 关于系统 <span class="badge pull-right">1</span> </a> </li>
      </ul>
+
+    <div class="row">
+          <div class="span3 bs-docs-sidebar">
+            <ul class="nav nav-list bs-docs-sidenav">
+              <li><a href="#dropdowns"><i class="icon-chevron-right"></i> 下拉菜单</a></li>
+              <li><a href="#buttonGroups"><i class="icon-chevron-right"></i> 按钮组</a></li>
+              <li><a href="#buttonDropdowns"><i class="icon-chevron-right"></i> 按钮下拉菜单</a></li>
+              <li><a href="#navs"><i class="icon-chevron-right"></i> 导航</a></li>
+              <li><a href="#navbar"><i class="icon-chevron-right"></i> 导航条</a></li>
+              <li><a href="#breadcrumbs"><i class="icon-chevron-right"></i> 面包屑</a></li>
+              <li><a href="#pagination"><i class="icon-chevron-right"></i> 分页</a></li>
+              <li><a href="#labels-badges"><i class="icon-chevron-right"></i> 标签与徽章</a></li>
+              <li><a href="#typography"><i class="icon-chevron-right"></i> 排版</a></li>
+              <li><a href="#thumbnails"><i class="icon-chevron-right"></i> 缩略图</a></li>
+              <li><a href="#alerts"><i class="icon-chevron-right"></i> 警告框</a></li>
+              <li><a href="#progress"><i class="icon-chevron-right"></i> 进度条</a></li>
+              <li><a href="#media"><i class="icon-chevron-right"></i> 媒体对象</a></li>
+              <li><a href="#misc"><i class="icon-chevron-right"></i> Misc</a></li>
+            </ul>
+        </div>
+      </div>
     </div>
 
 
@@ -145,10 +163,10 @@
 </div>
 
 <!-- ...... -->
-<div class="col-md-12">
-    <hr />
-    <p class="text-muted">Copyright ..  All Rights Reserved.</p>
-</div>
+        <div class="col-md-12">
+            <hr />
+            <p class="text-muted">Copyright ..  All Rights Reserved.</p>
+        </div>
 {% endblock %}
 
 {% block scripts %}
