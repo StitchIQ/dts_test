@@ -10,7 +10,7 @@ from flask.ext.login import login_required, current_user
 
 from ..models import Bugs, User, Process, BugStatus, Permission, \
     Bug_Now_Status, ProductInfo, VersionInfo, Attachment
-from .. import db , dts_mongodb
+from .. import db
 
 
 from . import reports
@@ -142,6 +142,7 @@ def bugdailydatas():
         'dataY': [s.total for s in daily_bugs],
         'dataX': [str(s.date) for s in daily_bugs],
         })
+
 
 @reports.route('/softwarebugdatas', methods=['GET'])
 @login_required

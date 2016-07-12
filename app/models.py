@@ -11,8 +11,12 @@ from markdown import markdown
 from flask import current_app, url_for, request
 
 from flask.ext.login import UserMixin, AnonymousUserMixin
-from . import db, login_manager
+from . import db, login_manager, mongodb
 from .email import send_email
+
+import bson.binary
+from cStringIO import StringIO
+
 
 dts_log = logging.getLogger('dts')
 
@@ -305,9 +309,24 @@ class Attachment(db.Model):
     @classmethod
     def create_by_uploadFile(cls, bug_id, uploadedFile):
         rst = cls(bug_id, uploadedFile.filename, uploadedFile.mimetype, 0)
-        uploadedFile.save(rst.save_path)
-        filestat = os.stat(rst.save_path)
-        rst.size = filestat.st_size
+
+        if current_app.config['MONGO_DB_USE']:
+            content = StringIO(uploadedFile.read())
+
+            c = dict(bug_id=bug_id,
+                    filename=rst.filename,
+                    filehash=rst.filehash,
+                    symlink=rst.symlink,
+                    content=bson.binary.Binary(content.getvalue()),
+                    mimetype=rst.mimetype
+                    )
+            mongodb.files.save(c)
+        else:
+            uploadedFile.save(rst.save_path)
+            filestat = os.stat(rst.save_path)
+            rst.size = filestat.st_size
+        db.session.add(rst)
+        db.session.commit()
         return rst
 
     @classmethod
@@ -318,11 +337,9 @@ class Attachment(db.Model):
     @property
     def save_path(self):
         return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
-        #return os.path.join('static/Uploads', self.filehash)
 
     @property
     def path(self):
-        # return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
         return os.path.join(current_app.config["UPLOAD_FOLDER"], self.filehash)
 
     @property
@@ -334,6 +351,16 @@ class Attachment(db.Model):
     def url_s(self):
         return "http://{host}/s/{symlink}".format(
             host=request.host, symlink=self.symlink)
+
+    def file_delete(self, symlink):
+        pasteFile = self.get_by_symlink(symlink)
+        db.session.delete(pasteFile)
+        db.session.commit()
+
+        if current_app.config['MONGO_DB_USE']:
+            mongodb.files.remove({'symlink': symlink})
+        else:
+            os.remove(current_app.config['UPLOAD_FOLDER'] + pasteFile.filehash)
 
 
 class User(UserMixin, db.Model):

@@ -9,10 +9,6 @@ from flask_wtf.file import FileField, FileAllowed
 
 from ..models import ProductInfo
 
-class NameForm(Form):
-    name = StringField('What is your name?', validators=[Required(), Email()])
-    submit = SubmitField('Submit')
-
 
 class MySelectField(SelectField):
     # 重写验证函数，只要值不为-1，就通过

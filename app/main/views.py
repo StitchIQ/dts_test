@@ -18,16 +18,13 @@ from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
 from ..email import send_email
 from ..models import Bugs, User, Process, BugStatus, Permission, \
     Bug_Now_Status, ProductInfo, VersionInfo, Attachment
-from .. import db , dts_mongodb
+from .. import db, mongodb
 
 from ..decorators import bug_edit_check2
 
-
-import pymongo
 import bson.binary
 from cStringIO import StringIO
-#mdb = pymongo.MongoClient('172.16.124.10',27017).test2
-mdb = dts_mongodb
+
 # flash :"success" "info" "danger"
 # TODO 增加单元测试。
 # TODO 附件的在bug中不同阶段分类
@@ -39,7 +36,10 @@ dts_log = logging.getLogger('DTS')
 def index(product=None, version=None, software=None):
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
     page = request.args.get('page', 1, type=int)
-
+    product = request.args.get('product')
+    version  = request.args.get('version')
+    software = request.args.get('software')
+    features = request.args.get('features')
     dts_log.debug(request.url)
     dts_log.debug(request.url_root)
     dts_log.debug(request.base_url)
@@ -61,6 +61,9 @@ def index(product=None, version=None, software=None):
 
     if software:
         a = a.filter(Bugs.software_version == software)
+
+    if features:
+        a = a.filter(Bugs.version_features == features)
 
     pagination1 = a.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
     '''
@@ -260,18 +263,16 @@ def newbug():
     # print request.values
     if form.validate_on_submit():
         if request.form.get('submit'):
-            form.bug_status.data = '2'
+            form.bug_status.data = Bug_Now_Status.TESTLEADER_AUDIT
 
         if request.form.get('save_crft'):
-            form.bug_status.data = '1'
+            form.bug_status.data = Bug_Now_Status.CREATED
         # if request.method == 'POST':
         #print form.version_features.value
 
         if len(form.errors) != 0:
             return render_template("standard_bug.html", form=form)
 
-        UPLOAD_FOLDER = 'static/Uploads/'
-        app_dir = 'app/'
         f = request.files['attachment']
         fname = None
         is_has_attach_files = False
@@ -313,7 +314,7 @@ def newbug():
                           author=User.query.filter_by(
                           email=form.bug_owner_id.data).first(),
                           bugs=bug,
-                          old_status='1',
+                          old_status=Bug_Now_Status.CREATED,
                           new_status=form.bug_status.data,
                           opinion='')
         db.session.add(process)
@@ -364,11 +365,9 @@ def newbug():
 @login_required
 def upload():
     import mimetypes
-    import os
     from tempfile import mktemp
     from werkzeug.utils import secure_filename
-    UPLOAD_FOLDER = 'static/Uploads/'
-    app_dir = 'app/'
+
     ALLOWED_MIMETYPES = {'image/jpg', 'image/jpeg', 'image/png', 'image/gif',
                          'image/pjpeg', 'image/x-png'}
 
@@ -385,40 +384,20 @@ def upload():
     except:
         return abort(400)
 
-    #mongo.save_file(uploadedFile.filename, request.files['attachment'])
-    #return redirect(url_for('main.get_upload', filename=uploadedFile.filename))
-    mongo_id = save_file(bug_id, uploadedFile)
-    #pasteFile = Attachment.create_by_uploadFile(bug_id, uploadedFile)
+    #mongo_id = save_file(bug_id, uploadedFile)
+    pasteFile = Attachment.create_by_uploadFile(bug_id, uploadedFile)
     #db.session.add(pasteFile)
     #db.session.commit()
 
     return jsonify({
-            "symlink": str(mongo_id['_id']),
-            "filename": str(mongo_id['filename'])})
+            "symlink": pasteFile.symlink,
+            "filename": pasteFile.filename})
 
-
-def save_file(bug_id, f):
-    content = StringIO(f.read())
-    '''
-    try:
-        mime = Image.open(content).format.lower()
-        if mime not in allow_formats:
-            raise IOError()
-    except IOError:
-        flask.abort(400)'''
-    # print len(bson.binary.Binary(content.getvalue()))
-    c = dict(bug_id=bug_id,
-            filename=f.filename,
-            content=bson.binary.Binary(content.getvalue()),
-            mime=f.mimetype
-            )
-    mdb.files.save(c)
-    return c
 
 @main.route('/viewimage/<fileid>')
 def viewimage(fileid=None):
     try:
-        f = mdb.files.find_one(bson.objectid.ObjectId(fileid))
+        f = mongodb.files.find_one(bson.objectid.ObjectId(fileid))
         # print f
         if f is None:
             dts_log.error(''.join([fileid, ' 没有找到']))
@@ -427,10 +406,11 @@ def viewimage(fileid=None):
         #response.headers['Content-Disposition'] = "attachment; filename={}".format("a.jpg")
         #return response
         response = make_response(send_file(StringIO(f['content'])))
-        response.headers['Content-Type'] = f['mime']
+        response.headers['Content-Type'] = f['mimetype']
         return response
     except bson.errors.InvalidId:
         abort(404)
+
 
 @main.route('/viewlargeimage/<fileid>')
 def viewlargeimage(fileid=None):
@@ -440,7 +420,7 @@ def viewlargeimage(fileid=None):
 @main.route('/mongodown/<fileid>')
 @login_required
 def mongo_download(fileid):
-    f = mdb.files.find_one(bson.objectid.ObjectId(fileid))
+    f = mongodb.files.find_one(bson.objectid.ObjectId(fileid))
 
     if f is None:
         dts_log.error(''.join([fileid, ' 没有找到']))
@@ -459,7 +439,7 @@ def mongo_download(fileid):
 @main.route('/mongodelete/<fileid>', methods=['POST'])
 @login_required
 def mongo_delete(fileid):
-    f = mdb.files.find_one(bson.objectid.ObjectId(fileid),{"_id":1,"bug_id":1})
+    f = mongodb.files.find_one(bson.objectid.ObjectId(fileid),{"_id":1,"bug_id":1})
 
     if f is None:
         dts_log.error(''.join([fileid, ' : ', ' 没有找到']))
@@ -474,7 +454,7 @@ def mongo_delete(fileid):
             dts_log.error(''.join([current_user.username,' : ', bugs.bug_id]))
             return abort(403)
 
-    mdb.files.remove(bson.objectid.ObjectId(fileid))
+    mongodb.files.remove(bson.objectid.ObjectId(fileid))
 
     return jsonify({
                 "delete": 'OK' ,
@@ -521,11 +501,8 @@ def delete_file(symlink):
             dts_log.error(''.join([current_user,' : ', bugs.bug_id]))
             return abort(403)
 
+    pasteFile.file_delete(symlink)
 
-    db.session.delete(pasteFile)
-    db.session.commit()
-    import os
-    os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash))
     return jsonify({
                 "delete": 'OK' ,
                 "id": pasteFile.symlink})
@@ -573,12 +550,12 @@ def download(symlink):
 def bug_process(id):
     bugs = Bugs.get_by_bug_id(id)
     attachments = None
+    attachlist  = None
     if bugs.bug_attachments:
-        attachments = Attachment.query.filter_by(bug_id=id).all()
-    # if bugs is None and bugs.status_equal(Bug_Now_Status.CREATED):
-    #    return render_template('404.html'), 404
-    attachlist = list(mdb.files.find({"bug_id":id},{"_id":1,"filename":1,"mime":1}))
-
+        if current_app.config['MONGO_DB_USE']:
+            attachlist = list(mongodb.files.find({"bug_id":id},{"_id":1,"filename":1,"mimetype":1}))
+        else:
+            attachments = Attachment.query.filter_by(bug_id=id).all()
 
     form = BugsProcess()
     testleadedit = TestLeadEdit()
@@ -791,7 +768,7 @@ def bug_edit(bug_id):
     attachments = None
     if bugs.bug_attachments:
         attachments = Attachment.get_all_attach_by_bug_id(bug_id)
-    attachlist = list(mdb.files.find({"bug_id":bug_id},{"_id":1,"filename":1,"mime":1}))
+    attachlist = list(mongodb.files.find({"bug_id":bug_id},{"_id":1,"filename":1,"mime":1}))
     # print bugs.now_status.id
 
 
@@ -934,9 +911,12 @@ def daochu():
     filename = datetime.now().strftime("%Y%m%d%H%M%S") + 'output.csv'
     # print filename
     import csv
-
-    with open('app/output_files/' + filename, 'wb') as csvfile:
-        spamwriter = csv.writer(csvfile)
+    #file_dir = current_app.config['FLASKY_POSTS_PER_PAGE']
+    print current_app.config['OUTPUT_FOLDER']
+    with open(current_app.config['OUTPUT_FOLDER'] + filename, 'wb') as csvfile:
+        # 为了与windows兼容,不乱码,写入前,应该写入这几个字符: \xEF\xBB\xBF
+        csvfile.write('\xEF\xBB\xBF')
+        spamwriter = csv.writer(csvfile, dialect='excel')
         for l in bug_list:
             res = Bugs.get_by_bug_id(l)
             row = (res.bug_id,
@@ -972,6 +952,6 @@ def data_output(filename):
     # response.headers['Content-Type'] = downloadFile.mimetype
     response.headers['Content-Disposition'] = "attachment; filename={}".format(filename)
     response.headers['Cache-Control'] = "no-cache, no-store, max-age=0, must-revalidate"
-    #return send_file(filename)
     #return send_file(filename, attachment_filename='capsule.zip', as_attachment=True)
-    return send_from_directory(current_app.config['OUTPUT_FOLDER'], filename, as_attachment=True)
+    #return send_from_directory(current_app.config['OUTPUT_FOLDER'], filename, as_attachment=True)
+    return response
