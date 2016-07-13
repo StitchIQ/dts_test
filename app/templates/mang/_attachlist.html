@@ -1,0 +1,42 @@
+<div class="table-responsive">
+<div id="toolbar" class="btn-group">
+    <button type="button" class="btn btn-default" id="submit" >
+        <i class="glyphicon glyphicon-plus">导出</i>
+    </button>
+    <div class="pull-right search"><input class="form-control" type="text" placeholder="搜索问题单"></div>
+
+</div>
+    <table id="table"
+           data-toggle="table"
+           data-click-to-select="true"
+           data-striped="true"
+           data-show-columns="true"
+           data-toolbar="#toolbar">
+       <thead>
+          <tr>
+             <th data-field="state" data-checkbox="true"><input type="checkbox"></input></th>
+             <th>Num.</th>
+             <th>文件管理</th>
+             <th>BugsID</th>
+             <th>文件名称</th>
+             <th>文件哈希名</th>
+             <th>文件类型</th>
+             <th>文件大小</th>
+          </tr>
+       </thead>
+       <tbody>
+            {% for attach in attach_list %}
+              <tr>
+                <td><input type="checkbox"></input></td>
+                <td>{{ loop.index }}</td>
+                <td><button class="btn btn-warning" type="button" name= {{ attach.symlink }} >删除</button></td>
+                <td><a href="{{ url_for('main.bug_process', id=attach.bug_id) }}" target="_blank">{{ attach.bug_id }}</a></td>
+                <td>{{ attach.filename }}</td>
+                <td>{{ attach.filehash }}</td>
+                <td>{{ attach.mimetype }}</td>
+                <td>{{ attach.size }}</td>
+              </tr>
+            {% endfor %}
+       </tbody>
+    </table>
+</div>

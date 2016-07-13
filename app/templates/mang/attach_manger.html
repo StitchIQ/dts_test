@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}D T S-问题单附件管理{% endblock %}
+
+{% block page_content %}
+<div class="col-md-9">
+
+    {% include 'mang/_attachlist.html' %}
+    {% if pagination %}
+        <div class="pagination">
+        {{ macros.pagination_widget(pagination, request.base_url) }}
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+
+<script src="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.js" type="text/javascript"></script>
+<link  href="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.css" rel="stylesheet" type="text/css">
+
+<script src="/static/bootstrap_table.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+$("#table").on("click", "button", function(){
+    //给tbody元素，所有tr添加事件
+    //删除bug新增加的附件
+    //获取当前点击的元素
+    var pic = $(this);
+    $.post("/delete/"+ pic.attr("name"),
+        function(){
+            console.log(pic.parents("tr"));
+            pic.parents("tr").remove()}
+    ).error(function() { alert("删除失败！"); });
+});
+
+</script>
+{% endblock %}
+
+

@@ -5,6 +5,9 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 from datetime import datetime
 import logging
+import bson.binary
+from cStringIO import StringIO
+
 
 from flask import render_template, redirect, request, url_for, flash, \
     current_app, jsonify, abort, send_from_directory, make_response, send_file
@@ -23,8 +26,7 @@ from .. import db, mongodb
 
 from ..decorators import bug_edit_check2
 
-import bson.binary
-from cStringIO import StringIO
+
 
 # flash :"success" "info" "danger"
 # TODO 增加单元测试。

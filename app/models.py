@@ -366,7 +366,7 @@ class Attachment(db.Model):
                 return True
             except:
                 dts_log.error(os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash))
-                dts_log.error('删除附件失败，%s' %pasteFile.filename)
+                dts_log.error(''.join(['删除附件失败 ',pasteFile.filename]))
                 return False
 
 
