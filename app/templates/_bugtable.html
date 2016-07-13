@@ -38,8 +38,13 @@
 
             <tr><td>{{ wtf.form_field(form.bug_owner_id) }}</td></tr>
             <tr><td>
-                {{ wtf.form_field(form.save_crft, button_map={'save_crft': 'info'})  }}
-                {{ wtf.form_field(form.submit, button_map={'submit': 'primary'})  }}</td></tr>
+                {% if current_user.is_administrator() %}
+                    {{ wtf.form_field(form.save_crft, button_map={'save_crft': 'info'})  }}
+                {% else %}
+                    {{ wtf.form_field(form.save_crft, button_map={'save_crft': 'info'})  }}
+                    {{ wtf.form_field(form.submit, button_map={'submit': 'primary'})  }}
+                {% endif %}
+                </td></tr>
         </tbody>
     </table>
 </div>

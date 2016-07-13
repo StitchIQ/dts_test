@@ -359,8 +359,15 @@ class Attachment(db.Model):
 
         if current_app.config['MONGO_DB_USE']:
             mongodb.files.remove({'symlink': symlink})
+            return True
         else:
-            os.remove(current_app.config['UPLOAD_FOLDER'] + pasteFile.filehash)
+            try:
+                os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash))
+                return True
+            except:
+                dts_log.error(os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash))
+                dts_log.error('删除附件失败，%s' %pasteFile.filename)
+                return False
 
 
 class User(UserMixin, db.Model):

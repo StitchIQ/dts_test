@@ -1,4 +1,5 @@
 # coding=utf-8
+import os
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -6,13 +7,13 @@ from datetime import datetime
 import logging
 
 from flask import render_template, redirect, request, url_for, flash, \
-    current_app, jsonify, abort, send_from_directory, make_response, send_file, Response
+    current_app, jsonify, abort, send_from_directory, make_response, send_file
 from flask.ext.login import login_required, current_user
 from wtforms_components import read_only
 from werkzeug import secure_filename
 
 from . import main
-from .countrol_func import Bug_Num_Generate
+from .countrol_func import Bug_Num_Generate, output_csv_file
 from .forms import StandardBug, BugsProcess, TestLeadEdit, DevelopEdit, \
     TestLeadEdit2, BugClose
 from ..email import send_email
@@ -302,14 +303,6 @@ def newbug():
 
         db.session.add(bug)
 
-        # bug_owner_id=form.bug_owner_id.data,
-        # bug.timestamp = db.Column(db.DateTime, index=True,
-        # default=datetime.utcnow)
-        #attachments = Attachment.query.filter_by(bug_id=bug.bug_id).all()
-        #for a in attachments:
-        #    a.confirm = True
-        # attachments.confirm = True
-        # map(db.session.add, attachments)
         process = Process(operator=current_user._get_current_object(),
                           author=User.query.filter_by(
                           email=form.bug_owner_id.data).first(),
@@ -321,22 +314,8 @@ def newbug():
         db.session.commit()
 
         flash(u'Bugs 提交成功.', "success")
-
-        # flash(request.files['photo'].filename)
         return redirect(url_for('.bug_process', id=bug.bug_id))
-    # flash('Bugs 准备提交.')
-    # flash(form.photo.data)
 
-    '''
-    if request.method == 'POST':
-        dts_log.debug(form.errors)
-        read_only(form.bugs_id)
-        dts_log.debug(form.product_version.data)
-        form.product_version.choices = [(form.product_version.data, form.product_version.data)]
-        form.software_version.choices = [(form.software_version.data, form.software_version.data)]
-        form.version_features.choices = [(form.version_features.data, form.version_features.data)]
-        return render_template("standard_bug.html", form=form)
-    '''
     form.bug_descrit.data = u'''
 支持MarkDown语法，帮助查看
 
@@ -394,13 +373,21 @@ def upload():
             "filename": pasteFile.filename})
 
 
-@main.route('/viewimage/<fileid>')
-def viewimage(fileid=None):
+@main.route('/viewimage/<symlink>')
+def viewimage(symlink=None):
+    pasteFile = Attachment.get_by_symlink(symlink)
+
+    if not pasteFile:
+        return abort(404)
+
+    #return redirect(pasteFile.url_p)
+    if  not current_app.config['MONGO_DB_USE']:
+        return send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
     try:
-        f = mongodb.files.find_one(bson.objectid.ObjectId(fileid))
-        # print f
+        f = mongodb.files.find_one({"symlink":symlink})
+        print f['filename']
         if f is None:
-            dts_log.error(''.join([fileid, ' 没有找到']))
+            dts_log.error(''.join([symlink, ' 没有找到']))
             raise bson.errors.InvalidId()
         #response = make_response(f['content'],mimetype='image/' + f['mime'])
         #response.headers['Content-Disposition'] = "attachment; filename={}".format("a.jpg")
@@ -417,77 +404,9 @@ def viewlargeimage(fileid=None):
     return render_template('imageview.html',fileid=fileid)
 
 
-@main.route('/mongodown/<fileid>')
-@login_required
-def mongo_download(fileid):
-    f = mongodb.files.find_one(bson.objectid.ObjectId(fileid))
-
-    if f is None:
-        dts_log.error(''.join([fileid, ' 没有找到']))
-        return abort(404)
-
-    response = make_response(send_file(StringIO(f['content'])))
-
-    # response.headers['X-Accel-Redirect'] = redirect(url_for('.download_file', filehash=downloadFile.filehash))
-    # response.headers['Content-Type'] = "application/octet-stream"
-    # response.headers['Content-Type'] = downloadFile.mimetype
-    response.headers['Content-Disposition'] = "attachment; filename={}".format(f['filename'])
-    response.headers['Content-Type'] = "application/octet-stream"
-    return response
-
-
-@main.route('/mongodelete/<fileid>', methods=['POST'])
-@login_required
-def mongo_delete(fileid):
-    f = mongodb.files.find_one(bson.objectid.ObjectId(fileid),{"_id":1,"bug_id":1})
-
-    if f is None:
-        dts_log.error(''.join([fileid, ' : ', ' 没有找到']))
-        return abort(404)
-
-    bugs = Bugs.query.filter_by(bug_id=f["bug_id"]).first()
-    # 检查是否有删除附件的权限
-    if bugs:
-        if not (current_user == bugs.author and \
-                bugs.status_equal(Bug_Now_Status.CREATED)) and \
-                not current_user.can(Permission.ADMINISTER):
-            dts_log.error(''.join([current_user.username,' : ', bugs.bug_id]))
-            return abort(403)
-
-    mongodb.files.remove(bson.objectid.ObjectId(fileid))
-
-    return jsonify({
-                "delete": 'OK' ,
-                "id": str(f['_id'])})
-
-
-@main.route('/s/<symlink>')
-@login_required
-def s(symlink):
-    pasteFile = Attachment.get_by_symlink(symlink)
-
-    if not pasteFile:
-        return abort(404)
-
-    #return redirect(pasteFile.url_p)
-    return send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
-
-@main.route('/p/<filehash>')
-@login_required
-def p(filehash):
-    pasteFile = Attachment.get_by_filehash(filehash)
-
-    if not pasteFile:
-        return abort(404)
-
-    return url_for('static', filename='Uploads/' + pasteFile.filehash)
-
-
 @main.route('/delete/<symlink>', methods=['GET', 'POST'])
 @login_required
 def delete_file(symlink):
-
-    #  可以加入bug的编辑权限控制，和bug状态判断
     pasteFile = Attachment.get_by_symlink(symlink)
     if not pasteFile:
         return abort(404)
@@ -498,15 +417,15 @@ def delete_file(symlink):
         if not (current_user == bugs.author and \
                 bugs.status_equal(Bug_Now_Status.CREATED)) and \
                 not current_user.can(Permission.ADMINISTER):
-            dts_log.error(''.join([current_user,' : ', bugs.bug_id]))
+            dts_log.error(''.join([current_user,' can not operate : ', bugs.bug_id]))
             return abort(403)
 
-    pasteFile.file_delete(symlink)
-
-    return jsonify({
-                "delete": 'OK' ,
-                "id": pasteFile.symlink})
-
+    if pasteFile.file_delete(symlink):
+        return jsonify({
+                    "delete": 'OK' ,
+                    "id": pasteFile.symlink})
+    else:
+        return abort(404)
 
 @main.route('/download/<filehash>')
 @login_required
@@ -517,30 +436,36 @@ def download_file(filehash):
         return abort(404)
 
     response = make_response(send_from_directory(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
-    #response = make_response(os.path.join(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
-
-    # response.headers['X-Accel-Redirect'] = redirect(url_for('.download_file', filehash=downloadFile.filehash))
-    # response.headers['Content-Type'] = "application/octet-stream"
-    # response.headers['Content-Type'] = downloadFile.mimetype
     response.headers['Content-Disposition'] = "attachment; filename={}".format(downloadFile.filename)
 
-    return send_from_directory(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash)
+    return response
 
 @main.route('/down/<symlink>')
 @login_required
 def download(symlink):
     downloadFile = Attachment.get_by_symlink(symlink)
-
     if not downloadFile:
+        dts_log.error(''.join([symlink, ' 没有找到']))
         return abort(404)
 
-    response = make_response(send_from_directory(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
-    #response = make_response(os.path.join(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
-    # 使用X-Accel-Redirect可以隐藏文件下载地址
-    response.headers['X-Accel-Redirect'] = redirect(url_for('.download_file', filehash=downloadFile.filehash))
-    # response.headers['Content-Type'] = "application/octet-stream"
-    # response.headers['Content-Type'] = downloadFile.mimetype
-    response.headers['Content-Disposition'] = "attachment; filename={}".format(downloadFile.filename)
+    response = make_response()
+
+    if current_app.config['MONGO_DB_USE']:
+        dts_log.debug(''.join([symlink, ' 使用mongodb']))
+        f = mongodb.files.find_one({"symlink":symlink})
+        if f is None:
+            dts_log.error(''.join([symlink, ' 没有找到']))
+            return abort(404)
+        response = make_response(send_file(StringIO(f['content'])))
+        #print response.headers['Content-Disposition']
+        response.headers['Content-Disposition'] = "attachment; filename={}".format(downloadFile.filename)
+        response.headers['Content-Type'] = "application/octet-stream"
+    else:
+        response = make_response(send_from_directory(current_app.config['UPLOAD_FOLDER'], downloadFile.filehash))
+        # 使用X-Accel-Redirect可以隐藏文件下载地址
+        response.headers['X-Accel-Redirect'] = redirect(url_for('.download_file', filehash=downloadFile.filehash))
+        response.headers['Content-Disposition'] = "attachment; filename={}".format(downloadFile.filename)
+        response.headers['Content-Type'] = "application/octet-stream"
 
     return response
 
@@ -550,12 +475,8 @@ def download(symlink):
 def bug_process(id):
     bugs = Bugs.get_by_bug_id(id)
     attachments = None
-    attachlist  = None
     if bugs.bug_attachments:
-        if current_app.config['MONGO_DB_USE']:
-            attachlist = list(mongodb.files.find({"bug_id":id},{"_id":1,"filename":1,"mimetype":1}))
-        else:
-            attachments = Attachment.query.filter_by(bug_id=id).all()
+        attachments = Attachment.query.filter_by(bug_id=id).all()
 
     form = BugsProcess()
     testleadedit = TestLeadEdit()
@@ -742,22 +663,21 @@ def bug_process(id):
     # flash(process_list.first().opinion)
 
     return render_template('bugs_process.html',
-                           form=form, bugs=bugs, attachments=attachments,attachlist=attachlist,
+                           form=form, bugs=bugs, attachments=attachments,
                            testleadedit=testleadedit, developedit=developedit,
                            testleadedit2=testleadedit2, bugclose=bugclose,
                            testmanager_log=testmanager_log,
                            process_log=process_log,
                            developedit_log=developedit_log,
                            bugtest_log=bugtest_log,
-                           retest_log=retest_log, bug_descrit_html=bug_descrit_html)
+                           retest_log=retest_log,
+                           bug_descrit_html=bug_descrit_html)
 
 
 @main.route('/bug_edit/<string:bug_id>', methods=['GET', 'POST'])
 @login_required
 def bug_edit(bug_id):
-    print bug_id
-    # bugs = Bugs.query.get_or_404(id)
-    #bugs = Bugs.query.filter_by(bug_id=id).first_or_404()
+    dts_log.debug(bug_id)
     bugs = Bugs.get_by_bug_id(bug_id)
     # 检查是否编辑权限
     if not (current_user == bugs.author and \
@@ -768,9 +688,7 @@ def bug_edit(bug_id):
     attachments = None
     if bugs.bug_attachments:
         attachments = Attachment.get_all_attach_by_bug_id(bug_id)
-    attachlist = list(mongodb.files.find({"bug_id":bug_id},{"_id":1,"filename":1,"mime":1}))
     # print bugs.now_status.id
-
 
     process_log = bugs.process.order_by(Process.timestamp.asc())
 
@@ -779,19 +697,10 @@ def bug_edit(bug_id):
     if form.validate_on_submit():
         # 判断是提交还是保存草稿
         if request.form.get('submit'):
-            form.bug_status.data = '2'
+            form.bug_status.data = Bug_Now_Status.TESTLEADER_AUDIT
         if request.form.get('save_crft'):
             form.bug_status.data = bugs.bug_status
 
-        # if request.method == 'POST':
-        UPLOAD_FOLDER = 'static/Uploads/'
-        app_dir = 'app/'
-        f = request.files['attachment']
-        fname = None
-        if f.filename != '':
-            pass
-            #fname = UPLOAD_FOLDER + secure_filename(f.filename)
-            #f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
         bugs.product_name = form.product_name.data
         bugs.product_version = form.product_version.data
         bugs.software_version = form.software_version.data
@@ -805,7 +714,7 @@ def bug_edit(bug_id):
                             email=form.bug_owner_id.data).first()
         bugs.author = current_user._get_current_object()
         bugs.bug_status = form.bug_status.data
-        bugs.bug_photos = fname
+        bugs.bug_photos = None
         db.session.add(bugs)
 
         # bug_owner_id=form.bug_owner_id.data,
@@ -869,7 +778,6 @@ def bug_edit(bug_id):
     # flash(process_list.first().opinion)
     read_only(form.bugs_id)
     return render_template('bug_edit.html', form=form, attachments=attachments,
-                            attachlist=attachlist,
                            bugs=bugs, process_log=process_log)
 
 
@@ -884,7 +792,7 @@ def test2():
 
 @main.route('/autocomplete', methods=['GET'])
 @login_required
-def autocomplete():
+def get_user():
     search = request.args.get('query', 0, type=str)
     print search.isalnum()
     if not search.isalnum():
@@ -896,7 +804,6 @@ def autocomplete():
 @main.route('/daochu', methods=['POST'])
 @login_required
 def daochu():
-
     # print '4',request.data
     # print '6',request.get_json(force=True)
     # print '7',request.json
@@ -908,36 +815,10 @@ def daochu():
 
     bug_list = request.json
 
-    filename = datetime.now().strftime("%Y%m%d%H%M%S") + 'output.csv'
-    # print filename
-    import csv
-    #file_dir = current_app.config['FLASKY_POSTS_PER_PAGE']
-    print current_app.config['OUTPUT_FOLDER']
-    with open(current_app.config['OUTPUT_FOLDER'] + filename, 'wb') as csvfile:
-        # 为了与windows兼容,不乱码,写入前,应该写入这几个字符: \xEF\xBB\xBF
-        csvfile.write('\xEF\xBB\xBF')
-        spamwriter = csv.writer(csvfile, dialect='excel')
-        for l in bug_list:
-            res = Bugs.get_by_bug_id(l)
-            row = (res.bug_id,
-                   res.author.username,
-                   res.bug_owner.username if res.bug_owner else None,
-                   res.product_name,
-                   res.product_version,
-                   res.software_version,
-                   res.version_features,
-                   res.bug_level,
-                   res.system_view,
-                   res.bug_show_times,
-                   "'"+res.bug_title+"'",
-                   res.now_status.bug_status_descrit,
-                   res.resolve_version,
-                   res.regression_test_version)
-            # print row
-            spamwriter.writerow(row)
+
 
     #return send_file(filename, attachment_filename='capsule.zip', as_attachment=True)
-    return jsonify({'filename':filename})
+    return jsonify({'filename':output_csv_file(bug_list)})
 
 
 @main.route('/daochu2/<filename>')
