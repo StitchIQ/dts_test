@@ -120,9 +120,6 @@ def bug_manger(product=None):
     page     = request.args.get('page', 1, type=int)
     version  = request.args.get('version')
     software = request.args.get('software')
-    date     = request.args.get('date')
-    features = request.args.get('features')
-    serious  = request.args.get('serious')
     status   = request.args.get('status')
     author   = request.args.get('author')
 
@@ -142,15 +139,6 @@ def bug_manger(product=None):
     if software:
         bugs_list = bugs_list.filter(Bugs.software_version == software)
 
-    if date:
-        bugs_list = bugs_list.filter(db.func.date(Bugs.timestamp)== date)
-
-    if features:
-        bugs_list = bugs_list.filter(Bugs.version_features == features)
-
-    if serious:
-        bugs_list = bugs_list.filter(Bugs.bug_level == serious)
-
     if status:
         st = BugStatus.query.filter_by(bug_status_descrit=status).first()
         bugs_list = bugs_list.filter_by(now_status = st)
@@ -159,7 +147,8 @@ def bug_manger(product=None):
         au = User.query.filter_by(username=author).first()
         bugs_list = bugs_list.filter_by(author = au)
 
-    pagination = bugs_list.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+    pagination = bugs_list.order_by(Bugs.timestamp.desc()).paginate(
+                 page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
 
     bugs_list = pagination.items
 
@@ -172,9 +161,7 @@ def bug_manger(product=None):
 @login_required
 @admin_required
 def bug_attach():
-    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
-    page     = request.args.get('page', 1, type=int)
-
+    page = request.args.get('page', 1, type=int)
 
     pagination = Attachment.query.order_by(
                     Attachment.uploadTime.desc()).paginate(
@@ -185,3 +172,25 @@ def bug_attach():
 
     return render_template('mang/attach_manger.html', attach_list=attach_list,
                                                 pagination=pagination)
+
+@mang.route('/bug-attach-non')
+@login_required
+@admin_required
+def bug_attach_no_bug_id():
+    page = request.args.get('page', 1, type=int)
+    '''
+    pagination = Attachment.query.order_by(
+                    Attachment.uploadTime.desc()).paginate(
+                    page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+                    error_out=False)
+
+    pagination = Attachment.query.join(Bugs, Attachment.bug_id == Bugs.bug_id).filter(
+                    Attachment.bug_id == None).order_by(
+                    Attachment.uploadTime.desc()).paginate(
+                    page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+                    error_out=False)'''
+    attach_list = db.session.execute("select * from attachment where attachment.bug_id not in (select bug_id from bugs);").fetchall()
+
+    #attach_list = pagination.items
+
+    return render_template('mang/attach_manger.html', attach_list=attach_list)

@@ -354,18 +354,23 @@ class Attachment(db.Model):
 
     def file_delete(self, symlink):
         pasteFile = self.get_by_symlink(symlink)
-        db.session.delete(pasteFile)
-        db.session.commit()
 
         if current_app.config['MONGO_DB_USE']:
             mongodb.files.remove({'symlink': symlink})
+            db.session.delete(pasteFile)
+            db.session.commit()
             return True
         else:
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
             try:
-                os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash))
+                if os.path.isfile(filepath):
+                    os.remove(filepath)
+                db.session.delete(pasteFile)
+                db.session.commit()
+                dts_log.debug(''.join(['删除附件 ', pasteFile.filename]))
                 return True
             except:
-                dts_log.error(os.path.join(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash))
+                dts_log.error(filepath)
                 dts_log.error(''.join(['删除附件失败 ',pasteFile.filename]))
                 return False
 

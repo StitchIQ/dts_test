@@ -806,35 +806,15 @@ def get_user():
 @main.route('/daochu', methods=['POST'])
 @login_required
 def daochu():
-    # print '4',request.data
-    # print '6',request.get_json(force=True)
-    # print '7',request.json
-    # print type(request.json)
-    json_data = request.data
-    # bug_list = json_data.split(',')
-    # print bug_list
-    # print type(json_data)
-
     bug_list = request.json
 
-
-
-    #return send_file(filename, attachment_filename='capsule.zip', as_attachment=True)
     return jsonify({'filename':output_csv_file(bug_list)})
 
 
 @main.route('/daochu2/<filename>')
 @login_required
 def data_output(filename):
-    #filename = 'output.csv'
-    #response = make_response(send_file(filename))
     response = make_response(send_from_directory(current_app.config['OUTPUT_FOLDER'], filename))
-
-    # response.headers['X-Accel-Redirect'] = redirect(url_for('.download_file', filehash=downloadFile.filehash))
-    # response.headers['Content-Type'] = "application/octet-stream"
-    # response.headers['Content-Type'] = downloadFile.mimetype
     response.headers['Content-Disposition'] = "attachment; filename={}".format(filename)
     response.headers['Cache-Control'] = "no-cache, no-store, max-age=0, must-revalidate"
-    #return send_file(filename, attachment_filename='capsule.zip', as_attachment=True)
-    #return send_from_directory(current_app.config['OUTPUT_FOLDER'], filename, as_attachment=True)
     return response
