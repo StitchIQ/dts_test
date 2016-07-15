@@ -8,6 +8,7 @@
 </div>
     <table id="table"
            data-toggle="table"
+           data-search="true"
            data-click-to-select="true"
            data-striped="true"
            data-show-columns="true"
@@ -21,6 +22,7 @@
              <th>产品版本</th>
              <th>软件版本</th>
              <th>问题单描述</th>
+             <th>当前状态</th>
              <th>提交人</th>
              <th>问题状态</th>
              <th>当前处理人</th>
@@ -38,6 +40,13 @@
                 <td><a href="{{ url_for(request.endpoint, product=bugs.product_name, version=bugs.product_version, software=bugs.software_version) }}">
                     {{ bugs.software_version }}</a></td>
                 <td>{{ bugs.bug_title }}</td>
+                <td>
+                    {% if not bugs.bug_forbidden_status %}
+                        <button class="btn btn-danger" type="button" name= {{ bugs.bug_id }} value="True">锁定</button>
+                    {% else %}
+                        <button class="btn btn-success" type="button" name= {{ bugs.bug_id }} value="False">解锁</button>
+                    {% endif %}
+                </td>
                 <td>{{ bugs.author.username }}</td>
                 <td>{{ bugs.now_status.bug_status_descrit }}</td>
                 <td>{{ bugs.bug_owner.username }}</td>

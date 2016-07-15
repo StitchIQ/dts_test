@@ -1,6 +1,7 @@
 # coding=utf-8
 import logging
-from flask import render_template, redirect, url_for, flash, request, current_app
+from flask import render_template, redirect, url_for, flash, request, \
+                  current_app, jsonify
 from flask.ext.login import login_required
 from wtforms_components import read_only
 from .. import db
@@ -111,11 +112,11 @@ def product_edit(id):
 
 
 
-@mang.route('/bug-manger')
-@mang.route('/bug-manger/<string:product>')
+@mang.route('/bug-manager')
+@mang.route('/bug-manager/<string:product>')
 @login_required
 @admin_required
-def bug_manger(product=None):
+def bug_manager(product=None):
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
     page     = request.args.get('page', 1, type=int)
     version  = request.args.get('version')
@@ -152,10 +153,27 @@ def bug_manger(product=None):
 
     bugs_list = pagination.items
 
-    return render_template('mang/bugmang.html', bugs_list=bugs_list,
+    return render_template('mang/bugmanage.html', bugs_list=bugs_list,
                                                 pagination=pagination)
 
 
+@mang.route('/bugstatusmanage/<string:bug_id>')
+@login_required
+@admin_required
+def bug_forbidden_status_manage(bug_id=None):
+    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
+    status  = request.args.get('manager')
+    print status
+    dts_log.debug(request.url)
+    dts_log.debug(request.url_root)
+    dts_log.debug(request.base_url)
+    bug = Bugs.get_by_bug_id(bug_id)
+
+    if bug:
+        bug.bug_running_manage(status)
+
+    return jsonify({
+                    "status": bug.bug_running_manage(status)})
 
 @mang.route('/bug-attach')
 @login_required

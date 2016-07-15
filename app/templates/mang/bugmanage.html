@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}D T S-首页{% endblock %}
+
+{% block page_content %}
+<div class="col-md-9">
+
+    {% include 'mang/_buglist.html' %}
+    {% if pagination %}
+        <div class="pagination">
+        {{ macros.pagination_widget(pagination, request.base_url) }}
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+
+<script src="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.js" type="text/javascript"></script>
+<link  href="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.css" rel="stylesheet" type="text/css">
+
+<script src="/static/bootstrap_table.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+
+$("#table").on("click", "button", function(){
+    //给tbody元素，所有tr添加事件
+    //修改bug状态，设置禁止的bug不在显示
+    //获取当前点击的元素
+    var pic = $(this);
+    $.getJSON("/mang/bugstatusmanage/"+ pic.attr("name"),{
+            manager:pic.val()
+        },
+        function(data){
+            console.log(data.status);
+            if(data.status){
+                //console.log(pic.parents("tr"));
+                //console.log(pic.parents("td").prev().children().addClass("btn btn-danger"));
+                //console.log(pic.parents("td").next());
+                pic.removeClass("btn btn-danger");
+                pic.addClass("btn btn-success");
+                pic.val("False");
+                pic.text("解锁");
+            }
+            else{
+                pic.removeClass();
+                pic.addClass("btn btn-danger");
+                pic.text("锁定");
+                pic.val("True");
+            }
+        }
+    ).error(function() { alert("修改失败！"); });
+});
+
+</script>
+{% endblock %}
+

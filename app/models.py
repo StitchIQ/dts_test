@@ -186,6 +186,7 @@ class Bugs(db.Model):
     regression_test_version = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     bug_last_update = db.Column(db.DateTime(), default=datetime.utcnow)
+    bug_forbidden_status = db.Column(db.Boolean, nullable=False, default=False)
     process = db.relationship('Process',
                               foreign_keys=[Process.bugs_id],
                               backref='bugs', lazy='dynamic')
@@ -199,7 +200,21 @@ class Bugs(db.Model):
         return cls.query.filter_by(bug_id=bug_id).first_or_404()
 
 
+    def bug_running_manage(self, status):
+        if status == 'True':
+            self.bug_forbidden_status = True
+            dts_log.debug(self.bug_id + str(status))
+            db.session.add(self)
+            return True
+        else:
+            self.bug_forbidden_status = False
+            dts_log.debug(self.bug_id + str(status))
+            db.session.add(self)
+            return False
+
+
     def to_json(self):
+        """把bug的信息转换为json格式"""
         json_post = {
             'url': url_for('main.bug_process', id=self.bug_id, _external=True),
             'id': self.bug_id,
@@ -218,10 +233,12 @@ class Bugs(db.Model):
         return json_post
 
     def ping(self):
+        """更新最后访问时间"""
         self.bug_last_update = datetime.utcnow()
         db.session.add(self)
 
     def status_equal(self, status):
+        """判断问题单状态是否与当前状态相等"""
         return self.bug_status is not None and self.bug_status == status
 
     @staticmethod
