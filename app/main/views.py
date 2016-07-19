@@ -11,7 +11,7 @@ from cStringIO import StringIO
 
 from flask import render_template, redirect, request, url_for, flash, \
     current_app, jsonify, abort, send_from_directory, make_response, send_file
-from flask.ext.login import login_required, current_user
+from flask_login import login_required, current_user
 from wtforms_components import read_only
 from werkzeug import secure_filename
 

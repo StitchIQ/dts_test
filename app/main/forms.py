@@ -1,10 +1,10 @@
 # coding=utf-8
-from flask.ext.wtf import Form
+from flask_wtf import Form
 from wtforms import StringField, SubmitField, TextAreaField, RadioField, \
         SelectField, IntegerField
 from wtforms.validators import Required, Length, Email
 from wtforms import ValidationError
-from flask.ext.pagedown.fields import PageDownField
+from flask_pagedown.fields import PageDownField
 from flask_wtf.file import FileField, FileAllowed
 
 from ..models import ProductInfo

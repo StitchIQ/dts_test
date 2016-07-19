@@ -10,7 +10,7 @@ import bleach
 from markdown import markdown
 from flask import current_app, url_for, request
 
-from flask.ext.login import UserMixin, AnonymousUserMixin, current_user
+from flask_login import UserMixin, AnonymousUserMixin, current_user
 from . import db, login_manager, mongodb
 from .email import send_email
 

@@ -2,7 +2,7 @@
 import logging
 from flask import render_template, redirect, url_for, flash, request, \
                   current_app, jsonify
-from flask.ext.login import login_required
+from flask_login import login_required
 from wtforms_components import read_only
 from .. import db
 from . import mang
@@ -194,6 +194,7 @@ def bug_forbidden_status_manage(bug_id=None):
 
     return jsonify({
                     "status": bug.bug_running_manage(status)})
+
 
 @mang.route('/bug-attach')
 @login_required

@@ -6,7 +6,7 @@ sys.setdefaultencoding("utf-8")
 import logging
 
 from flask import render_template, request, current_app, jsonify, make_response
-from flask.ext.login import login_required, current_user
+from flask_login import login_required, current_user
 
 from ..models import Bugs, User, Process, BugStatus, Permission, \
     Bug_Now_Status, ProductInfo, VersionInfo, Attachment

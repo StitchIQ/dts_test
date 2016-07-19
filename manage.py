@@ -3,8 +3,8 @@
 import os
 from app import create_app, db
 from app.models import User, Role, Bugs, BugStatus, Process, ProductInfo, Bug_Now_Status
-from flask.ext.script import Manager, Shell
-from flask.ext.migrate import Migrate, MigrateCommand
+from flask_script import Manager, Shell
+from flask_migrate import Migrate, MigrateCommand
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -22,7 +22,7 @@ manager.add_command("db", MigrateCommand)
 
 @manager.command
 def database_upgrade():
-    """升级数据库"""
+    u"""升级数据库"""
     from flask.ext.migrate import upgrade, migrate
     migrate()
     upgrade()
