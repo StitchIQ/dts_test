@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% import "_macros.html" as macros %}
 
-{% block title %}D T S-首页{% endblock %}
+{% block title %}D T S-用户管理{% endblock %}
 
 {% block page_content %}
 <div class="col-md-9">
 
-    {% include 'mang/_buglist.html' %}
+    {% include 'mang/_userlist.html' %}
     {% if pagination %}
         <div class="pagination">
         {{ macros.pagination_widget(pagination, request.base_url) }}
@@ -21,6 +21,8 @@
 
 <script src="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.js" type="text/javascript"></script>
 <link  href="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.css" rel="stylesheet" type="text/css">
+
+<script src="/static/bootstrap_table.js" type="text/javascript"></script>
 
 <script src="/static/manager/set_status.js" type="text/javascript"></script>
 {% endblock %}

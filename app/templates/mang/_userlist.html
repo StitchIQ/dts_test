@@ -1,0 +1,50 @@
+<div class="table-responsive">
+
+</div>
+    <table id="table"
+           data-toggle="table"
+           data-search="true"
+           data-click-to-select="true"
+           data-striped="true"
+           data-show-columns="true"
+           data-toolbar="#toolbar">
+       <thead>
+          <tr>
+             <th data-field="state" data-checkbox="true"><input type="checkbox"></input></th>
+             <th>Num.</th>
+             <th>用户ID</th>
+             <th>用户名称</th>
+             <th>用户邮箱</th>
+             <th>用户角色</th>
+             <th>确认状态</th>
+             <th>当前状态</th>
+             <th>修改状态</th>
+             <th>注册日期</th>
+             <th>最后登录</th>
+          </tr>
+       </thead>
+       <tbody>
+            {% for user in userlist %}
+              <tr>
+                <td><input type="checkbox"></input></td>
+                <td>{{ loop.index }}</td>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role.name }}</td>
+                <td>{{ user.confirmed }}</td>
+                <td>
+                    {% if user.forbidden_status %}
+                        <button class="btn btn-danger" type="button" value="1">锁定</button>
+                    {% else %}
+                        <button class="btn btn-success" type="button" value="0">正常</button>
+                    {% endif %}
+                </td>
+                <td><button class="btn btn-warning" type="button" name="/mang/set-user-forbidden/{{ user.id }}">修改状态</button></td>
+                <td>{{ moment(user.member_since).format('YYYY-MM-DD, HH:mm:ss') }}</td>
+                <td>{{ moment(user.last_seen).fromNow() }}</td>
+              </tr>
+            {% endfor %}
+       </tbody>
+    </table>
+</div>

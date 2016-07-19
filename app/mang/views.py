@@ -13,6 +13,30 @@ from ..decorators import admin_required
 
 dts_log = logging.getLogger('DTS')
 
+@mang.route('/userlist', methods=['GET'])
+@login_required
+@admin_required
+def user_manage():
+    userlist = User.query.all()
+
+    return render_template('mang/userlist.html', userlist=userlist)
+
+
+@mang.route('/set-user-forbidden/<string:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def user_forbidden_status_manage(user_id=None):
+    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
+    status  = request.form.get('manager')
+    dts_log.debug(status)
+    dts_log.debug(user_id)
+    dts_log.debug(request.url)
+
+    user = User.get_by_id(user_id)
+
+    return jsonify({
+                    "status": user.set_forbidden_status(status)})
+
 @mang.route('/productlist', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -116,7 +140,7 @@ def product_edit(id):
 @mang.route('/bug-manager/<string:product>')
 @login_required
 @admin_required
-def bug_manager(product=None):
+def bug_manage(product=None):
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
     page     = request.args.get('page', 1, type=int)
     version  = request.args.get('version')
@@ -157,20 +181,16 @@ def bug_manager(product=None):
                                                 pagination=pagination)
 
 
-@mang.route('/bugstatusmanage/<string:bug_id>')
+@mang.route('/set-bug-forbidden/<string:bug_id>', methods=['POST'])
 @login_required
 @admin_required
 def bug_forbidden_status_manage(bug_id=None):
     # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
-    status  = request.args.get('manager')
-    print status
+    status  = request.form.get('manager')
+    dts_log.debug(status)
     dts_log.debug(request.url)
-    dts_log.debug(request.url_root)
-    dts_log.debug(request.base_url)
-    bug = Bugs.get_by_bug_id(bug_id)
 
-    if bug:
-        bug.bug_running_manage(status)
+    bug = Bugs.get_by_bug_id(bug_id)
 
     return jsonify({
                     "status": bug.bug_running_manage(status)})
