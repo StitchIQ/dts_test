@@ -49,10 +49,10 @@ def index(product=None, version=None, software=None):
     # sts=BugStatus.query.filter_by(id=6).first()
     # Bugs.bug_status not in [Bug_Now_Status.CREATED, Bug_Now_Status.CLOSED]
     # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
-    a = Bugs.query.filter(Bugs.bug_owner == current_user ,
+    a = Bugs.query.filter_by(bug_forbidden_status=False).filter(Bugs.bug_owner == current_user ,
                           Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
                           Bugs.bug_status > Bug_Now_Status.CREATED)
-    b = Bugs.query.filter(Bugs.author == current_user ,
+    b = Bugs.query.filter_by(bug_forbidden_status=False).filter(Bugs.author == current_user ,
                           Bugs.bug_status == Bug_Now_Status.CREATED)
 
     a = a.union(b)

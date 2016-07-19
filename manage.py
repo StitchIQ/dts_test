@@ -20,6 +20,15 @@ def make_shell_context():
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
 
+@manager.command
+def database_upgrade():
+    """升级数据库"""
+    from flask.ext.migrate import upgrade, migrate
+    migrate()
+    upgrade()
+    print u'数据库升级成功'
+
+
 
 @manager.command
 def test():
@@ -30,5 +39,5 @@ def test():
 
 
 if __name__ == '__main__':
-    #manager.run()
-    app.run(host="0.0.0.0", port=8080)
+    manager.run()
+    #app.run(host="0.0.0.0", port=8080)

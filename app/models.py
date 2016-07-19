@@ -10,7 +10,7 @@ import bleach
 from markdown import markdown
 from flask import current_app, url_for, request
 
-from flask.ext.login import UserMixin, AnonymousUserMixin
+from flask.ext.login import UserMixin, AnonymousUserMixin, current_user
 from . import db, login_manager, mongodb
 from .email import send_email
 
@@ -197,20 +197,25 @@ class Bugs(db.Model):
     #TODO 优化bugs查询，增加classmethod方法，查询方便
     @classmethod
     def get_by_bug_id(cls, bug_id):
-        return cls.query.filter_by(bug_id=bug_id).first_or_404()
+        # 非管理员禁止查看和编辑禁用的问题单
+        if current_user.can(Permission.ADMINISTER):
+            return cls.query.filter_by(bug_id=bug_id).first_or_404()
+        else:
+            return cls.query.filter_by(bug_forbidden_status=False).filter_by(bug_id=bug_id).first_or_404()
 
 
     def bug_running_manage(self, status):
-        if status == 'True':
-            self.bug_forbidden_status = True
-            dts_log.debug(self.bug_id + str(status))
-            db.session.add(self)
-            return True
-        else:
+    # 设置问题单的运行状态，传过来的状态为当前状态，收到请求后反转状态，并返回设置后的状态
+        if status == '1':
             self.bug_forbidden_status = False
             dts_log.debug(self.bug_id + str(status))
             db.session.add(self)
-            return False
+            return '0'
+        else:
+            self.bug_forbidden_status = True
+            dts_log.debug(self.bug_id + str(status))
+            db.session.add(self)
+            return '1'
 
 
     def to_json(self):

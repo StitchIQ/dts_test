@@ -23,6 +23,7 @@
              <th>软件版本</th>
              <th>问题单描述</th>
              <th>当前状态</th>
+             <th>修改状态</th>
              <th>提交人</th>
              <th>问题状态</th>
              <th>当前处理人</th>
@@ -41,12 +42,13 @@
                     {{ bugs.software_version }}</a></td>
                 <td>{{ bugs.bug_title }}</td>
                 <td>
-                    {% if not bugs.bug_forbidden_status %}
-                        <button class="btn btn-danger" type="button" name= {{ bugs.bug_id }} value="True">锁定</button>
+                    {% if bugs.bug_forbidden_status %}
+                        <button class="btn btn-danger" type="button" value="1">锁定</button>
                     {% else %}
-                        <button class="btn btn-success" type="button" name= {{ bugs.bug_id }} value="False">解锁</button>
+                        <button class="btn btn-success" type="button" value="0">正常</button>
                     {% endif %}
                 </td>
+                <td><button class="btn btn-warning" type="button" name= {{ bugs.bug_id }}>修改状态</button></td>
                 <td>{{ bugs.author.username }}</td>
                 <td>{{ bugs.now_status.bug_status_descrit }}</td>
                 <td>{{ bugs.bug_owner.username }}</td>
