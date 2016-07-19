@@ -433,12 +433,18 @@ class User(UserMixin, db.Model):
     @classmethod
     def get_by_email(cls, email):
         dts_log.debug("Get Email : %s" %email)
-        return cls.query.filter_by(email=email).first_or_404()
+        if current_user.can(Permission.ADMINISTER):
+            return cls.query.filter_by(email=email).first_or_404()
+        else:
+            return cls.query.filter_by(forbidden_status=False, email=email).first_or_404()
 
     @classmethod
     def get_by_id(cls, id):
         dts_log.debug("Get id : %s" %id)
-        return cls.query.filter_by(id=id).first_or_404()
+        if current_user.can(Permission.ADMINISTER):
+            return cls.query.filter_by(id=id).first_or_404()
+        else:
+            return cls.query.filter_by(forbidden_status=False, id=id).first_or_404()
 
 
     @property
