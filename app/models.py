@@ -173,7 +173,8 @@ class Bugs(db.Model):
     software_version = db.Column(db.String(64))
     version_features = db.Column(db.String(64))
     bug_level = db.Column(db.String(64))
-    system_view = db.Column(db.String(64))
+    # 问题单知情人
+    bug_insiders  = db.Column(db.String(64))
     bug_show_times = db.Column(db.String(64))
     bug_title = db.Column(db.String(64))
     bug_descrit = db.Column(db.Text)

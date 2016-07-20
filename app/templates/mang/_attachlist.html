@@ -17,11 +17,11 @@
           <tr>
              <th data-field="state" data-checkbox="true"><input type="checkbox"></input></th>
              <th>Num.</th>
-             <th>文件管理</th>
              <th>BugsID</th>
              <th>文件名称</th>
-             <th>文件哈希名</th>
              <th>文件类型</th>
+             <th>文件管理</th>
+             <th>文件哈希名</th>
              <th>文件大小</th>
           </tr>
        </thead>
@@ -30,11 +30,17 @@
               <tr>
                 <td><input type="checkbox"></input></td>
                 <td>{{ loop.index }}</td>
-                <td><button class="btn btn-warning" type="button" name= {{ attach.symlink }} >删除</button></td>
                 <td><a href="{{ url_for('main.bug_process', id=attach.bug_id) }}" target="_blank">{{ attach.bug_id }}</a></td>
-                <td>{{ attach.filename }}</td>
-                <td>{{ attach.filehash }}</td>
+                <td>
+                    {% if attach.mimetype.find('image')==0 %}
+                        <a href="{{ url_for('main.viewlargeimage', symlink=attach.symlink) }}" target="_blank">{{ attach.filename }}</a>
+                    {% else %}
+                        <a href="{{ url_for('main.download', symlink=attach.symlink) }}" target="_blank">{{ attach.filename }}</a>
+                    {% endif %}
+                </td>
                 <td>{{ attach.mimetype }}</td>
+                <td><button class="btn btn-warning" type="button" name= {{ attach.symlink }} >删除</button></td>
+                <td>{{ attach.filehash }}</td>
                 <td>{{ attach.size }}</td>
               </tr>
             {% endfor %}

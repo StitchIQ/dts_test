@@ -98,6 +98,7 @@ def buglist(product=None):
     author   = request.args.get('author')
 
     dts_log.debug(product)
+    dts_log.debug(request.view_args)
     dts_log.debug(request.url)
     dts_log.debug(request.url_root)
     dts_log.debug(request.base_url)
@@ -183,6 +184,7 @@ def get_software():
 def task(mytask='process', product=None, version=None, software=None):
     dts_log.debug(request.url)
     dts_log.debug(request.url_root)
+    dts_log.debug(request.view_args)
     dts_log.debug(request.base_url)
     dts_log.debug(request.endpoint)
     dts_log.debug(request.view_args.copy())
@@ -292,7 +294,7 @@ def newbug():
                    software_version=unicode(form.software_version.data),
                    version_features=unicode(form.version_features.data),
                    bug_level=form.bug_level.data,
-                   system_view=form.system_view.data,
+                   bug_insiders=form.bug_insiders.data,
                    bug_show_times=form.bug_show_times.data,
                    bug_title=form.bug_title.data,
                    bug_descrit=form.bug_descrit.data,
@@ -384,7 +386,8 @@ def viewimage(symlink=None):
 
     #return redirect(pasteFile.url_p)
     if  not current_app.config['MONGO_DB_USE']:
-        return send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash)
+        response = make_response(send_from_directory(current_app.config['UPLOAD_FOLDER'], pasteFile.filehash))
+        return response
     try:
         f = mongodb.files.find_one({"symlink":symlink})
         print f['filename']
@@ -401,9 +404,9 @@ def viewimage(symlink=None):
         abort(404)
 
 
-@main.route('/viewlargeimage/<fileid>')
-def viewlargeimage(fileid=None):
-    return render_template('imageview.html',fileid=fileid)
+@main.route('/viewlargeimage/<symlink>')
+def viewlargeimage(symlink=None):
+    return render_template('imageview.html', symlink=symlink)
 
 
 @main.route('/delete/<symlink>', methods=['GET', 'POST'])
@@ -646,7 +649,7 @@ def bug_process(id):
     form.software_version.data = bugs.software_version
     form.version_features.data = bugs.version_features
     form.bug_level.data = bugs.bug_level
-    form.system_view.data = bugs.system_view
+    form.bug_insiders.data = bugs.bug_insiders
     form.bug_show_times.data = bugs.bug_show_times
     bug_descrit_html = bugs.bug_descrit_html
     form.bug_title.data = bugs.bug_title
@@ -658,7 +661,7 @@ def bug_process(id):
     read_only(form.software_version)
     read_only(form.version_features)
     read_only(form.bug_level)
-    read_only(form.system_view)
+    read_only(form.bug_insiders)
     read_only(form.bug_show_times)
     read_only(form.bug_descrit)
 
@@ -708,7 +711,7 @@ def bug_edit(bug_id):
         bugs.software_version = form.software_version.data
         bugs.version_features = form.version_features.data
         bugs.bug_level = form.bug_level.data
-        bugs.system_view = form.system_view.data
+        bugs.bug_insiders = form.bug_insiders.data
         bugs.bug_show_times = form.bug_show_times.data
         bugs.bug_title = form.bug_title.data
         bugs.bug_descrit = form.bug_descrit.data
@@ -771,7 +774,7 @@ def bug_edit(bug_id):
     form.software_version.data = bugs.software_version
     form.version_features.data = bugs.version_features
     form.bug_level.data = bugs.bug_level
-    form.system_view.data = bugs.system_view
+    form.bug_insiders.data = bugs.bug_insiders
     form.bug_show_times.data = bugs.bug_show_times
     form.bug_descrit.data = bugs.bug_descrit
     form.bug_title.data = bugs.bug_title

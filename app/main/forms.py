@@ -26,7 +26,7 @@ class StandardBug(Form):
     bug_level = SelectField(u'严重程度',
                             choices=[(u'致命', u'致命'), (u'严重', u'严重'),
                                      (u'一般', u'一般'), (u'提示', u'提示')])
-    system_view = StringField(u'问题单知情人')
+    bug_insiders = StringField(u'问题单知情人')
     bug_show_times = SelectField(u'出现频率',
                                  choices=[(u'必现', u'必现'),
                                           (u'频繁出现', u'频繁出现'),
@@ -69,7 +69,7 @@ class BugsProcess(Form):
     software_version = StringField(u'软件版本号')
     version_features = StringField(u'软件特性')
     bug_level = StringField(u'严重程度')
-    system_view = StringField(u'系统表现')
+    bug_insiders = StringField(u'问题单知情人')
     bug_show_times = StringField(u'出现频率')
     bug_title = StringField(u'问题标题')
     bug_descrit = TextAreaField(u'问题描述')
