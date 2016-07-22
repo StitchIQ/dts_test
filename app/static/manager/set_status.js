@@ -29,3 +29,23 @@ $("#table").on("click", "button.btn-warning", function(){
         }
     ).error(function() { alert("修改失败！"); });
 });
+
+
+$("#table").on("click", "button#delete", function(){
+    //给tbody元素，所有tr添加事件
+    //修改bug状态，设置禁止的bug不在显示
+    //获取当前点击的元素
+    var pic = $(this);
+    var lable_status = pic.parents("td").prev().children();
+    console.log(lable_status.val());
+    $.post(pic.attr("name"),{
+            manager:lable_status.val()
+        },
+        function(data){
+            console.log(data.status);
+            console.log(pic.parents("tr"));
+            pic.parents("tr").remove();
+            //alert("删除成功");
+        }
+    ).error(function() { alert("修改失败！"); });
+});

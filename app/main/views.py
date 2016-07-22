@@ -131,10 +131,10 @@ def buglist(product=None):
         au = User.query.filter_by(username=author).first()
         bugs_list = bugs_list.filter_by(author = au)
 
-    bugs_list = bugs_list.order_by(Bugs.timestamp.desc())
-
+    pagination = bugs_list.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+    items = pagination.items
     dts_log.debug(buglist.__name__)
-    return render_template('index.html', bugs_list=bugs_list)
+    return render_template('index.html', bugs_list=items, pagination=pagination)
 
 
 @main.route('/check_user')
@@ -479,9 +479,7 @@ def download(symlink):
 @login_required
 def bug_process(id):
     bugs = Bugs.get_by_bug_id(id)
-    attachments = None
-    if bugs.bug_attachments:
-        attachments = Attachment.query.filter_by(bug_id=id).all()
+    attachments = Attachment.query.filter_by(bug_id=id).all()
 
     form = BugsProcess()
     testleadedit = TestLeadEdit()
@@ -497,7 +495,7 @@ def bug_process(id):
         print testleadedit.validate_on_submit()
         print testleadedit2.validate_on_submit()
         print bugclose.validate_on_submit()
-        print developedit.errors
+        dts_log.debug(developedit.errors)
         print developedit.dversion_features.data
 
     if bugs.bug_status == Bug_Now_Status.TESTLEADER_AUDIT \
@@ -507,7 +505,6 @@ def bug_process(id):
             dts_log.debug('testleaderedit')
             dts_log.debug(testleadedit.bug_status.data)
             dts_log.debug(developedit.bug_status.data)
-            dts_log.debug("Get Email 222")
             bugs.bug_owner_id = User.get_by_email(
                                     testleadedit.bug_owner_id.data).id
 

@@ -181,6 +181,21 @@ def bug_manage(product=None):
                                                 pagination=pagination)
 
 
+@mang.route('/bug-delete/<string:bug_id>', methods=['POST'])
+@login_required
+@admin_required
+def bug_delete(bug_id=None):
+    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
+    status  = request.form.get('manager')
+    dts_log.debug(status)
+    dts_log.debug(request.url)
+
+    bug = Bugs.get_by_bug_id(bug_id)
+
+    return jsonify({
+                    "status": bug.bug_delete()})
+
+
 @mang.route('/set-bug-forbidden/<string:bug_id>', methods=['POST'])
 @login_required
 @admin_required
@@ -193,7 +208,7 @@ def bug_forbidden_status_manage(bug_id=None):
     bug = Bugs.get_by_bug_id(bug_id)
 
     return jsonify({
-                    "status": bug.bug_running_manage(status)})
+                    "status": bug.set_running_manage(status)})
 
 
 @mang.route('/bug-attach')

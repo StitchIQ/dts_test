@@ -1,7 +1,4 @@
 <div class="table-responsive">
-
-
-</div>
     <table id="table"
            data-toggle="table"
            data-search="true"
@@ -20,6 +17,7 @@
              <th>问题单描述</th>
              <th>当前状态</th>
              <th>修改状态</th>
+             <th>删除</th>
              <th>提交人</th>
              <th>问题状态</th>
              <th>当前处理人</th>
@@ -45,6 +43,7 @@
                     {% endif %}
                 </td>
                 <td><button class="btn btn-warning" type="button" name="/mang/set-bug-forbidden/{{ bugs.bug_id }}">修改状态</button></td>
+                <td><button id="delete" class="btn btn-danger" type="button" name="/mang/bug-delete/{{ bugs.bug_id }}">删除</button></td>
                 <td>{{ bugs.author.username }}</td>
                 <td>{{ bugs.now_status.bug_status_descrit }}</td>
                 <td>{{ bugs.bug_owner.username }}</td>

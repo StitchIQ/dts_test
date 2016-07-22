@@ -149,6 +149,13 @@ class Process(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     @staticmethod
+    def process_delete(bug_id):
+        try:
+            Process.query.filter_by(bug_id=bug_id).delete()
+        except:
+            db.session.rollback()
+
+    @staticmethod
     def after_insert(mapper, connection, target):
         user = User.query.filter_by(id=target.author_id).first()
         if str(target.old_status) == str(target.new_status):
@@ -190,7 +197,8 @@ class Bugs(db.Model):
     bug_forbidden_status = db.Column(db.Boolean, nullable=False, default=False)
     process = db.relationship('Process',
                               foreign_keys=[Process.bugs_id],
-                              backref='bugs', lazy='dynamic')
+                              backref='bugs', lazy='dynamic',
+                              cascade='all, delete-orphan')
 
     def __repr__(self):
         return '<Bugs %r>' % self.bug_id
@@ -204,7 +212,7 @@ class Bugs(db.Model):
         else:
             return cls.query.filter_by(bug_forbidden_status=False).filter_by(bug_id=bug_id).first_or_404()
 
-    def bug_running_manage(self, status):
+    def set_running_manage(self, status):
         """设置问题单的运行状态，传过来的状态为当前状态，收到请求后反转状态，并返回设置后的状态"""
         if status == '1':
             self.bug_forbidden_status = False
@@ -217,6 +225,22 @@ class Bugs(db.Model):
             db.session.add(self)
             return '1'
 
+    def bug_delete(self):
+        """删除bug"""
+
+        dts_log.debug(u'删除问题单: ' + self.bug_id)
+        #attach = Attachment.get_all_attach_by_bug_id(self.bug_id)
+        #map(db.session.delete, attach)
+        Attachment.attach_delete(self.bug_id)
+        p = self.process.filter_by(bugs_id=self.bug_id).all()
+        dts_log.debug(u'删除处理意见: ' + str(len(p)))
+        map(db.session.delete, p)
+        db.session.delete(self)
+        db.session.commit()
+        return '0'
+
+
+
     def to_json(self):
         """把bug的信息转换为json格式"""
         json_post = {
@@ -227,7 +251,7 @@ class Bugs(db.Model):
             'product_version': self.product_version,
             'software_version': self.software_version,
             'bug_level': self.bug_level,
-            'system_view': self.system_view,
+            'bug_insiders': self.bug_insiders,
             'bug_show_times': self.bug_show_times,
             'bug_title': self.bug_title,
             'bug_owner': self.bug_owner.username,
@@ -372,6 +396,14 @@ class Attachment(db.Model):
     def url_s(self):
         return "http://{host}/s/{symlink}".format(
             host=request.host, symlink=self.symlink)
+
+    @staticmethod
+    def attach_delete(bug_id):
+        pasteFile = Attachment.query.filter_by(bug_id=bug_id).all()
+
+        for p in pasteFile:
+            p.file_delete(p.symlink)
+
 
     def file_delete(self, symlink):
         pasteFile = self.get_by_symlink(symlink)
