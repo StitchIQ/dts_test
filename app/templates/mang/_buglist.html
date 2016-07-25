@@ -16,7 +16,6 @@
              <th>软件版本</th>
              <th>问题单描述</th>
              <th>当前状态</th>
-             <th>修改状态</th>
              <th>删除</th>
              <th>提交人</th>
              <th>问题状态</th>
@@ -37,12 +36,11 @@
                 <td>{{ bugs.bug_title }}</td>
                 <td>
                     {% if bugs.bug_forbidden_status %}
-                        <button class="btn btn-danger" type="button" value="1">锁定</button>
+                        <button id="modify" class="btn btn-danger" type="button" name="/mang/set-bug-forbidden/{{ bugs.bug_id }}" value="1">锁定</button>
                     {% else %}
-                        <button class="btn btn-success" type="button" value="0">正常</button>
+                        <button id="modify" class="btn btn-success" type="button" name="/mang/set-bug-forbidden/{{ bugs.bug_id }}" value="0">正常</button>
                     {% endif %}
                 </td>
-                <td><button class="btn btn-warning" type="button" name="/mang/set-bug-forbidden/{{ bugs.bug_id }}">修改状态</button></td>
                 <td><button id="delete" class="btn btn-danger" type="button" name="/mang/bug-delete/{{ bugs.bug_id }}">删除</button></td>
                 <td>{{ bugs.author.username }}</td>
                 <td>{{ bugs.now_status.bug_status_descrit }}</td>
