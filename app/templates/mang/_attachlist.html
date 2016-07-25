@@ -39,7 +39,7 @@
                     {% endif %}
                 </td>
                 <td>{{ attach.mimetype }}</td>
-                <td><button class="btn btn-warning" type="button" name= {{ attach.symlink }} >删除</button></td>
+                <td><button id="delete" class="btn btn-danger" type="button" name="/delete/{{ attach.symlink }}" >删除</button></td>
                 <td>{{ attach.filehash }}</td>
                 <td>{{ attach.size }}</td>
               </tr>

@@ -38,7 +38,7 @@ $("#table").on("click", "button#delete", function(){
     var pic = $(this);
     var lable_status = pic.parents("tr").find("td:eq(2)").text();
     console.log(lable_status);
-    var r=confirm("确认删除问题单 : " + lable_status)
+    var r=confirm("删除后无法恢复！确认删除 ？")
     console.log(r);
     if (r == true){
         $.post(pic.attr("name"),
