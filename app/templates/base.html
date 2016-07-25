@@ -112,7 +112,7 @@
       <li> <a href="#configSetting" class="nav-header" data-toggle="collapse" aria-expanded="true">
         <i class="glyphicon glyphicon-credit-card"></i> 问题单浏览 <span class="pull-right glyphicon  glyphicon-chevron-toggle"></span> </a>
            <ul id="configSetting" class="nav nav-list collapse secondmenu in">
-            <li><a href="{{ url_for('main.buglist') }}"><i class="glyphicon glyphicon-star-empty"></i>&nbsp;问题单查询</a></li>
+            <li><a href="{{ url_for('main.buglist') }}"><i class="glyphicon glyphicon-th-list"></i>&nbsp;问题单查询</a></li>
             <li class="disabled"><a href="{{ url_for('reports.productcharts') }}"><i class="glyphicon glyphicon-star"></i>&nbsp;产品问题单报表</a></li>
             <li><a href="{{ url_for('reports.bugsversioncharts') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;版本问题单分析报表</a></li>
             <li class="disabled"><a href="#"><i class="glyphicon glyphicon-ok-circle"></i>&nbsp;测试报告报表</a></li>
@@ -123,12 +123,12 @@
       <li> <a href="#dicSetting" class="nav-header" data-toggle="collapse" aria-expanded="true">
           <i class="glyphicon glyphicon-bold"></i> 系统管理 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
        <ul id="dicSetting" class="nav nav-list secondmenu collapse in">
-        <li><a href="{{ url_for('mang.user_manage') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;用户管理</a></li>
-        <li><a href="{{ url_for('mang.productlist') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;产品列表</a></li>
+        <li><a href="{{ url_for('mang.user_manage') }}"><i class="glyphicon glyphicon-list-alt"></i>&nbsp;用户管理</a></li>
+        <li><a href="{{ url_for('mang.productlist') }}"><i class="glyphicon glyphicon-list"></i>&nbsp;产品列表</a></li>
         <li><a href="{{ url_for('mang.add_product') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;添加产品和版本</a></li>
-        <li><a href="{{ url_for('mang.bug_manage') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;问题单管理</a></li>
-        <li><a href="{{ url_for('mang.bug_attach') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;问题单附件管理</a></li>
-        <li><a href="{{ url_for('mang.bug_attach_no_bug_id') }}"><i class="glyphicon glyphicon-text-width"></i>&nbsp;问题单多余附件管理</a></li>
+        <li><a href="{{ url_for('mang.bug_manage') }}"><i class="glyphicon glyphicon-pencil"></i>&nbsp;问题单管理</a></li>
+        <li><a href="{{ url_for('mang.bug_attach') }}"><i class="glyphicon glyphicon-paperclip"></i>&nbsp;问题单附件管理</a></li>
+        <li><a href="{{ url_for('mang.bug_attach_no_bug_id') }}"><i class="glyphicon glyphicon-remove"></i>&nbsp;问题单多余附件管理</a></li>
        </ul> </li>
       <li> <a href="#"> <i class="glyphicon glyphicon-fire"></i> 关于系统 <span class="badge pull-right">1</span> </a> </li>
      </ul>

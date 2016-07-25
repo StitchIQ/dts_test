@@ -412,6 +412,7 @@ def viewlargeimage(symlink=None):
 @main.route('/delete/<symlink>', methods=['GET', 'POST'])
 @login_required
 def delete_file(symlink):
+    """ 管理员页面附件删除也调用了此函数 """
     pasteFile = Attachment.get_by_symlink(symlink)
     if not pasteFile:
         return abort(404)
@@ -431,6 +432,7 @@ def delete_file(symlink):
                     "id": pasteFile.symlink})
     else:
         return abort(404)
+
 
 @main.route('/download/<filehash>')
 @login_required

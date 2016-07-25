@@ -19,7 +19,7 @@ dts_log = logging.getLogger('DTS')
 def user_manage():
     userlist = User.query.all()
 
-    return render_template('mang/userlist.html', userlist=userlist)
+    return render_template('mang/user_manage.html', userlist=userlist)
 
 
 @mang.route('/set-user-forbidden/<string:user_id>', methods=['POST'])
