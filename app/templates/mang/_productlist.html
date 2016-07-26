@@ -1,0 +1,46 @@
+<div class="table-responsive">
+
+</div>
+    <table id="table"
+           data-toggle="table"
+           data-search="true"
+           data-click-to-select="true"
+           data-striped="true"
+           data-show-columns="true"
+           data-toolbar="#toolbar">
+       <thead>
+          <tr>
+             <th data-field="state" data-checkbox="true"><input type="checkbox"></input></th>
+             <th>Num.</th>
+             <th>产品名称</th>
+             <th>产品说明</th>
+             <th>产品状态</th>
+             <th>当前状态</th>
+             <th>增加版本</th>
+          </tr>
+       </thead>
+       <tbody>
+            {% for p in product %}
+              <tr>
+                <td><input type="checkbox"></input></td>
+                <td>{{ loop.index }}</td>
+                <td>{{ p.product_name }}</td>
+                <td>{{ p.product_descrit }}</td>
+                <td>
+                    {% if p.product_status %}
+                        <button id="modify" class="btn btn-danger" type="button" name="/mang/product-manage/{{ p.id }}" value="1">锁定</button>
+                    {% else %}
+                        <button id="modify" class="btn btn-success" type="button" name="/mang/product-manage/{{ p.id }}" value="0">正常</button>
+                    {% endif %}
+                </td>
+                <td class="host_buttom">
+                        <a class="btn btn-warning btn-xs"  href="{{ url_for('mang.product_edit', id=p.id) }}">修改信息</a>
+                </td>
+                <td class="host_buttom">
+                        <a class="btn btn-warning btn-xs"  href="{{ url_for('mang.add_software', id=p.id) }}">增加版本</a>
+                </td>
+              </tr>
+            {% endfor %}
+       </tbody>
+    </table>
+</div>

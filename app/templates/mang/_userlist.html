@@ -18,7 +18,6 @@
              <th>用户角色</th>
              <th>确认状态</th>
              <th>当前状态</th>
-             <th>修改状态</th>
              <th>注册日期</th>
              <th>最后登录</th>
           </tr>
@@ -35,12 +34,11 @@
                 <td>{{ user.confirmed }}</td>
                 <td>
                     {% if user.forbidden_status %}
-                        <button class="btn btn-danger" type="button" value="1">锁定</button>
+                        <button id="modify" class="btn btn-danger" type="button" name="/mang/set-user-forbidden/{{ user.id }}" value="1">锁定</button>
                     {% else %}
-                        <button class="btn btn-success" type="button" value="0">正常</button>
+                        <button id="modify" class="btn btn-success" type="button" name="/mang/set-user-forbidden/{{ user.id }}" value="0">正常</button>
                     {% endif %}
                 </td>
-                <td><button class="btn btn-warning" type="button" name="/mang/set-user-forbidden/{{ user.id }}">修改状态</button></td>
                 <td>{{ moment(user.member_since).format('YYYY-MM-DD, HH:mm:ss') }}</td>
                 <td>{{ moment(user.last_seen).fromNow() }}</td>
               </tr>

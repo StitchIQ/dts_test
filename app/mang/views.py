@@ -34,8 +34,8 @@ def user_forbidden_status_manage(user_id=None):
 
     user = User.get_by_id(user_id)
 
-    return jsonify({
-                    "status": user.set_forbidden_status(status)})
+    return jsonify({"status": user.set_forbidden_status(status)})
+
 
 @mang.route('/productlist', methods=['GET', 'POST'])
 @login_required
@@ -135,6 +135,18 @@ def product_edit(id):
     return render_template('mang/add_product.html', add_product=add_product)
 
 
+@mang.route('/product-manage/<int:id>', methods=['POST'])
+@login_required
+@admin_required
+def product_manage(id):
+    product = ProductInfo.query.get_or_404(id)
+    status  = request.form.get('manager')
+    dts_log.debug(status)
+    dts_log.debug(request.url)
+
+    return jsonify({"status": product.set_status(status)})
+
+
 
 @mang.route('/bug-manager')
 @mang.route('/bug-manager/<string:product>')
@@ -177,7 +189,7 @@ def bug_manage(product=None):
 
     bugs_list = pagination.items
 
-    return render_template('mang/bugmanage.html', bugs_list=bugs_list,
+    return render_template('mang/bug_manage.html', bugs_list=bugs_list,
                                                 pagination=pagination)
 
 
@@ -192,8 +204,7 @@ def bug_delete(bug_id=None):
 
     bug = Bugs.get_by_bug_id(bug_id)
 
-    return jsonify({
-                    "status": bug.bug_delete()})
+    return jsonify({"status": bug.bug_delete()})
 
 
 @mang.route('/set-bug-forbidden/<string:bug_id>', methods=['POST'])
@@ -207,8 +218,7 @@ def bug_forbidden_status_manage(bug_id=None):
 
     bug = Bugs.get_by_bug_id(bug_id)
 
-    return jsonify({
-                    "status": bug.set_running_manage(status)})
+    return jsonify({"status": bug.set_running_manage(status)})
 
 
 @mang.route('/bug-attach')

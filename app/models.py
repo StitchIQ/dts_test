@@ -113,6 +113,7 @@ class ProductInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(64), unique=True)
     product_descrit = db.Column(db.Text)
+    # 产品状态信息，默认是false，代表没有禁止使用
     product_status = db.Column(db.Boolean, default=False)
     create_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
@@ -124,7 +125,18 @@ class ProductInfo(db.Model):
     @classmethod
     def get_all_product(cls):
         #查询所有状态为激活的产品
-        return cls.query.filter_by(product_status=True).all()
+        return cls.query.filter_by(product_status=False).all()
+
+    def set_status(self,status):
+        dts_log.debug(str(self.id) + str(status))
+        if status == '1':
+            self.product_status = False
+            db.session.add(self)
+            return '0'
+        else:
+            self.product_status = True
+            db.session.add(self)
+            return '1'
 
     def product_name_json(self):
         json_post = {
