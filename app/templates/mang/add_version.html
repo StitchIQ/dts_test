@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}DTS - 添加产品和版本{% endblock %}
+
+{% block page_content %}
+<div class="table-responsive">
+<div id="toolbar" class="btn-group">
+    <button type="button" class="btn btn-default" id="submit" data-toggle="modal" data-target="#softwareModal">
+        <i class="glyphicon glyphicon-plus">增加版本</i>
+    </button>
+
+</div>
+<div class="col-md-9">
+    <table id="table"
+           data-toggle="table"
+           data-search="true"
+           data-click-to-select="true"
+           data-striped="true"
+           data-show-columns="true"
+           data-toolbar="#toolbar" style="word-break:break-all; word-wrap:break-all;">
+       <thead>
+          <tr>
+             <th data-field="state" data-checkbox="true"><input type="checkbox"></input></th>
+             <th>Num.</th>
+             <th>产品名称</th>
+             <th>版本名称</th>
+             <th>版本描述</th>
+             <th>软件版本列表</th>
+             <th>软件版本</th>
+             <th>软件特性</th>
+          </tr>
+       </thead>
+       <tbody>
+            {% for p in version_list %}
+              <tr>
+                <td><input type="checkbox"></input></td>
+                <td>{{ loop.index }}</td>
+                <td>{{ p.version.product_name }}</td>
+                <td>{{ p.version_name }}</td>
+                <td>{{ p.version_descrit }}</td>
+                <td> {% for s in software_list %}
+                         {% if s.software.id == p.id %}
+                          {{ s.software_name }}<br>
+                        {% endif %}
+                     {% endfor %}
+                </td>
+                <td><a href="{{ url_for('mang.add_software',id=p.id) }}">
+                        <button class="btn btn-primary">
+                        增加软件版本</button></a>
+                </td>
+                <td><a href="{{ url_for('mang.add_feature',id=p.id) }}">
+                    <button class="btn btn-primary">增加软件特性</button></a>
+                </td>
+              </tr>
+            {% endfor %}
+       </tbody>
+    </table>
+</div>
+
+</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.js" type="text/javascript"></script>
+<link  href="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.css" rel="stylesheet" type="text/css">
+
+
+{% endblock %}

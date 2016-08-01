@@ -32,8 +32,8 @@
                         <button id="modify" class="btn btn-success" type="button" name="/mang/product-manage/{{ p.id }}" value="0">正常</button>
                     {% endif %}
                 </td>
-                <td>
-                    <a class="btn btn-warning btn-xs"  href="{{ url_for('mang.add_software', id=p.id) }}">增加版本</a>
+                <td><a href="{{ url_for('mang.add_version', id=p.id) }}">
+                    <button class="btn btn-primary">增加版本</button></a>
                 </td>
               </tr>
             {% endfor %}

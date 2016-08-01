@@ -6,8 +6,9 @@ from flask_login import login_required
 from wtforms_components import read_only
 from .. import db
 from . import mang
-from .forms import Add_Product, Add_Software
-from ..models import Bugs, User, ProductInfo, VersionInfo, Attachment
+from .forms import Add_Product, Add_Software, Add_Version, Add_Software2, Add_Feature
+from ..models import Bugs, User, ProductInfo, VersionInfo, Attachment, \
+      SoftWareInfo, FeatureInfo
 from ..decorators import admin_required
 
 
@@ -46,13 +47,14 @@ def productlist():
     return render_template('mang/productlist.html', product=product)
 
 
-@mang.route('/add-software/<int:id>', methods=['GET', 'POST'])
+@mang.route('/add-version/<int:id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def add_software(id):
+def add_version(id):
     product = ProductInfo.query.get_or_404(id)
-    software_list = VersionInfo.query.filter_by(product=product.id).all()
-    software = Add_Software()
+    version_list = VersionInfo.query.filter_by(product=product.id).all()
+    software_list = SoftWareInfo.query.all()
+    software = Add_Version()
     print software.errors
     print request.form.get('software_version')
     print request.form.getlist('software_version')
@@ -62,25 +64,85 @@ def add_software(id):
         software_info = VersionInfo(
                             product=product.id,
                             version_name=software.version_name.data,
-                            version_descrit=software.version_descrit.data,
-                            software_version=software.software_version.data,
-                            version_features=software.version_features.data)
+                            version_descrit=software.version_descrit.data)
 
         db.session.add(software_info)
         db.session.commit()
         flash('Softare 提交成功.')
         software_list = VersionInfo.query.filter_by(product=product.id).all()
-        return render_template('mang/add_softare.html', software=software,
-                               software_list=software_list)
+        #return render_template('mang/add_softare.html', software=software,
+        #                       version_list=version_list)
+        return redirect(url_for('mang.add_version', id=product.id))
     software.product_name.data = product.product_name
     software.product_descrit.data = product.product_descrit
 
     read_only(software.product_name)
     read_only(software.product_descrit)
-    # flash(software_list)
+
     return render_template(
-                'mang/add_softare.html',
-                software=software, software_list=software_list)
+                'mang/add_version.html',
+                software=software, version_list=version_list,software_list=software_list)
+
+
+@mang.route('/add-software/<int:id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_software(id):
+    version = VersionInfo.query.filter_by(id=id).first()
+    software = Add_Software2()
+    print software.errors
+    print request.form.get('software_version')
+    print request.form.getlist('software_version')
+    print request.form.get('version_features')
+    print request.form.getlist('version_features')
+    if software.validate_on_submit():
+        software_info = SoftWareInfo(
+                            version_id=version.id,
+                            software_name=software.software_name.data,
+                            software_descrit=software.software_descrit.data)
+        db.session.add(software_info)
+        db.session.commit()
+        flash('Softare 提交成功.')
+
+        return redirect(url_for('mang.add_version', id=id))
+    software.product_name.data = version.version.product_name
+    software.product_descrit.data = version.version.product_descrit
+    software.version_name.data = version.version_name
+    software.version_descrit.data = version.version_descrit
+
+    read_only(software.product_name)
+    read_only(software.product_descrit)
+    read_only(software.version_name)
+    read_only(software.version_descrit)
+    return render_template('mang/add_software.html', software=software)
+
+
+@mang.route('/add-feature/<int:id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_feature(id):
+    version = VersionInfo.query.filter_by(id=id).first()
+    feature = Add_Feature()
+    if feature.validate_on_submit():
+        feature_info = FeatureInfo(
+                            version_id=version.id,
+                            feature_name=feature.feature_name.data,
+                            feature_descrit=feature.feature_descrit.data)
+        db.session.add(feature_info)
+        db.session.commit()
+        flash('Softare 提交成功.')
+
+        return redirect(url_for('mang.add_version', id=id))
+    feature.product_name.data = version.version.product_name
+    feature.product_descrit.data = version.version.product_descrit
+    feature.version_name.data = version.version_name
+    feature.version_descrit.data = version.version_descrit
+
+    read_only(feature.product_name)
+    read_only(feature.product_descrit)
+    read_only(feature.version_name)
+    read_only(feature.version_descrit)
+    return render_template('mang/add_feature.html', feature=feature)
 
 
 @mang.route('/add-product', methods=['GET', 'POST'])

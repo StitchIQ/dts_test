@@ -62,16 +62,45 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
 
+class SoftWareInfo(db.Model):
+    __tablename__ = 'softwareinfo'
+    id = db.Column(db.Integer, primary_key=True)
+    version_id = db.Column(db.Integer, db.ForeignKey('versioninfo.id'))
+    software_name = db.Column(db.String(64))
+    software_descrit = db.Column(db.Text)
+    software_status = db.Column(db.Boolean, default=False)
+    create_time = db.Column(db.DateTime, default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class FeatureInfo(db.Model):
+    __tablename__ = 'featureinfo'
+    id = db.Column(db.Integer, primary_key=True)
+    version_id = db.Column(db.Integer, db.ForeignKey('versioninfo.id'))
+    feature_name = db.Column(db.String(64))
+    feature_descrit = db.Column(db.Text)
+    feature_status = db.Column(db.Boolean, default=False)
+    create_time = db.Column(db.DateTime, default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 class VersionInfo(db.Model):
     __tablename__ = 'versioninfo'
     id = db.Column(db.Integer, primary_key=True)
-    product = db.Column(db.Integer, db.ForeignKey('productinfo.id'))
-    version_name = db.Column(db.Text)
+    product = db.Column(db.Integer, db.ForeignKey('productinfo.id'), index=True)
+    # version_id = db.Column(db.Integer, unique=True)
+    version_name = db.Column(db.String(64))
+    version_status = db.Column(db.Boolean, default=False)
     version_descrit = db.Column(db.Text)
-    software_version = db.Column(db.Text)
-    version_features = db.Column(db.Text)
-    create_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    update_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    create_time = db.Column(db.DateTime, default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, default=datetime.utcnow)
+
+    software_fk = db.relationship('SoftWareInfo',
+                           foreign_keys=[SoftWareInfo.version_id],
+                           backref='software', lazy='dynamic')
+    feature_fk = db.relationship('FeatureInfo',
+                           foreign_keys=[FeatureInfo.version_id],
+                           backref='feature', lazy='dynamic')
 
     @classmethod
     def get_by_product(cls, product_name):
@@ -118,9 +147,9 @@ class ProductInfo(db.Model):
     create_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
-    p_id = db.relationship('VersionInfo',
+    version_fk = db.relationship('VersionInfo',
                            foreign_keys=[VersionInfo.product],
-                           backref='software', lazy='dynamic')
+                           backref='version', lazy='dynamic')
 
     @classmethod
     def get_all_product(cls):

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}DTS 管理{% endblock %}
+
+{% block page_content %}
+
+<div class="col-md-4">
+    {{ wtf.quick_form(software) }}
+
+</div>
+
+
+{% endblock %}
