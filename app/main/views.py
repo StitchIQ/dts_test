@@ -163,7 +163,7 @@ def get_software():
     # jquery传递的参数需要转码
     product_name = unicode(request.args.get('product', 0, type=str))
     # software = VersionInfo.query.filter_by(product_name=a)
-    software = VersionInfo.get_by_product(product_name)
+    version = VersionInfo.get_by_product(product_name)
 
     # 对于外键，在连接时还是要使用原来的值
     # print str(VersionInfo.query.join(ProductInfo,
@@ -171,7 +171,7 @@ def get_software():
     #            ProductInfo.product_name==a))
 
     return jsonify({
-        'soft_info': [soft.software_to_json() for soft in software]
+        'soft_info': [v.software_to_json() for v in version]
         })
 
 
@@ -480,6 +480,7 @@ def download(symlink):
 @main.route('/bug_process/<string:id>', methods=['GET', 'POST'])
 @login_required
 def bug_process(id):
+    # TODO 需要在页面上显示问题的解决版本和回归测试版本
     bugs = Bugs.get_by_bug_id(id)
     attachments = Attachment.query.filter_by(bug_id=id).all()
 

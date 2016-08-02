@@ -26,6 +26,7 @@
 
         <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade in active" id="development">
+
                 {% if current_user == bugs.bug_owner and bugs.bug_status == Bug_Now_Status.DEVELOPMENT %}
 
                     <form method="post" class="form" role="form">

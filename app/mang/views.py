@@ -23,6 +23,21 @@ def user_manage():
     return render_template('mang/user_manage.html', userlist=userlist)
 
 
+@mang.route('/user-role-modify/<string:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def user_role_modify(user_id=None):
+    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
+    status  = request.form.get('manager')
+    dts_log.debug(status)
+    dts_log.debug(user_id)
+    dts_log.debug(request.url)
+
+    user = User.get_by_id(user_id)
+
+    return jsonify({"status": user.set_role(status)})
+
+
 @mang.route('/set-user-forbidden/<string:user_id>', methods=['POST'])
 @login_required
 @admin_required
@@ -38,50 +53,67 @@ def user_forbidden_status_manage(user_id=None):
     return jsonify({"status": user.set_forbidden_status(status)})
 
 
-@mang.route('/productlist', methods=['GET', 'POST'])
+@mang.route('/add-product', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def productlist():
+def add_product():
     product = ProductInfo.query.all()
+    add_product = Add_Product()
+    if add_product.validate_on_submit():
+        product_info = ProductInfo(
+            product_name = add_product.product_name.data,
+            product_descrit = add_product.product_descrit.data,
+            product_status = add_product.product_status.data)
+        db.session.add(product_info)
+        db.session.commit()
+        flash('产品信息更新成功.')
+        # return render_template('mang/add_product.html',
+        # add_product=add_product)
+        return redirect(url_for('mang.add_product'))
 
-    return render_template('mang/productlist.html', product=product)
+    return render_template('mang/productlist.html', product=product,
+                            add_product=add_product)
 
 
 @mang.route('/add-version/<int:id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def add_version(id):
-    product = ProductInfo.query.get_or_404(id)
-    version_list = VersionInfo.query.filter_by(product=product.id).all()
+    version_list = VersionInfo.query.filter_by(product=id).all()
+    product = ProductInfo.query.filter_by(id=id).first()
+
+    #查询软件版本、特性，供列表展示
     software_list = SoftWareInfo.query.all()
-    software = Add_Version()
-    print software.errors
+    feature_list = FeatureInfo.query.all()
+    version_form = Add_Version()
     print request.form.get('software_version')
     print request.form.getlist('software_version')
     print request.form.get('version_features')
     print request.form.getlist('version_features')
-    if software.validate_on_submit():
-        software_info = VersionInfo(
-                            product=product.id,
-                            version_name=software.version_name.data,
-                            version_descrit=software.version_descrit.data)
+    if version_form.validate_on_submit():
+        version_info = VersionInfo(
+                            product=id,
+                            version_name=version_form.version_name.data,
+                            version_descrit=version_form.version_descrit.data)
 
-        db.session.add(software_info)
+        db.session.add(version_info)
         db.session.commit()
         flash('Softare 提交成功.')
-        software_list = VersionInfo.query.filter_by(product=product.id).all()
+        #software_list = VersionInfo.query.filter_by(version=id).all()
         #return render_template('mang/add_softare.html', software=software,
         #                       version_list=version_list)
-        return redirect(url_for('mang.add_version', id=product.id))
-    software.product_name.data = product.product_name
-    software.product_descrit.data = product.product_descrit
+        return redirect(url_for('mang.add_version', id=id))
+    version_form.product_name.data = product.product_name
+    version_form.product_descrit.data = product.product_descrit
 
-    read_only(software.product_name)
-    read_only(software.product_descrit)
+    read_only(version_form.product_name)
+    read_only(version_form.product_descrit)
 
     return render_template(
-                'mang/add_version.html',
-                software=software, version_list=version_list,software_list=software_list)
+                'mang/add_version.html', version_form=version_form,
+                version_list=version_list,
+                software_list=software_list,
+                feature_list=feature_list)
 
 
 @mang.route('/add-software/<int:id>', methods=['GET', 'POST'])
@@ -104,7 +136,7 @@ def add_software(id):
         db.session.commit()
         flash('Softare 提交成功.')
 
-        return redirect(url_for('mang.add_version', id=id))
+        return redirect(url_for('mang.add_version', id=version.version.id))
     software.product_name.data = version.version.product_name
     software.product_descrit.data = version.version.product_descrit
     software.version_name.data = version.version_name
@@ -132,7 +164,7 @@ def add_feature(id):
         db.session.commit()
         flash('Softare 提交成功.')
 
-        return redirect(url_for('mang.add_version', id=id))
+        return redirect(url_for('mang.add_version', id=version.version.id))
     feature.product_name.data = version.version.product_name
     feature.product_descrit.data = version.version.product_descrit
     feature.version_name.data = version.version_name
@@ -145,58 +177,6 @@ def add_feature(id):
     return render_template('mang/add_feature.html', feature=feature)
 
 
-@mang.route('/add-product', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def add_product():
-    add_product = Add_Software()
-    if add_product.validate_on_submit():
-        product_info = ProductInfo(
-                            product_name=add_product.product_name.data,
-                            product_descrit=add_product.product_descrit.data,
-                            product_status=add_product.product_status.data)
-
-        db.session.add(product_info)
-        db.session.commit()
-
-        software_info = VersionInfo(
-                            product=product_info.id,
-                            version_name=add_product.version_name.data,
-                            version_descrit=add_product.version_descrit.data,
-                            software_version=add_product.software_version.data,
-                            version_features=add_product.version_features.data)
-        db.session.add(software_info)
-        db.session.commit()
-        flash('增加产品和版本成功.')
-        return redirect(url_for('mang.add_software', id=product_info.id))
-    return render_template('mang/add_product.html', add_product=add_product)
-
-
-@mang.route('/product-edit/<int:id>', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def product_edit(id):
-    product = ProductInfo.query.get_or_404(id)
-    add_product = Add_Product()
-    if add_product.validate_on_submit():
-
-        product.product_name = add_product.product_name.data
-        product.product_descrit = add_product.product_descrit.data
-        product.product_status = add_product.product_status.data
-        db.session.add(product)
-        db.session.commit()
-        flash('产品信息更新成功.')
-        # return render_template('mang/add_product.html',
-        # add_product=add_product)
-        return redirect(url_for('mang.productlist'))
-
-    add_product.product_name.data = product.product_name
-    add_product.product_descrit.data = product.product_descrit
-    # add_product.product_status.data = product.product_status
-    add_product.product_status.checked = '0'
-    return render_template('mang/add_product.html', add_product=add_product)
-
-
 @mang.route('/product-manage/<int:id>', methods=['POST'])
 @login_required
 @admin_required
@@ -207,7 +187,6 @@ def product_manage(id):
     dts_log.debug(request.url)
 
     return jsonify({"status": product.set_status(status)})
-
 
 
 @mang.route('/bug-manager')

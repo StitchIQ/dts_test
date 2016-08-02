@@ -10,8 +10,8 @@ class Add_Product(Form):
     product_descrit = StringField(u'产品描述',
                                   validators=[Required(), Length(1, 64)],render_kw={"placeholder": u"请输入产品描述"})
     product_status = RadioField(u'产品状态',
-                                choices=[('1', '正常'), ('0', '禁用')],
-                                default='1')
+                                choices=[('0', '正常'), ('1', '禁用')],
+                                default='0')
 
     submit = SubmitField('提交')
 
@@ -73,10 +73,10 @@ class Add_Software2(Form):
                                   validators=[Required(), Length(1, 64)],
                                   render_kw={"placeholder": u"请输入版本描述"})
 
-    software_name = StringField('软件版本描述',
+    software_name = StringField('软件版本名称',
                                   validators=[Required(), Length(1, 64)],
                                   render_kw={"placeholder": u"请输入版本名称"})
-    software_descrit = StringField('版本描述',
+    software_descrit = StringField('软件版本描述',
                                   validators=[Required(), Length(1, 64)],
                                   render_kw={"placeholder": u"请输入版本描述"})
 
@@ -99,11 +99,10 @@ class Add_Feature(Form):
                                   validators=[Required(), Length(1, 64)],
                                   render_kw={"placeholder": u"请输入版本描述"})
 
-    feature_name = StringField('软件版本描述',
+    feature_name = StringField('软件特性名称',
                                   validators=[Required(), Length(1, 64)],
-                                  render_kw={"placeholder": u"请输入版本名称"})
-    feature_descrit = StringField('版本描述',
-                                  validators=[Required(), Length(1, 64)],
-                                  render_kw={"placeholder": u"请输入版本描述"})
+                                  render_kw={"placeholder": u"请输入特性名称"})
+    feature_descrit = StringField('软件特性描述',
+                                  render_kw={"placeholder": u"请输入特性描述"})
 
     submit = SubmitField('提交')

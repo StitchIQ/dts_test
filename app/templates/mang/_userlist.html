@@ -10,12 +10,11 @@
            data-toolbar="#toolbar">
        <thead>
           <tr>
-             <th data-field="state" data-checkbox="true"><input type="checkbox"></input></th>
              <th>Num.</th>
              <th>用户ID</th>
              <th>用户名称</th>
              <th>用户邮箱</th>
-             <th>用户角色</th>
+             <th>修改角色</th>
              <th>确认状态</th>
              <th>当前状态</th>
              <th>注册日期</th>
@@ -25,12 +24,15 @@
        <tbody>
             {% for user in userlist %}
               <tr>
-                <td><input type="checkbox"></input></td>
                 <td>{{ loop.index }}</td>
                 <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.role.name }}</td>
+                <td>{% if user.is_administrator() %}
+                        <button id="usermodify" class="btn btn-danger" type="button" name="/mang/user-role-modify/{{ user.id }}" value="default">管理员</button>
+                    {% else %}
+                        <button id="usermodify" class="btn btn-success" type="button" name="/mang/user-role-modify/{{ user.id }}" value="ADMINISTER">普通用户</button>
+                    {% endif %}</td>
                 <td>{{ user.confirmed }}</td>
                 <td>
                     {% if user.forbidden_status %}

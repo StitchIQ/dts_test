@@ -1,3 +1,34 @@
+$("#table").on("click", "button#usermodify", function(){
+    //给tbody元素，所有tr添加事件
+    //获取当前点击的元素
+    var pic = $(this);
+    console.log(pic.val());
+    var r=confirm("确认修改人员权限 ？")
+    if (r == false){ return };
+    $.post(pic.attr("name"),{
+            manager:pic.val()
+        },
+        function(data){
+            console.log(data.status);
+            if(data.status == 'ADMINISTER'){
+                //console.log(pic.parents("tr"));
+                //console.log(pic.parents("td").prev().children().addClass("btn btn-danger"));
+                //console.log(pic.parents("td").next());
+                pic.removeClass();
+                pic.addClass("btn btn-success");
+                pic.val(data.status);
+                pic.text("普通用户");
+            }
+            if(data.status == 'default'){
+                pic.removeClass();
+                pic.addClass("btn btn-danger");
+                pic.text("管理员");
+                pic.val(data.status);
+            }
+        }
+    ).error(function() { alert("修改失败！"); });
+});
+
 
 $("#table").on("click", "button#modify", function(){
     //给tbody元素，所有tr添加事件

@@ -28,6 +28,7 @@
              <th>版本描述</th>
              <th>软件版本列表</th>
              <th>软件版本</th>
+             <th>软件特性列表</th>
              <th>软件特性</th>
           </tr>
        </thead>
@@ -49,6 +50,12 @@
                         <button class="btn btn-primary">
                         增加软件版本</button></a>
                 </td>
+                    <td> {% for s in feature_list %}
+                         {% if s.feature.id == p.id %}
+                          {{ s.feature_name }}<br>
+                        {% endif %}
+                     {% endfor %}
+                </td>
                 <td><a href="{{ url_for('mang.add_feature',id=p.id) }}">
                     <button class="btn btn-primary">增加软件特性</button></a>
                 </td>
@@ -57,7 +64,7 @@
        </tbody>
     </table>
 </div>
-
+{% include 'mang/_add_software.html' %}
 </div>
 </div>
 

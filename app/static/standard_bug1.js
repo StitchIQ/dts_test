@@ -59,11 +59,11 @@ $(document).ready(function () {
         $(temp.soft_info).each(function () {
             //alert(this.software);
             if(this.software == $("#product_version :selected").text()){
-                $.each((this.version.split(";")),function (i,item) {
+                $.each((this.version),function (i,item) {
                     //alert(item);
                     $("#software_version").append($("<option/>").text(item).attr("value", item));
                 });
-                $.each((this.features.split(";")),function (i,item) {
+                $.each((this.features),function (i,item) {
                     //alert(item);
                     $("#version_features").append($("<option/>").text(item).attr("value", item));
                 });

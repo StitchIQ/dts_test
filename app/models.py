@@ -84,6 +84,7 @@ class FeatureInfo(db.Model):
     update_time = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+
 class VersionInfo(db.Model):
     __tablename__ = 'versioninfo'
     id = db.Column(db.Integer, primary_key=True)
@@ -110,11 +111,16 @@ class VersionInfo(db.Model):
                     ProductInfo.product_name == product_name).all()
 
 
+    # 返回版本的名称和子版本以及特性列表
     def software_to_json(self):
+        s = SoftWareInfo.query.filter_by(version_id=self.id).all()
+        f = FeatureInfo.query.filter_by(version_id=self.id).all()
+        s_list = [s1.software_name for s1 in s]
+        f_list = [f1.feature_name for f1 in f]
         json_post = {
             'software': self.version_name,
-            'version': self.software_version,
-            'features': self.version_features,
+            'version': s_list,
+            'features': f_list,
             }
         return json_post
 
@@ -124,16 +130,18 @@ class VersionInfo(db.Model):
 
     # 返回软件版本的信息
     def software_to_turple(self):
+        s = SoftWareInfo.query.filter_by(version_id=self.id).all()
         dd = []
-        for soft in self.software_version.split(';'):
-            dd.append((soft, soft))
+        for soft in s:
+            dd.append((soft.software_name, soft.software_name))
         return dd
 
     # 返回软件特性的信息
     def features_to_turple(self):
+        f = FeatureInfo.query.filter_by(version_id=self.id).all()
         dd = []
-        for features in self.version_features.split(';'):
-            dd.append((features, features))
+        for features in f:
+            dd.append((features.feature_name, features.feature_name))
         return dd
 
 
@@ -574,6 +582,19 @@ class User(UserMixin, db.Model):
     def ping(self):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
+
+    def set_role(self, role):
+        """设置用户的角色，在管理员和普通用户间切换"""
+        if role == 'ADMINISTER':
+            self.role = Role.query.filter_by(permissions=0xff).first()
+            dts_log.debug(self.username + ' roles now is ADMINISTER')
+            db.session.add(self)
+            return 'default'
+        else:
+            self.role = Role.query.filter_by(default=True).first()
+            dts_log.debug(self.username + ' roles now is default')
+            db.session.add(self)
+            return 'ADMINISTER'
 
     def set_forbidden_status(self, status):
         """设置用户的运行状态，传过来的状态为当前状态，收到请求后反转状态，并返回设置后的状态"""
