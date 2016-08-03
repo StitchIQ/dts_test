@@ -123,7 +123,6 @@ def bugdailydatas():
     version = request.args.get('version')
     dts_log.debug(product)
     dts_log.debug(version)
-    # print prd
     daily_bugs = Bugs.query.with_entities(
         db.func.date(Bugs.timestamp).label('date'),
         db.func.count(Bugs.bug_id).label('total')).filter(

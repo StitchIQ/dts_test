@@ -8,6 +8,7 @@ import logging
 import bson.binary
 from cStringIO import StringIO
 
+from flask_sqlalchemy import get_debug_queries
 
 from flask import render_template, redirect, request, url_for, flash, \
     current_app, jsonify, abort, send_from_directory, make_response, send_file
@@ -28,10 +29,22 @@ from ..decorators import bug_edit_check2
 
 
 
+
 # flash :"success" "info" "danger"
 # TODO 增加单元测试。
 # TODO 附件的在bug中不同阶段分类
 dts_log = logging.getLogger('DTS')
+
+
+@main.after_app_request
+def after_request(response):
+    for query in get_debug_queries():
+        if query.duration >= current_app.config['FLASKY_SLOW_DB_QUERY_TIME']:
+            dts_log.warning(
+                'Slow query: %s\nParameters: %s\nDuration: %fs\nContext: %s\n'
+                % (query.statement, query.parameters, query.duration,
+                   query.context))
+    return response
 
 
 @main.route('/')
@@ -99,6 +112,7 @@ def buglist(product=None):
 
     dts_log.debug(product)
     dts_log.debug(request.view_args)
+    dts_log.debug(request.args)
     dts_log.debug(request.url)
     dts_log.debug(request.url_root)
     dts_log.debug(request.base_url)
@@ -231,7 +245,6 @@ def task(mytask='process', product=None, version=None, software=None):
                            pagination=pagination, mytask=mytask)
 
 
-
 @main.route('/copy_to_me/')
 @login_required
 def copy_to_me():
@@ -245,7 +258,6 @@ def copy_to_me():
             Bugs.timestamp.desc()).paginate(
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
-
 
     posts = pagination1.items
     return render_template('index.html', bugs_list=posts,
@@ -390,7 +402,7 @@ def viewimage(symlink=None):
         return response
     try:
         f = mongodb.files.find_one({"symlink":symlink})
-        print f['filename']
+        dts_log.debug(f['filename'])
         if f is None:
             dts_log.error(''.join([symlink, ' 没有找到']))
             raise bson.errors.InvalidId()
@@ -464,7 +476,7 @@ def download(symlink):
             dts_log.error(''.join([symlink, ' 没有找到']))
             return abort(404)
         response = make_response(send_file(StringIO(f['content'])))
-        #print response.headers['Content-Disposition']
+        # print response.headers['Content-Disposition']
         response.headers['Content-Disposition'] = "attachment; filename={}".format(downloadFile.filename)
         response.headers['Content-Type'] = "application/octet-stream"
     else:
@@ -487,19 +499,9 @@ def bug_process(id):
     form = BugsProcess()
     testleadedit = TestLeadEdit()
     developedit = DevelopEdit()
-    # developedit.resolve_version.choices  =
-    # [('B001','B001'),('B002','B002'),('B003','B003'),('B004','B004')]
     testleadedit2 = TestLeadEdit2()
     bugclose = BugClose()
 
-    if request.method == 'POST' and form.validate():
-        print request
-        print developedit.validate_on_submit()
-        print testleadedit.validate_on_submit()
-        print testleadedit2.validate_on_submit()
-        print bugclose.validate_on_submit()
-        dts_log.debug(developedit.errors)
-        print developedit.dversion_features.data
 
     if bugs.bug_status == Bug_Now_Status.TESTLEADER_AUDIT \
             and current_user == bugs.bug_owner:
@@ -693,7 +695,6 @@ def bug_edit(bug_id):
     attachments = None
     if bugs.bug_attachments:
         attachments = Attachment.get_all_attach_by_bug_id(bug_id)
-    # print bugs.now_status.id
 
     process_log = bugs.process.order_by(Process.timestamp.asc())
 
@@ -789,7 +790,6 @@ def bug_edit(bug_id):
 @main.route('/test')
 @login_required
 def test2():
-    print 'test2'
     print request.args.get('search')
     #return render_template('autocomplate.html')
     return render_template('test/checkbox.html')
@@ -799,7 +799,7 @@ def test2():
 @login_required
 def get_user():
     search = request.args.get('query', 0, type=str)
-    print search.isalnum()
+    dts_log.debug(search.isalnum())
     if not search.isalnum():
         return 'Not Found', 200
     user = User.query.filter(User.email.like(search + '%')).all()

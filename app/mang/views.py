@@ -86,10 +86,7 @@ def add_version(id):
     software_list = SoftWareInfo.query.all()
     feature_list = FeatureInfo.query.all()
     version_form = Add_Version()
-    print request.form.get('software_version')
-    print request.form.getlist('software_version')
-    print request.form.get('version_features')
-    print request.form.getlist('version_features')
+
     if version_form.validate_on_submit():
         version_info = VersionInfo(
                             product=id,
@@ -122,11 +119,7 @@ def add_version(id):
 def add_software(id):
     version = VersionInfo.query.filter_by(id=id).first()
     software = Add_Software2()
-    print software.errors
-    print request.form.get('software_version')
-    print request.form.getlist('software_version')
-    print request.form.get('version_features')
-    print request.form.getlist('version_features')
+
     if software.validate_on_submit():
         software_info = SoftWareInfo(
                             version_id=version.id,
