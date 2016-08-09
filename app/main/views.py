@@ -49,107 +49,55 @@ def after_request(response):
 
 @main.route('/')
 @login_required
-def index(product=None, version=None, software=None):
-    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
-    page = request.args.get('page', 1, type=int)
-    product = request.args.get('product')
-    version  = request.args.get('version')
-    software = request.args.get('software')
-    features = request.args.get('features')
+def index():
     dts_log.debug(request.url)
     dts_log.debug(request.url_root)
     dts_log.debug(request.base_url)
-    # sts=BugStatus.query.filter_by(id=6).first()
-    # Bugs.bug_status not in [Bug_Now_Status.CREATED, Bug_Now_Status.CLOSED]
-    # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
-    a = Bugs.query.filter_by(bug_forbidden_status=False).filter(Bugs.bug_owner == current_user ,
-                          Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
-                          Bugs.bug_status > Bug_Now_Status.CREATED)
-    b = Bugs.query.filter_by(bug_forbidden_status=False).filter(Bugs.author == current_user ,
-                          Bugs.bug_status == Bug_Now_Status.CREATED)
 
-    a = a.union(b)
-    if product:
-        a = a.filter(Bugs.product_name == product)
-
-    if version:
-        a = a.filter(Bugs.product_version == version)
-
-    if software:
-        a = a.filter(Bugs.software_version == software)
-
-    if features:
-        a = a.filter(Bugs.version_features == features)
-
-    pagination1 = a.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
-    '''
-    pagination1 = Bugs.query.filter(
-            (Bugs.bug_owner == current_user and (Bug_Now_Status.CREATED < Bugs.bug_status and Bugs.bug_status< Bug_Now_Status.CLOSED)),
-            (Bugs.author == current_user and Bugs.status_equal(Bug_Now_Status.CREATED))).order_by(
-            Bugs.timestamp.desc()).paginate(
-            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-            error_out=False)
-    '''
     dts_log.debug("index")
-    posts = pagination1.items
+    pagination = Bugs.bugs_filter('process', request.args)
+    posts = pagination.items
     return render_template('index.html',
-                           bugs_list=posts, pagination=pagination1)
+                           bugs_list=posts, pagination=pagination)
 
 
 @main.route('/buglist')
 @main.route('/buglist/<string:product>')
 @login_required
 def buglist(product=None):
-    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
-    page     = request.args.get('page', 1, type=int)
-    version  = request.args.get('version')
-    software = request.args.get('software')
-    date     = request.args.get('date')
-    features = request.args.get('features')
-    serious  = request.args.get('serious')
-    status   = request.args.get('status')
-    author   = request.args.get('author')
-
-    dts_log.debug(product)
-    dts_log.debug(request.view_args)
-    dts_log.debug(request.args)
-    dts_log.debug(request.url)
-    dts_log.debug(request.url_root)
-    dts_log.debug(request.base_url)
-
-    bugs_list = Bugs.query
-
-    if product:
-        bugs_list = bugs_list.filter(Bugs.product_name == product)
-
-    if version:
-        bugs_list = bugs_list.filter(Bugs.product_version == version)
-
-    if software:
-        bugs_list = bugs_list.filter(Bugs.software_version == software)
-
-    if date:
-        bugs_list = bugs_list.filter(db.func.date(Bugs.timestamp)== date)
-
-    if features:
-        bugs_list = bugs_list.filter(Bugs.version_features == features)
-
-    if serious:
-        bugs_list = bugs_list.filter(Bugs.bug_level == serious)
-
-    if status:
-        st = BugStatus.query.filter_by(bug_status_descrit=status).first()
-        bugs_list = bugs_list.filter_by(now_status = st)
-
-    if author:
-        au = User.query.filter_by(username=author).first()
-        bugs_list = bugs_list.filter_by(author = au)
-
-    pagination = bugs_list.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+    pagination = Bugs.bugs_filter('',request.args)
     items = pagination.items
     dts_log.debug(buglist.__name__)
     return render_template('index.html', bugs_list=items, pagination=pagination)
 
+
+@main.route('/task')
+@main.route('/task/<string:mytask>')
+@main.route('/task/<string:mytask>/<string:product>')
+@main.route('/task/<string:mytask>/<string:product>/<string:version>')
+@main.route('/task/<string:mytask>/<string:product>/<string:version>/<string:software>')
+@login_required
+def task(mytask='process', product=None, version=None, software=None):
+    dts_log.debug(request.url)
+    dts_log.debug(request.url_root)
+    dts_log.debug(request.view_args)
+    dts_log.debug(request.view_args.get('product'))
+    dts_log.debug(request.base_url)
+    dts_log.debug(request.endpoint)
+    dts_log.debug(request.view_args.copy())
+    page = request.args.get('page', 1, type=int)
+    dts_log.debug(mytask)
+    args = request.view_args.copy()
+    dts_log.debug( args)
+    args['page'] = request.args.get('page', 1, type=int)
+    dts_log.debug( args)
+    pagination = Bugs.bugs_filter(mytask, args)
+
+    posts = pagination.items
+    # flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.bug_id).filter(
+    #        Process.operator == current_user)))
+    return render_template('main.html', bugs_list=posts,
+                           pagination=pagination, mytask=mytask)
 
 @main.route('/check_user')
 @login_required
@@ -187,62 +135,6 @@ def get_software():
     return jsonify({
         'soft_info': [v.software_to_json() for v in version]
         })
-
-
-@main.route('/task')
-@main.route('/task/<string:mytask>')
-@main.route('/task/<string:mytask>/<string:product>')
-@main.route('/task/<string:mytask>/<string:product>/<string:version>')
-@main.route('/task/<string:mytask>/<string:product>/<string:version>/<string:software>')
-@login_required
-def task(mytask='process', product=None, version=None, software=None):
-    dts_log.debug(request.url)
-    dts_log.debug(request.url_root)
-    dts_log.debug(request.view_args)
-    dts_log.debug(request.base_url)
-    dts_log.debug(request.endpoint)
-    dts_log.debug(request.view_args.copy())
-    page = request.args.get('page', 1, type=int)
-    dts_log.debug(mytask)
-    if mytask == 'process':
-        a = Bugs.query.filter(Bugs.bug_owner == current_user ,
-                              Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
-                              Bugs.bug_status > Bug_Now_Status.CREATED)
-        b = Bugs.query.filter(Bugs.author == current_user ,
-                              Bugs.bug_status == Bug_Now_Status.CREATED)
-
-        pagination = a.union(b)
-
-
-    if mytask == 'created':
-
-        pagination = Bugs.query.filter_by(author=current_user)
-        # posts = pagination2.items
-
-    if mytask == 'processed':
-
-        # 查询的思路是表连接,要去重复值
-        pagination = Bugs.query.join(
-                    Process,
-                    Process.bugs_id == Bugs.bug_id).distinct().filter(
-                    Process.operator == current_user)
-
-    if product:
-        pagination = pagination.filter(Bugs.product_name == product)
-
-    if version:
-        pagination = pagination.filter(Bugs.product_version == version)
-
-    if software:
-        pagination = pagination.filter(Bugs.software_version == software)
-
-    pagination = pagination.order_by(Bugs.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
-
-    posts = pagination.items
-    # flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.bug_id).filter(
-    #        Process.operator == current_user)))
-    return render_template('main.html', bugs_list=posts,
-                           pagination=pagination, mytask=mytask)
 
 
 @main.route('/copy_to_me/')

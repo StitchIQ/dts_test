@@ -261,6 +261,90 @@ class Bugs(db.Model):
         else:
             return cls.query.filter_by(bug_forbidden_status=False).filter_by(bug_id=bug_id).first_or_404()
 
+
+    @classmethod
+    def bugs_filter(cls, query=None, request_args=None):
+        page     = None
+        product  = None
+        version  = None
+        software = None
+        date     = None
+        features = None
+        serious  = None
+        status   = None
+        author   = None
+        dts_log.debug(request_args)
+        product  = request_args.get('product')
+        version  = request_args.get('version')
+        software = request_args.get('software')
+        date     = request_args.get('date')
+        features = request_args.get('features')
+        serious  = request_args.get('serious')
+        status   = request_args.get('status')
+        author   = request_args.get('author')
+        page     = request_args.get('page')
+        if page :
+            page = int(page)
+        dts_log.debug(product)
+        dts_log.debug(page)
+        dts_log.debug(version)
+        dts_log.debug(software)
+        dts_log.debug(date)
+        dts_log.debug(features)
+
+        bugs_list = cls.query.filter_by(bug_forbidden_status=False)
+
+        if query == 'process':
+            # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
+            a = bugs_list.filter(Bugs.bug_owner == current_user ,
+                          Bugs.bug_status < Bug_Now_Status.CLOSED).filter(
+                          Bugs.bug_status > Bug_Now_Status.CREATED)
+            b = bugs_list.filter(Bugs.author == current_user ,
+                          Bugs.bug_status == Bug_Now_Status.CREATED)
+            bugs_list = a.union(b)
+
+        if query == 'created':
+            bugs_list = bugs_list.filter_by(author=current_user)
+            # posts = pagination2.items
+
+        if query == 'processed':
+            # 查询的思路是表连接,要去重复值
+            bugs_list = Bugs.query.filter_by(bug_forbidden_status=False).join(
+                        Process,
+                        Process.bugs_id == Bugs.bug_id).distinct().filter(
+                        Process.operator == current_user)
+
+        if product:
+            bugs_list = bugs_list.filter(cls.product_name == product)
+
+        if version:
+            bugs_list = bugs_list.filter(cls.product_version == version)
+
+        if software:
+            bugs_list = bugs_list.filter(cls.software_version == software)
+
+        if date:
+            bugs_list = bugs_list.filter(db.func.date(Bugs.timestamp)== date)
+
+        if features:
+            bugs_list = bugs_list.filter(cls.version_features == features)
+
+        if serious:
+            bugs_list = bugs_list.filter(cls.bug_level == serious)
+
+        if status:
+            st = BugStatus.query.filter_by(bug_status_descrit=status).first()
+            bugs_list = bugs_list.filter_by(now_status = st)
+
+        if author:
+            au = User.query.filter_by(username=author).first()
+            bugs_list = bugs_list.filter_by(author = au)
+
+        pagination = bugs_list.order_by(cls.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+
+        return pagination
+
+
     def set_running_manage(self, status):
         """设置问题单的运行状态，传过来的状态为当前状态，收到请求后反转状态，并返回设置后的状态"""
         if status == '1':
@@ -287,8 +371,6 @@ class Bugs(db.Model):
         db.session.delete(self)
         db.session.commit()
         return '0'
-
-
 
     def to_json(self):
         """把bug的信息转换为json格式"""
