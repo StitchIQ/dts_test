@@ -261,19 +261,9 @@ class Bugs(db.Model):
         else:
             return cls.query.filter_by(bug_forbidden_status=False).filter_by(bug_id=bug_id).first_or_404()
 
-
     @classmethod
     def bugs_filter(cls, query=None, request_args=None):
-        page     = None
-        product  = None
-        version  = None
-        software = None
-        date     = None
-        features = None
-        serious  = None
-        status   = None
-        author   = None
-        dts_log.debug(request_args)
+        dts_log.debug(request_args.copy())
         product  = request_args.get('product')
         version  = request_args.get('version')
         software = request_args.get('software')
@@ -285,15 +275,15 @@ class Bugs(db.Model):
         page     = request_args.get('page')
         if page :
             page = int(page)
-        dts_log.debug(product)
         dts_log.debug(page)
-        dts_log.debug(version)
-        dts_log.debug(software)
-        dts_log.debug(date)
-        dts_log.debug(features)
 
+        # 默认查询
         bugs_list = cls.query.filter_by(bug_forbidden_status=False)
+        if current_user.can(Permission.ADMINISTER):
+            # 管理员可以查询所有的问题单
+            bugs_list = cls.query
 
+        # 查询待处理的问题单列表
         if query == 'process':
             # 不用的条件的查询结果 使用union，添加组合时，使用逗号分割，不要使用and
             a = bugs_list.filter(Bugs.bug_owner == current_user ,
@@ -303,10 +293,11 @@ class Bugs(db.Model):
                           Bugs.bug_status == Bug_Now_Status.CREATED)
             bugs_list = a.union(b)
 
+        # 查询创建的问题单列表
         if query == 'created':
             bugs_list = bugs_list.filter_by(author=current_user)
-            # posts = pagination2.items
 
+        # 查询处理过的问题单列表
         if query == 'processed':
             # 查询的思路是表连接,要去重复值
             bugs_list = Bugs.query.filter_by(bug_forbidden_status=False).join(
@@ -593,6 +584,10 @@ class User(UserMixin, db.Model):
             if self.role is None:
                 dts_log.debug("Query User %s " %self.username)
                 self.role = Role.query.filter_by(default=True).first()
+
+    @classmethod
+    def user_autocomplete(cls, search_str):
+        return cls.query.filter_by(confirmed=True,forbidden_status=False).filter(User.email.like(search_str + '%')).all()
 
     @classmethod
     def get_by_email(cls, email):

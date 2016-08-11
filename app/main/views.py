@@ -51,8 +51,6 @@ def after_request(response):
 @login_required
 def index():
     dts_log.debug(request.url)
-    dts_log.debug(request.url_root)
-    dts_log.debug(request.base_url)
 
     dts_log.debug("index")
     pagination = Bugs.bugs_filter('process', request.args)
@@ -65,9 +63,12 @@ def index():
 @main.route('/buglist/<string:product>')
 @login_required
 def buglist(product=None):
-    pagination = Bugs.bugs_filter('',request.args)
+    dts_log.debug(request.url)
+    dts_log.debug(request.args)
+
+    pagination = Bugs.bugs_filter('', request.args)
     items = pagination.items
-    dts_log.debug(buglist.__name__)
+
     return render_template('index.html', bugs_list=items, pagination=pagination)
 
 
@@ -79,23 +80,15 @@ def buglist(product=None):
 @login_required
 def task(mytask='process', product=None, version=None, software=None):
     dts_log.debug(request.url)
-    dts_log.debug(request.url_root)
     dts_log.debug(request.view_args)
-    dts_log.debug(request.view_args.get('product'))
-    dts_log.debug(request.base_url)
-    dts_log.debug(request.endpoint)
-    dts_log.debug(request.view_args.copy())
     page = request.args.get('page', 1, type=int)
-    dts_log.debug(mytask)
     args = request.view_args.copy()
-    dts_log.debug( args)
     args['page'] = request.args.get('page', 1, type=int)
-    dts_log.debug( args)
-    pagination = Bugs.bugs_filter(mytask, args)
+    dts_log.debug(args)
 
+    pagination = Bugs.bugs_filter(mytask, args)
     posts = pagination.items
-    # flash(str(Bugs.query.join(Process, Process.bugs_id == Bugs.bug_id).filter(
-    #        Process.operator == current_user)))
+
     return render_template('main.html', bugs_list=posts,
                            pagination=pagination, mytask=mytask)
 
@@ -171,25 +164,28 @@ def newbug():
 
     # print request.values
     if form.validate_on_submit():
+        dts_log.debug(1)
         if request.form.get('submit'):
             form.bug_status.data = Bug_Now_Status.TESTLEADER_AUDIT
-
+        dts_log.debug(2)
         if request.form.get('save_crft'):
             form.bug_status.data = Bug_Now_Status.CREATED
         # if request.method == 'POST':
         #print form.version_features.value
-
+        dts_log.debug(3)
         if len(form.errors) != 0:
             return render_template("standard_bug.html", form=form)
 
-        f = request.files['attachment']
+        dts_log.debug(5)
+        #f = request.files['attachment']
+        dts_log.debug(6)
         fname = None
-        is_has_attach_files = False
-
-        if f.filename != '':
+        is_has_attach_files = True
+        dts_log.debug(4)
+        #if f.filename != '':
             # fname = UPLOAD_FOLDER + secure_filename(f.filename)
             # f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
-            is_has_attach_files = True
+        #    is_has_attach_files = True
 
         dts_log.debug(unicode(form.version_features.data))
         bug = Bugs(bug_id=form.bugs_id.data,
@@ -694,7 +690,7 @@ def get_user():
     dts_log.debug(search.isalnum())
     if not search.isalnum():
         return 'Not Found', 200
-    user = User.query.filter(User.email.like(search + '%')).all()
+    user = User.user_autocomplete(search)
     return jsonify({"suggestions":[u.email for u in user]})
 
 

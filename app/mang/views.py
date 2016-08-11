@@ -187,40 +187,10 @@ def product_manage(id):
 @login_required
 @admin_required
 def bug_manage(product=None):
-    # bugs_list = Bugs.query.filter_by(bug_owner=current_user).all()
-    page     = request.args.get('page', 1, type=int)
-    version  = request.args.get('version')
-    software = request.args.get('software')
-    status   = request.args.get('status')
-    author   = request.args.get('author')
-
-    dts_log.debug(product)
     dts_log.debug(request.url)
     dts_log.debug(request.url_root)
-    dts_log.debug(request.base_url)
 
-    bugs_list = Bugs.query
-
-    if product:
-        bugs_list = bugs_list.filter(Bugs.product_name == product)
-
-    if version:
-        bugs_list = bugs_list.filter(Bugs.product_version == version)
-
-    if software:
-        bugs_list = bugs_list.filter(Bugs.software_version == software)
-
-    if status:
-        st = BugStatus.query.filter_by(bug_status_descrit=status).first()
-        bugs_list = bugs_list.filter_by(now_status = st)
-
-    if author:
-        au = User.query.filter_by(username=author).first()
-        bugs_list = bugs_list.filter_by(author = au)
-
-    pagination = bugs_list.order_by(Bugs.timestamp.desc()).paginate(
-                 page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
-
+    pagination = Bugs.bugs_filter(query=None, request_args=request.args)
     bugs_list = pagination.items
 
     return render_template('mang/bug_manage.html', bugs_list=bugs_list,
