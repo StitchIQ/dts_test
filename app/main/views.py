@@ -28,13 +28,10 @@ from .. import db, mongodb
 from ..decorators import bug_edit_check2
 
 
-
-
 # flash :"success" "info" "danger"
 # TODO 增加单元测试。
 # TODO 附件的在bug中不同阶段分类
 dts_log = logging.getLogger('DTS')
-
 
 @main.after_app_request
 def after_request(response):
@@ -48,49 +45,40 @@ def after_request(response):
 
 
 @main.route('/')
-@login_required
-def index():
-    dts_log.debug(request.url)
-
-    dts_log.debug("index")
-    pagination = Bugs.bugs_filter('process', request.args)
-    posts = pagination.items
-    return render_template('index.html',
-                           bugs_list=posts, pagination=pagination)
-
-
-@main.route('/buglist')
-@main.route('/buglist/<string:product>')
-@login_required
-def buglist(product=None):
-    dts_log.debug(request.url)
-    dts_log.debug(request.args)
-
-    pagination = Bugs.bugs_filter('', request.args)
-    items = pagination.items
-
-    return render_template('index.html', bugs_list=items, pagination=pagination)
-
-
 @main.route('/task')
 @main.route('/task/<string:mytask>')
 @main.route('/task/<string:mytask>/<string:product>')
 @main.route('/task/<string:mytask>/<string:product>/<string:version>')
 @main.route('/task/<string:mytask>/<string:product>/<string:version>/<string:software>')
+@main.route('/task/<string:mytask>/<string:product>/<string:version>/<string:software>/<string:features>')
 @login_required
-def task(mytask='process', product=None, version=None, software=None):
+def index(mytask='process', product=None, version=None, software=None, features=None):
     dts_log.debug(request.url)
-    dts_log.debug(request.view_args)
-    page = request.args.get('page', 1, type=int)
-    args = request.view_args.copy()
-    args['page'] = request.args.get('page', 1, type=int)
-    dts_log.debug(args)
+    dts_log.debug(request.args.copy())
+    dts_log.debug(request.view_args.copy())
 
-    pagination = Bugs.bugs_filter(mytask, args)
+    myurl = request.base_url
+    mydict = request.args.copy()
+    s = ''
+    if len(mydict)>=1 :
+        for d in mydict:
+            if d != 'page':
+                s = s + d + '='+ mydict[d] + '&'
+        myurl = myurl + '?' + s
+    else:
+        myurl = myurl + '?'
+
+    dts_log.debug(myurl)
+
+    view_args = request.view_args.copy()
+    request_args= request.args
+
+    pagination = Bugs.bugs_filter(mytask, view_args, request_args)
     posts = pagination.items
 
-    return render_template('main.html', bugs_list=posts,
-                           pagination=pagination, mytask=mytask)
+    return render_template('index.html', bugs_list=posts,
+                           pagination=pagination, mytask=mytask, myurl=myurl)
+
 
 @main.route('/check_user')
 @login_required
@@ -162,30 +150,16 @@ def newbug():
     dts_log.debug(form.errors)
     dts_log.debug(form.validate_on_submit())
 
-    # print request.values
     if form.validate_on_submit():
-        dts_log.debug(1)
         if request.form.get('submit'):
             form.bug_status.data = Bug_Now_Status.TESTLEADER_AUDIT
-        dts_log.debug(2)
         if request.form.get('save_crft'):
             form.bug_status.data = Bug_Now_Status.CREATED
-        # if request.method == 'POST':
-        #print form.version_features.value
-        dts_log.debug(3)
         if len(form.errors) != 0:
             return render_template("standard_bug.html", form=form)
 
-        dts_log.debug(5)
-        #f = request.files['attachment']
-        dts_log.debug(6)
         fname = None
         is_has_attach_files = True
-        dts_log.debug(4)
-        #if f.filename != '':
-            # fname = UPLOAD_FOLDER + secure_filename(f.filename)
-            # f.save(app_dir + UPLOAD_FOLDER + secure_filename(f.filename))
-        #    is_has_attach_files = True
 
         dts_log.debug(unicode(form.version_features.data))
         bug = Bugs(bug_id=form.bugs_id.data,
@@ -247,16 +221,6 @@ def newbug():
 @main.route('/upload', methods=['POST'])
 @login_required
 def upload():
-    import mimetypes
-    from tempfile import mktemp
-    from werkzeug.utils import secure_filename
-
-    ALLOWED_MIMETYPES = {'image/jpg', 'image/jpeg', 'image/png', 'image/gif',
-                         'image/pjpeg', 'image/x-png'}
-
-    if request.method == 'GET':
-        return render_template('upload.html', img='')
-
     bug_id = None
     uploadedFile = None
     try:
@@ -267,10 +231,7 @@ def upload():
     except:
         return abort(400)
 
-    #mongo_id = save_file(bug_id, uploadedFile)
     pasteFile = Attachment.create_by_uploadFile(bug_id, uploadedFile)
-    #db.session.add(pasteFile)
-    #db.session.commit()
 
     return jsonify({
             "symlink": pasteFile.symlink,
@@ -347,6 +308,7 @@ def download_file(filehash):
 
     return response
 
+
 @main.route('/down/<symlink>')
 @login_required
 def download(symlink):
@@ -389,7 +351,6 @@ def bug_process(id):
     developedit = DevelopEdit()
     testleadedit2 = TestLeadEdit2()
     bugclose = BugClose()
-
 
     if bugs.bug_status == Bug_Now_Status.TESTLEADER_AUDIT \
             and current_user == bugs.bug_owner:

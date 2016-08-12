@@ -18,18 +18,12 @@ from . import reports
 
 dts_log = logging.getLogger('DTS')
 
-# TODO URL不再使用
-@reports.route('/dailycharts', methods=['GET'])
-@login_required
-def dailycharts():
-    return render_template('reports/dailycharts.html')
-
 
 @reports.route('/bugsversioncharts', methods=['GET'])
 @login_required
 def bugsversioncharts():
     product = ProductInfo.get_all_product()
-    version = VersionInfo.query.all()
+    version = VersionInfo.get_all_version()
 
     return render_template('reports/versionreports.html', product=product,
                             version=version)
@@ -43,7 +37,7 @@ def dailydatas():
     # db.func.count(Bugs.id).label('total')).group_by(db.func.strftime(
     #       '%Y.%m.%d',Bugs.timestamp).label('date')).all()
 
-    daily_bugs = Bugs.query.with_entities(
+    daily_bugs = Bugs.query.filter_by(bug_forbidden_status=False).with_entities(
                     db.func.date(Bugs.timestamp).label('date'),
                     db.func.count(Bugs.bug_id).label('total')).group_by(
                     db.func.date(Bugs.timestamp).label('date')).all()
@@ -60,22 +54,12 @@ def dailydatas():
         })
 
 
-@reports.route('/productcharts', methods=['GET'])
-@login_required
-def productcharts():
-    # product = ProductInfo.query.all()
-    product = ProductInfo.get_all_product()
-
-    return render_template('reports/productcharts.html', product=product)
-
-
-
 @reports.route('/versiondatas', methods=['GET'])
 @login_required
 def versiondatas():
     version = request.args.get('product')
     # print prd
-    daily_bugs = Bugs.query.with_entities(
+    daily_bugs = Bugs.query.filter_by(bug_forbidden_status=False).with_entities(
         db.func.date(Bugs.timestamp).label('date'),
         db.func.count(Bugs.bug_id).label('total')).filter(
         Bugs.product_version == version).group_by(
@@ -103,7 +87,7 @@ def bugtodaydatas():
                     db.func.date(Bugs.timestamp).label('date'),
                     db.func.count(Bugs.bug_id).label('total')).filter(
                     db.func.date(Bugs.timestamp)==db.func.date('now','localtime')).filter(
-                    Bugs.product_version == version).group_by(
+                    Bugs.product_version == version, Bugs.bug_forbidden_status==False).group_by(
                     db.func.date(Bugs.timestamp)).all()
     # ss = db.session.execute("select strftime('%Y.%m.%d',timestamp)
     # as date,count(id) as total from bugs GROUP BY
@@ -126,7 +110,7 @@ def bugdailydatas():
     daily_bugs = Bugs.query.with_entities(
         db.func.date(Bugs.timestamp).label('date'),
         db.func.count(Bugs.bug_id).label('total')).filter(
-        Bugs.product_name == product)
+        Bugs.product_name == product, Bugs.bug_forbidden_status==False)
 
     if version:
         daily_bugs = daily_bugs.filter(Bugs.product_version == version)
@@ -152,7 +136,7 @@ def softwarebugdatas():
     daily_bugs = Bugs.query.with_entities(
         Bugs.software_version.label('software'),
         db.func.count(Bugs.bug_id).label('total')).filter(
-        Bugs.product_name == product)
+        Bugs.product_name == product, Bugs.bug_forbidden_status==False)
 
     if version:
         daily_bugs = daily_bugs.filter(Bugs.product_version == version)
@@ -177,7 +161,7 @@ def featuresbugdatas():
     daily_bugs = Bugs.query.with_entities(
         Bugs.version_features.label('features'),
         db.func.count(Bugs.bug_id).label('total')).filter(
-        Bugs.product_name == product)
+        Bugs.product_name == product, Bugs.bug_forbidden_status==False)
 
     if version:
         daily_bugs = daily_bugs.filter(Bugs.product_version == version)
@@ -200,7 +184,7 @@ def seriousbugdatas():
     daily_bugs = Bugs.query.with_entities(
         Bugs.bug_level.label('level'),
         db.func.count(Bugs.bug_id).label('total')).filter(
-        Bugs.product_name == product)
+        Bugs.product_name == product, Bugs.bug_forbidden_status==False)
 
     if version:
         daily_bugs = daily_bugs.filter(Bugs.product_version == version)
@@ -224,7 +208,7 @@ def statusbugdatas():
     daily_bugs = db.session.query(
                 db.func.count(Bugs.bug_id).label('total'),
                 BugStatus.bug_status_descrit.label('status')).filter(
-                Bugs.product_name == product)
+                Bugs.product_name == product, Bugs.bug_forbidden_status==False)
 
     if version:
         daily_bugs = daily_bugs.filter(Bugs.product_version == version)
@@ -249,7 +233,7 @@ def authorbugsdatas():
 
     daily_bugs = db.session.query(db.func.count(Bugs.id).label('total'),
                                   User.username.label('status')).filter(
-                                  Bugs.product_name == product)
+                                  Bugs.product_name == product, Bugs.bug_forbidden_status==False)
 
     if version:
         daily_bugs = daily_bugs.filter(Bugs.product_version == version)
@@ -268,10 +252,10 @@ def authorbugsdatas():
 @login_required
 def seriousdataspie():
     prd = request.args.get('product')
-    daily_bugs = Bugs.query.with_entities(
+    daily_bugs = Bugs.query.filter_by(bug_forbidden_status=False).with_entities(
                     Bugs.bug_level.label('level'),
                     db.func.count(Bugs.bug_id).label('total')).filter(
-                    Bugs.product_name == prd).group_by(
+                    Bugs.product_name == prd, Bugs.bug_forbidden_status==False).group_by(
                     Bugs.bug_level.label('level')).all()
 
     data = [{"value": s.total, "name": s.level} for s in daily_bugs]
@@ -296,12 +280,9 @@ def statusdatas():
     daily_bugs = db.session.query(
                 db.func.count(Bugs.bug_id).label('total'),
                 BugStatus.bug_status_descrit.label('status')).filter(
-                Bugs.product_name == prd).filter(
+                Bugs.product_name == prd, Bugs.bug_forbidden_status==False).filter(
                 Bugs.bug_status == BugStatus.bug_status).group_by(
                 Bugs.bug_status).all()
-    # print '44'*20
-    # print str(daily_bugs)
-    # print '44'*20
 
     # 直接使用sql语句查询的结果访问属性会失败，返回500的错误
     # daily_bugs = db.session.execute("SELECT bugstatus.bug_status_descrit as

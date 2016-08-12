@@ -110,6 +110,9 @@ class VersionInfo(db.Model):
                     ProductInfo, ProductInfo.id == VersionInfo.product).filter(
                     ProductInfo.product_name == product_name).all()
 
+    @classmethod
+    def get_all_version(cls):
+        return cls.query.filter_by(version_status=False).all()
 
     # 返回版本的名称和子版本以及特性列表
     def software_to_json(self):
@@ -262,22 +265,22 @@ class Bugs(db.Model):
             return cls.query.filter_by(bug_forbidden_status=False).filter_by(bug_id=bug_id).first_or_404()
 
     @classmethod
-    def bugs_filter(cls, query=None, request_args=None):
-        dts_log.debug(request_args.copy())
-        product  = request_args.get('product')
-        version  = request_args.get('version')
-        software = request_args.get('software')
+    def bugs_filter(cls, query='list', view_args=None, request_args=None):
+        dts_log.debug(view_args)
+        dts_log.debug(request_args)
+        product  = view_args.get('product', None)
+        version  = view_args.get('version')
+        software = view_args.get('software')
+        features = view_args.get('features')
+
         date     = request_args.get('date')
-        features = request_args.get('features')
         serious  = request_args.get('serious')
         status   = request_args.get('status')
         author   = request_args.get('author')
-        page     = request_args.get('page')
-        if page :
-            page = int(page)
+        page     = request_args.get('page',1, type=int)
+        dts_log.debug(date)
         dts_log.debug(page)
-
-        # 默认查询
+        # 默认查询 默认query值为list，全部查询
         bugs_list = cls.query.filter_by(bug_forbidden_status=False)
         if current_user.can(Permission.ADMINISTER):
             # 管理员可以查询所有的问题单

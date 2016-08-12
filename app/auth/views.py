@@ -99,5 +99,5 @@ def change_password():
             flash('密码修改成功.', "success")
             return redirect(url_for('main.index'))
         else:
-            flash('Invalid password.')
+            flash('无效的密码.')
     return render_template("auth/change_password.html", form=form)

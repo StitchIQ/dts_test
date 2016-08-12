@@ -189,8 +189,8 @@ def product_manage(id):
 def bug_manage(product=None):
     dts_log.debug(request.url)
     dts_log.debug(request.url_root)
-
-    pagination = Bugs.bugs_filter(query=None, request_args=request.args)
+    dts_log.debug(request.view_args)
+    pagination = Bugs.bugs_filter('list', request.view_args, request_args=request.args)
     bugs_list = pagination.items
 
     return render_template('mang/bug_manage.html', bugs_list=bugs_list,

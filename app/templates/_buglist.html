@@ -35,11 +35,11 @@
                 <td><input type="checkbox"></input></td>
                 <td>{{ loop.index }}</td>
                 <td><a href="{{ url_for('main.bug_process', id=bugs.bug_id) }}" target="_blank">{{ bugs.bug_id }}</a></td>
-                <td><a href="{{ url_for(request.endpoint, product=bugs.product_name)}}">{{ bugs.product_name }}</a></td>
-                <td><a href="{{ url_for(request.endpoint, product=bugs.product_name, version=bugs.product_version) }}">{{ bugs.product_version }}</a></td>
-                <td><a href="{{ url_for(request.endpoint, product=bugs.product_name, version=bugs.product_version, software=bugs.software_version) }}">
+                <td><a href="{{ url_for(request.endpoint, mytask=mytask, product=bugs.product_name)}}">{{ bugs.product_name }}</a></td>
+                <td><a href="{{ url_for(request.endpoint, mytask=mytask, product=bugs.product_name, version=bugs.product_version) }}">{{ bugs.product_version }}</a></td>
+                <td><a href="{{ url_for(request.endpoint, mytask=mytask, product=bugs.product_name, version=bugs.product_version, software=bugs.software_version) }}">
                     {{ bugs.software_version }}</a></td>
-                <td><a href="{{ url_for(request.endpoint, product=bugs.product_name, version=bugs.product_version, software=bugs.software_version, features=bugs.version_features) }}">
+                <td><a href="{{ url_for(request.endpoint, mytask=mytask, product=bugs.product_name, version=bugs.product_version, software=bugs.software_version, features=bugs.version_features) }}">
                     {{ bugs.version_features }}</a></td>
                 <td>{{ bugs.bug_level }}</td>
                 <td>{{ bugs.bug_show_times }}</td>
