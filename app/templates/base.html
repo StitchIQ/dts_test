@@ -119,7 +119,7 @@
            </ul>
       </li>
 
-
+     {% if current_user.is_administrator() %}
       <li> <a href="#dicSetting" class="nav-header" data-toggle="collapse" aria-expanded="true">
           <i class="glyphicon glyphicon-bold"></i> 系统管理 <span class="pull-right glyphicon glyphicon-chevron-toggle"></span> </a>
        <ul id="dicSetting" class="nav nav-list secondmenu collapse in">
@@ -129,6 +129,8 @@
         <li><a href="{{ url_for('mang.bug_attach') }}"><i class="glyphicon glyphicon-paperclip"></i>&nbsp;问题单附件管理</a></li>
         <li><a href="{{ url_for('mang.bug_attach_no_bug_id') }}"><i class="glyphicon glyphicon-remove"></i>&nbsp;问题单多余附件管理</a></li>
        </ul> </li>
+    {% endif %}
+
       <li> <a href="#"> <i class="glyphicon glyphicon-fire"></i> 关于系统 <span class="badge pull-right">1</span> </a> </li>
      </ul>
     </div>

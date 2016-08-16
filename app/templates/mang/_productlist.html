@@ -28,7 +28,7 @@
               <tr>
                 <td><input type="checkbox"></input></td>
                 <td>{{ loop.index }}</td>
-                <td>{{ p.product_name }}</td>
+                <td><a href="{{ url_for('mang.add_version', id=p.id) }}">{{ p.product_name }}</a></td>
                 <td>{{ p.product_descrit }}</td>
                 <td>
                     {% if p.product_status %}

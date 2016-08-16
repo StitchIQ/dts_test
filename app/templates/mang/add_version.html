@@ -11,7 +11,7 @@
     </button>
 
 </div>
-<div class="col-md-9">
+<div class="col-md-10">
     <table id="table"
            data-toggle="table"
            data-search="true"
@@ -25,11 +25,10 @@
              <th>Num.</th>
              <th>产品名称</th>
              <th>版本名称</th>
+             <th>修改状态</th>
              <th>版本描述</th>
              <th>软件版本列表</th>
-             <th>软件版本</th>
              <th>软件特性列表</th>
-             <th>软件特性</th>
           </tr>
        </thead>
        <tbody>
@@ -39,25 +38,48 @@
                 <td>{{ loop.index }}</td>
                 <td>{{ p.version.product_name }}</td>
                 <td>{{ p.version_name }}</td>
+                <td>{% if p.version_status %}
+                        <button id="modify" class="btn btn-danger" type="button" name="/mang/version-manage/{{ p.id }}" value="1">锁定</button>
+                    {% else %}
+                        <button id="modify" class="btn btn-success" type="button" name="/mang/version-manage/{{ p.id }}" value="0">正常</button>
+                    {% endif %}
+                </td>
                 <td>{{ p.version_descrit }}</td>
                 <td> {% for s in software_list %}
                          {% if s.software.id == p.id %}
-                          {{ s.software_name }}<br>
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-default">{{ s.software_name}}</button>
+                              {% if s.software_status %}
+                                <button id="modify" class="btn btn-danger" type="button" name="/mang/software-manage/{{ s.id }}" value="1">锁定</button>
+                              {% else %}
+                                <button id="modify" class="btn btn-success" type="button" name="/mang/software-manage/{{ s.id }}" value="0">正常</button>
+                              {% endif %}
+                            </div>
+                            <br>
                         {% endif %}
                      {% endfor %}
-                </td>
-                <td><a href="{{ url_for('mang.add_software',id=p.id) }}">
+                    <br>
+                    <a href="{{ url_for('mang.add_software',id=p.id) }}">
                         <button class="btn btn-primary">
                         增加软件版本</button></a>
                 </td>
+
                     <td> {% for s in feature_list %}
                          {% if s.feature.id == p.id %}
-                          {{ s.feature_name }}<br>
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-default">{{ s.feature_name }}</button>
+                              {% if s.feature_status %}
+                                <button id="modify" class="btn btn-danger" type="button" name="/mang/feature-manage/{{ s.id }}" value="1">锁定</button>
+                              {% else %}
+                                <button id="modify" class="btn btn-success" type="button" name="/mang/feature-manage/{{ s.id }}" value="0">正常</button>
+                              {% endif %}
+                            </div>
+                            <br>
                         {% endif %}
                      {% endfor %}
-                </td>
-                <td><a href="{{ url_for('mang.add_feature',id=p.id) }}">
-                    <button class="btn btn-primary">增加软件特性</button></a>
+                     <br>
+                    <a href="{{ url_for('mang.add_feature',id=p.id) }}">
+                      <button class="btn btn-primary">增加软件特性</button></a>
                 </td>
               </tr>
             {% endfor %}
@@ -75,5 +97,5 @@
 <script src="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.js" type="text/javascript"></script>
 <link  href="/static/libs/bootstrap-table1.10.1/bootstrap-table.min.css" rel="stylesheet" type="text/css">
 
-
+<script src="/static/manager/bug_manage.js" type="text/javascript"></script>
 {% endblock %}

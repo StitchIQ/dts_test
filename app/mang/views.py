@@ -181,6 +181,41 @@ def product_manage(id):
 
     return jsonify({"status": product.set_status(status)})
 
+@mang.route('/version-manage/<int:id>', methods=['POST'])
+@login_required
+@admin_required
+def version_manage(id):
+    version = VersionInfo.query.get_or_404(id)
+    status  = request.form.get('manager')
+    dts_log.debug(status)
+    dts_log.debug(request.url)
+
+    return jsonify({"status": version.set_status(status)})
+
+
+@mang.route('/software-manage/<int:id>', methods=['POST'])
+@login_required
+@admin_required
+def software_manage(id):
+    software = SoftWareInfo.query.get_or_404(id)
+    status  = request.form.get('manager')
+    dts_log.debug(status)
+    dts_log.debug(request.url)
+
+    return jsonify({"status": software.set_status(status)})
+
+
+@mang.route('/feature-manage/<int:id>', methods=['POST'])
+@login_required
+@admin_required
+def feature_manage(id):
+    feature = FeatureInfo.query.get_or_404(id)
+    status  = request.form.get('manager')
+    dts_log.debug(status)
+    dts_log.debug(request.url)
+
+    return jsonify({"status": feature.set_status(status)})
+
 
 @mang.route('/bug-manager')
 @mang.route('/bug-manager/<string:product>')
@@ -193,8 +228,20 @@ def bug_manage(product=None):
     pagination = Bugs.bugs_filter('list', request.view_args, request_args=request.args)
     bugs_list = pagination.items
 
+    myurl = request.base_url
+    mydict = request.args.copy()
+    s = ''
+    if len(mydict) >= 1:
+        for d in mydict:
+            if d != 'page':
+                s = s + d + '='+ mydict[d] + '&'
+        myurl = myurl + '?' + s
+    else:
+        myurl = myurl + '?'
+    dts_log.debug(myurl)
+
     return render_template('mang/bug_manage.html', bugs_list=bugs_list,
-                                                pagination=pagination)
+                                                pagination=pagination, myurl=myurl)
 
 
 @mang.route('/bug-delete/<string:bug_id>', methods=['POST'])
@@ -238,8 +285,20 @@ def bug_attach():
 
     attach_list = pagination.items
 
+    myurl = request.base_url
+    mydict = request.args.copy()
+    s = ''
+    if len(mydict) >= 1:
+        for d in mydict:
+            if d != 'page':
+                s = s + d + '='+ mydict[d] + '&'
+        myurl = myurl + '?' + s
+    else:
+        myurl = myurl + '?'
+    dts_log.debug(myurl)
+
     return render_template('mang/attach_manger.html', attach_list=attach_list,
-                                                pagination=pagination)
+                                                pagination=pagination, myurl=myurl)
 
 @mang.route('/bug-attach-non')
 @login_required

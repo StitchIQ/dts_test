@@ -9,7 +9,7 @@
     {% include 'mang/_attachlist.html' %}
     {% if pagination %}
         <div class="pagination">
-        {{ macros.pagination_widget(pagination, request.base_url) }}
+        {{ macros.pagination_widget(pagination, myurl) }}
         </div>
     {% endif %}
 

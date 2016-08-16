@@ -72,6 +72,16 @@ class SoftWareInfo(db.Model):
     create_time = db.Column(db.DateTime, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def set_status(self,status):
+        dts_log.debug(str(self.id) + str(status))
+        if status == '1':
+            self.software_status = False
+            db.session.add(self)
+            return '0'
+        else:
+            self.software_status = True
+            db.session.add(self)
+            return '1'
 
 class FeatureInfo(db.Model):
     __tablename__ = 'featureinfo'
@@ -83,7 +93,16 @@ class FeatureInfo(db.Model):
     create_time = db.Column(db.DateTime, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, default=datetime.utcnow)
 
-
+    def set_status(self,status):
+        dts_log.debug(str(self.id) + str(status))
+        if status == '1':
+            self.feature_status = False
+            db.session.add(self)
+            return '0'
+        else:
+            self.feature_status = True
+            db.session.add(self)
+            return '1'
 
 class VersionInfo(db.Model):
     __tablename__ = 'versioninfo'
@@ -105,19 +124,31 @@ class VersionInfo(db.Model):
 
     @classmethod
     def get_by_product(cls, product_name):
-        dts_log.debug('Get all product')
+        dts_log.debug('Get all product: %s' %product_name)
         return cls.query.join(
                     ProductInfo, ProductInfo.id == VersionInfo.product).filter(
-                    ProductInfo.product_name == product_name).all()
+                    ProductInfo.product_name == product_name,
+                    VersionInfo.version_status==False).all()
 
     @classmethod
     def get_all_version(cls):
         return cls.query.filter_by(version_status=False).all()
 
+    def set_status(self,status):
+        dts_log.debug(str(self.id) + str(status))
+        if status == '1':
+            self.version_status = False
+            db.session.add(self)
+            return '0'
+        else:
+            self.version_status = True
+            db.session.add(self)
+            return '1'
+
     # 返回版本的名称和子版本以及特性列表
     def software_to_json(self):
-        s = SoftWareInfo.query.filter_by(version_id=self.id).all()
-        f = FeatureInfo.query.filter_by(version_id=self.id).all()
+        s = SoftWareInfo.query.filter_by(version_id=self.id,software_status=False).all()
+        f = FeatureInfo.query.filter_by(version_id=self.id,feature_status=False).all()
         s_list = [s1.software_name for s1 in s]
         f_list = [f1.feature_name for f1 in f]
         json_post = {

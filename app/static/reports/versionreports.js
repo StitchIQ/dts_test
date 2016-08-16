@@ -25,7 +25,7 @@
                 dataView : {show: true, readOnly: false},
                 magicType : {show: true, type: ['line', 'bar']},
                 restore : {show: true},
-                //saveAsImage : {show: true}
+                saveAsImage : {show: true}
             }
         },
          xAxis : [
@@ -53,7 +53,7 @@
                     normal: {
                         label: {
                             show: true,//是否展示
-                            position:'inside'
+                            position:'top' //在顶上显示数据
                         }
                     }},
         }]
