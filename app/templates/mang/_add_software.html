@@ -9,7 +9,7 @@
                     <h4 class="modal-title" id="myModalLabel">增加软件版本</h4>
                 </div>
                 <div class="modal-body">
-                    {{ wtf.quick_form(version_form) }}
+                    {{ wtf.quick_form(version_form,button_map={'submit': 'primary'}) }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

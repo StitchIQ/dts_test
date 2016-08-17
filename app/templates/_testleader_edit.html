@@ -24,22 +24,20 @@
         </ul>
 
         <div id="myTabContent" class="tab-content">
-
+            <div class="tab-pane fade in active" id="testleader">
                 {% if current_user == bugs.bug_owner and bugs.bug_status == Bug_Now_Status.TESTLEADER_AUDIT %}
-                    <div class="tab-pane fade in active" id="testleader">
                     {{ wtf.quick_form(testleadedit,horizontal_columns=('lg', 2, 20),button_map={'submit': 'primary'}) }}
-                     </div>
                 {% endif %}
+             </div>
 
-
-                {% for log in testmanager_log %}
-                   <div class="tab-pane fade" id={{ log.id }}>
-                      <div>{{ log.opinion }}</div>
-                      <hr/>
-                      <lable>Processed by: {{ log.operator.username }} @
-                        <i>{{ moment(log.timestamp).format('YYYY-MM-D HH:mm:ss') }}</i></lable>
-                   </div>
-                {% endfor %}
+            {% for log in testmanager_log %}
+               <div class="tab-pane fade" id={{ log.id }}>
+                  <div>{{ log.opinion }}</div>
+                  <hr/>
+                  <lable>Processed by: {{ log.operator.username }} @
+                    <i>{{ moment(log.timestamp).format('YYYY-MM-D HH:mm:ss') }}</i></lable>
+               </div>
+            {% endfor %}
         </div>
         </ul>
     {% endif %}

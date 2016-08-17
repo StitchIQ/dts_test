@@ -87,7 +87,7 @@
              option.xAxis[0].data = data.dataX;
              option.series[0].name = data.name;
              option.series[0].data = data.dataY;
-             option.title.text = "问题单版本分布报表";
+             option.title.text = "每日问题单分布报表";
              dailycharts.clear();//清空绘画内容，清空后实例可用
              dailycharts.hideLoading();//清除无数据时动画显示
              dailycharts.setOption(option,true);

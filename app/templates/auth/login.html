@@ -8,7 +8,7 @@
     <h1>登录</h1>
 </div>
 <div class="col-md-4">
-    {{ wtf.quick_form(form) }}
+    {{ wtf.quick_form(form,button_map={'submit': 'primary'}) }}
     <br>
     <p>新用户? <a href="{{ url_for('auth.register') }}">点击注册</a>.</p>
 </div>
