@@ -447,8 +447,8 @@ class Bug_Now_Status:
 class BugStatus(db.Model):
     __tablename__ = 'bugstatus'
     id = db.Column(db.Integer, primary_key=True)
-    bug_status = db.Column(db.Integer, index=True)
-    bug_status_descrit = db.Column(db.String(64))
+    bug_status = db.Column(db.Integer, index=True, unique=True)
+    bug_status_descrit = db.Column(db.String(64), unique=True)
 
     old_status = db.relationship('Process', foreign_keys=[Process.old_status],
                                  backref='old', lazy='dynamic')
@@ -618,6 +618,18 @@ class User(UserMixin, db.Model):
             if self.role is None:
                 dts_log.debug("Query User %s " %self.username)
                 self.role = Role.query.filter_by(default=True).first()
+
+    @classmethod
+    def create_admin_user(cls, username, password, email):
+        admin = cls(email=email,
+                    username=username,
+                    password=password,
+                    role=Role.query.filter_by(name='Administrator').first(),
+                    confirmed=True)
+
+        db.session.add(admin)
+        db.session.commit()
+        return admin
 
     @classmethod
     def user_autocomplete(cls, search_str):
