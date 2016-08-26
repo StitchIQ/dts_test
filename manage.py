@@ -99,7 +99,22 @@ def install(username=None, password=None, email=None):
     else:
         create_admin()
 
+    dir_create()
     print("Congratulations! DTS has been successfully installed")
+
+@manager.command
+def dir_create():
+    u"""创建运行需要的文件夹"""
+    UPLOAD_FOLDER = app.config['UPLOAD_FOLDER']
+    OUTPUT_FOLDER = app.config['OUTPUT_FOLDER']
+
+    if not os.path.exists(UPLOAD_FOLDER): #如果目录不存在就返回False
+        os.makedirs(UPLOAD_FOLDER)
+        print u'创建 %s 目录成功' %UPLOAD_FOLDER
+    if not os.path.exists(OUTPUT_FOLDER):
+        os.makedirs(OUTPUT_FOLDER)
+        print u'创建 %s 目录成功' % OUTPUT_FOLDER
+
 
 @manager.command
 def database_upgrade():
@@ -108,7 +123,6 @@ def database_upgrade():
     migrate()
     upgrade()
     print u'数据库升级成功'
-
 
 
 @manager.command
@@ -120,5 +134,6 @@ def test():
 
 
 if __name__ == '__main__':
+    # python manage.py runserver -h 127.0.0.1 -p 8000 带参数运行这个命令
     manager.run()
     #app.run(host="0.0.0.0", port=8080)

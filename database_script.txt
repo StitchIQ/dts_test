@@ -1,0 +1,10 @@
+create database dts_database;
+insert into mysql.user(Host,User,Password) values("%","dts",password("123456"));
+grant all privileges on dts_database.* to dts@"%" identified by '123456';
+flush privileges;
+
+
+create database dts_test;
+// insert into mysql.user(Host,User,Password) values("%","dts",password("123456"));
+grant all privileges on dts_test.* to dts@"%" identified by '123456';
+flush privileges;
